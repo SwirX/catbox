@@ -1,5 +1,5 @@
 import ToolCard from "../components/ToolCard";
-import { ImageIcon, Send, WholeWordIcon } from "lucide-react";
+import { FileJson, ImageIcon, Send, WholeWordIcon } from "lucide-react";
 
 export default function HomePage() {
     return (
@@ -42,6 +42,12 @@ export default function HomePage() {
                         title="Image Exporter V3"
                         description="An Image Exporter (RLE)"
                         path="/image-exporter-v3"
+                    />
+                    <ToolCard
+                        icon={<FileJson size={24} />}
+                        title="JSON Cleaner"
+                        description="Clean and transform JSON data"
+                        path="/json-cleaner"
                     />
                 </div>
             </section>
