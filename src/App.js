@@ -8,6 +8,7 @@ import ListImporter from "./pages/ListImporterV2";
 import JsonCleaner from "./pages/JsonCleaner";
 import Layout from "./components/Layout";
 import ScriptEditor from "./pages/ScriptEditor";
+import RichTextEditor from "./pages/RichtextEditor";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/image-exporter-v3" element={<ImageRichTextExporterHEXRLEV2 />} />
         <Route path="/json-cleaner" element={<JsonCleaner />} />
         <Route path="/script-editor" element={<ScriptEditor />} />
+        <Route path="/rich-text-editor" element={<RichTextEditor />} />
       </Routes>
     </Layout>
   );

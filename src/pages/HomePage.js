@@ -1,5 +1,5 @@
 import ToolCard from "../components/ToolCard";
-import { Code, FileJson, ImageIcon, Send, WholeWordIcon } from "lucide-react";
+import { Code, FileJson, ImageIcon, Send, WholeWordIcon, Type } from "lucide-react";
 
 export default function HomePage() {
     return (
@@ -54,6 +54,12 @@ export default function HomePage() {
                         title="Script Editor"
                         description="Visually edit Catweb scripts with a drag-and-drop interface."
                         path="/script-editor"
+                    />
+                    <ToolCard
+                        icon={<Type size={24} />}
+                        title="Rich Text Editor"
+                        description="Create and export Roblox-compatible rich text."
+                        path="/rich-text-editor"
                     />
                 </div>
             </section>
