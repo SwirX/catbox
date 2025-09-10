@@ -1,6 +1,6 @@
 # Catbox
-![Vercel](https://img.shields.io/badge/Vercel-000?style=flat-square&logo=vercel)
-![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-blue.svg)
+![Vercel](https://img.shields.io/badge/Deployed%20On%20Vercel-000?style=flat-square&logo=vercel)
+![License: MPL 2.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-blue.svg)
 
 **Catbox – Your Catweb Toolbox Wherever You Go.**
 
