@@ -1,0 +1,25 @@
+# Contributing to Catbox
+
+Thank you for considering contributing to Catbox! Please read this guide before submitting PRs.
+
+## Pull Requests
+- Fork the repo and create a branch for your feature/fix.
+- Test your changes locally before submitting.
+- Include a clear description of your changes.
+- Reference related issues when applicable.
+- Avoid breaking the main branch.
+- Highlight any potential side effects or bugs.
+
+## Code Style
+- Write readable and maintainable code.
+- Split long scripts into multiple files when possible.
+- Comment complex sections for clarity.
+
+## Bug Reporting
+- Describe the bug and how to reproduce it.
+- Suggest severity: minor, medium, major.
+- Include screenshots if relevant.
+
+---
+
+Thank you for helping make Catbox better!

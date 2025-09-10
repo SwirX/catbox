@@ -1,0 +1,46 @@
+# Catbox Changelog
+
+## [Unreleased]
+### 1.7.0-beta+1
+- Added Rich Text Editor (available in the dev branch)
+- General bug fixes and code refactoring for improved stability
+
+### 1.7.0-beta
+- Introduced Script Editor (work-in-progress, dev branch)
+
+## 1.6.3
+- Added Json Cleaner tool for optimized Catweb JSON handling
+
+## 1.5.3
+- Released Image Exporter V3 with improved compression and format validation
+- Added support for nested structures in List Importer
+- Miscellaneous bug fixes
+
+## 1.5.2
+- Updated Image Exporter to V2 (deprecated)
+- Added support for structured data in List Importer
+- Bug fixes and performance improvements
+
+## 1.5.1
+- Ported Image Exporter from previous implementation
+
+## 1.4.1
+- Resolved various issues in List Importer for better reliability
+
+## 1.4.0
+- Refactored TKBG tools to support List Importer development
+- First **public release** hosted on Vercel
+
+## 1.3.0
+- Released Lyra API Builder
+- Bug fixes and improvements in Lyra Tools
+
+## 1.2.0
+- Updated Lyra Tools
+- Added private tool for TKBG ("The Keyboard Game")
+
+## 1.1.0
+- Developed private tools for Lyra
+
+## 1.0.0
+- Initial private release of Catbox
