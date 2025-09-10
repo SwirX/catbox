@@ -77,7 +77,7 @@ See [ROADMAP.md](./ROADMAP.md) for upcoming features, WIP tools, and long-term v
 
 ## License
 
-Catbox is open-source under the [Mozilla Public License 2.0](./LICENSE). You can contribute and use the code freely but **cannot monetize it directly**.
+Catbox is open-source under the [Creative Commons Attribution-NonCommercial 4.0 International](./LICENSE). You can contribute and use the code freely but **cannot monetize it directly**.
 
 ## Credits
 - Image Exporter (original [Python version](https://github.com/quitism/catweb/blob/main/ascii.py)) by [quitism](https://github.com/quitism)
