@@ -1,5 +1,5 @@
 import ToolCard from "../components/ToolCard";
-import { FileJson, ImageIcon, Send, WholeWordIcon } from "lucide-react";
+import { Code, FileJson, ImageIcon, Send, WholeWordIcon } from "lucide-react";
 
 export default function HomePage() {
     return (
@@ -48,6 +48,12 @@ export default function HomePage() {
                         title="JSON Cleaner"
                         description="Clean and transform JSON data"
                         path="/json-cleaner"
+                    />
+                    <ToolCard
+                        icon={<Code size={24} />}
+                        title="Script Editor"
+                        description="Visually edit Catweb scripts with a drag-and-drop interface."
+                        path="/script-editor"
                     />
                 </div>
             </section>

@@ -7,6 +7,7 @@ import ImageRichTextExporterHEXRLEV2 from "./pages/ImageExporterV3";
 import ListImporter from "./pages/ListImporterV2";
 import JsonCleaner from "./pages/JsonCleaner";
 import Layout from "./components/Layout";
+import ScriptEditor from "./pages/ScriptEditor";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/image-exporter-v2" element={<ImageRichTextExporterHEXRLE />} />
         <Route path="/image-exporter-v3" element={<ImageRichTextExporterHEXRLEV2 />} />
         <Route path="/json-cleaner" element={<JsonCleaner />} />
+        <Route path="/script-editor" element={<ScriptEditor />} />
       </Routes>
     </Layout>
   );
