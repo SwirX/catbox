@@ -1,4 +1,5 @@
 import React, { useRef, useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Download, Copy, Image as ImageIcon, Trash } from "lucide-react";
 
 export default function ImageRichTextExporterHEXRLEV2() {
@@ -156,110 +157,220 @@ export default function ImageRichTextExporterHEXRLEV2() {
     }, [imageSrc, origSize]);
 
     return (
-        <div className="min-h-screen p-6 bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
-            <div className="max-w-5xl mx-auto">
-                <header className="flex items-center gap-4 mb-6">
-                    <h1 className="text-2xl font-semibold">Image → RichText Exporter</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-300">Convert images to RichText (HEX+RLE).</p>
-                    <div className="ml-auto flex items-center gap-2">
-                        <button onClick={() => { setImageSrc(null); setGenerated(""); setOrigSize({ w: 0, h: 0 }); setWarning(""); }} className="text-xs px-2 py-1 rounded bg-slate-200 dark:bg-slate-800">Reset</button>
-                    </div>
-                </header>
+        <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 pb-24">
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-4"
+            >
+                <div className="w-12 h-12 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-cyan-500/20">
+                    <ImageIcon size={24} strokeWidth={2.5} />
+                </div>
+                <div>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#1D1D1F] dark:text-white">Image to RichText</h1>
+                    <p className="text-gray-500 dark:text-gray-400 font-medium">Convert images to HEX-encoded RichText for Roblox.</p>
+                </div>
+            </motion.div>
 
-                <main className="grid grid-cols-12 gap-6">
-                    <section className="col-span-12 lg:col-span-5 space-y-4">
-                        <div className="p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                            <label className="block text-sm font-medium mb-2">Source Image</label>
-                            <div
-                                onDrop={onDrop}
-                                onDragOver={(e) => e.preventDefault()}
-                                className="border-2 border-dashed border-gray-200 dark:border-slate-700 rounded p-4 text-center cursor-pointer"
-                                onClick={onPickClick}
-                            >
-                                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => onFilePicked(e.target.files?.[0])} />
-                                <div className="flex flex-col items-center gap-2">
-                                    <ImageIcon />
-                                    <div className="text-sm">Click or drop an image here</div>
-                                    <div className="text-xs text-slate-500 dark:text-slate-400">PNG/JPG with transparency supported (background compositing available)</div>
-                                </div>
-                            </div>
-
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Left Column: Controls & Input */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
+                    className="lg:col-span-5 space-y-6"
+                >
+                    <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E]">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                <span className="w-2 h-6 bg-cyan-500 rounded-full"></span>
+                                Configuration
+                            </h2>
                             {info && info.orig.w > 0 && (
-                                <div className="mt-3 text-xs text-slate-500 dark:text-slate-400">Original: {info.orig.w} × {info.orig.h}</div>
+                                <span className="px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 text-xs font-bold font-mono">
+                                    Original: {info.orig.w}×{info.orig.h}
+                                </span>
                             )}
-
-                            <div className="mt-4 grid grid-cols-2 gap-3">
-                                <label className="text-xs">Scale %</label>
-                                <input type="number" value={scalePercent} onChange={(e) => setScalePercent(Math.max(1, Number(e.target.value)))} className="px-2 py-1 rounded bg-gray-100 dark:bg-slate-900" />
-
-                                <label className="text-xs">Aspect (height multiplier)</label>
-                                <input type="number" step="0.1" value={aspect} onChange={(e) => setAspect(Math.max(0.01, Number(e.target.value)))} className="px-2 py-1 rounded bg-gray-100 dark:bg-slate-900" />
-
-                                <label className="text-xs">Glyph</label>
-                                <input value={glyph} onChange={(e) => setGlyph(e.target.value.slice(0, 1) || "█")} className="px-2 py-1 rounded bg-gray-100 dark:bg-slate-900" />
-
-                                <label className="text-xs">RichText</label>
-                                <div>
-                                    <label className="inline-flex items-center gap-2 text-sm">
-                                        <input type="checkbox" checked={richText} onChange={(e) => setRichText(e.target.checked)} />
-                                        <span className="text-xs">Wrap glyph in &lt;font color="#RRGGBB"&gt;</span>
-                                    </label>
-                                </div>
-
-                                <label className="text-xs">Background color</label>
-                                <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-full h-9 rounded border" />
-
-                                <label className="text-xs"># of Textboxes</label>
-                                <input
-                                    type="number"
-                                    value={numTextboxes}
-                                    min={1}
-                                    onChange={(e) => setNumTextboxes(Math.max(1, Number(e.target.value)))}
-                                    className="px-2 py-1 rounded bg-gray-100 dark:bg-slate-900"
-                                />
-
-
-                                <label className="text-xs">Output filename</label>
-                                <input value={fileName} onChange={(e) => setFileName(e.target.value)} className="px-2 py-1 rounded bg-gray-100 dark:bg-slate-900" />
-                            </div>
-
-                            <div className="mt-4 flex gap-2">
-                                <button onClick={generate} className="px-3 py-2 bg-indigo-600 text-white rounded flex items-center gap-2"><ImageIcon size={16} /> Generate</button>
-                                <button onClick={() => { setGenerated(""); setWarning(""); }} className="px-3 py-2 border rounded">Clear output</button>
-                                <div className="ml-auto text-xs text-slate-500 dark:text-slate-300">{generated ? `Chars: ${generated.length}` : ''}</div>
-                            </div>
-
-                            {warning && <div className="mt-3 text-xs text-yellow-500">{warning}</div>}
                         </div>
 
-                        <div className="p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                            <label className="block text-sm font-medium mb-2">Preview Image</label>
+                        <div
+                            onClick={onPickClick}
+                            onDrop={onDrop}
+                            onDragOver={(e) => e.preventDefault()}
+                            className={`
+                                group relative w-full h-48 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden
+                                ${imageSrc
+                                    ? "border-cyan-500 bg-cyan-50/10 dark:border-cyan-500/50"
+                                    : "border-gray-200 dark:border-[#3A3A3C] hover:border-cyan-400 hover:bg-gray-50 dark:hover:bg-[#2C2C2E]"
+                                }
+                            `}
+                        >
+                            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => onFilePicked(e.target.files?.[0])} />
+
                             {imageSrc ? (
-                                <img src={imageSrc} alt="preview" className="w-full max-h-64 object-contain rounded" />
+                                <>
+                                    <div className="absolute inset-0 z-0">
+                                        <img src={imageSrc} className="w-full h-full object-cover blur-sm opacity-50" alt="Preview Background" />
+                                    </div>
+                                    <img src={imageSrc} className="relative z-10 max-h-36 max-w-[80%] object-contain rounded-lg shadow-lg" alt="Preview" />
+                                    <div className="absolute top-2 right-2 z-20">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setImageSrc(null); setGenerated(""); setOrigSize({ w: 0, h: 0 }); }}
+                                            className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg"
+                                        >
+                                            <Trash size={14} />
+                                        </button>
+                                    </div>
+                                </>
                             ) : (
-                                <div className="text-sm text-slate-500">No image loaded</div>
+                                <div className="text-center space-y-2 p-4">
+                                    <div className="w-12 h-12 bg-gray-100 dark:bg-[#2C2C2E] rounded-full flex items-center justify-center mx-auto text-gray-400 group-hover:text-cyan-500 transition-colors">
+                                        <ImageIcon size={24} />
+                                    </div>
+                                    <p className="font-bold text-gray-600 dark:text-gray-300">Click to upload image</p>
+                                    <p className="text-xs text-gray-400">or drop file here</p>
+                                </div>
                             )}
                         </div>
-                    </section>
 
-                    <aside className="col-span-12 lg:col-span-7 space-y-4">
-                        <div className="p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                            <label className="block text-sm font-medium mb-2">Generated Text Preview</label>
-                            <div className="max-h-[60vh] overflow-auto bg-gray-900 text-white p-3 rounded text-xs font-mono whitespace-pre-wrap break-words">
-                                {generated || <span className="text-slate-400">No output yet — click Generate to build the text output.</span>}
+                        <div className="mt-6 space-y-5">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Scale (%)</label>
+                                    <input
+                                        type="number"
+                                        value={scalePercent}
+                                        onChange={(e) => setScalePercent(Math.max(1, Number(e.target.value)))}
+                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-cyan-500 focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-bold text-center"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Aspect Ratio</label>
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        value={aspect}
+                                        onChange={(e) => setAspect(Math.max(0.01, Number(e.target.value)))}
+                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-cyan-500 focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-bold text-center"
+                                    />
+                                </div>
                             </div>
 
-                            <div className="mt-3 flex gap-2">
-                                <button onClick={copyToClipboard} className="px-3 py-2 bg-indigo-600 text-white rounded flex items-center gap-2"><Copy size={16} /> Copy</button>
-                                <button onClick={downloadTxt} className="px-3 py-2 bg-indigo-600 text-white rounded flex items-center gap-2"><Download size={16} /> Download</button>
-                                <button onClick={() => { setImageSrc(null); setGenerated(""); setOrigSize({ w: 0, h: 0 }); }} className="px-3 py-2 border rounded flex items-center gap-2"><Trash size={14} /> Reset</button>
-                                <div className="ml-auto text-xs text-slate-500 dark:text-slate-300">Preview lines: {generated ? generated.split('\n').length - 1 : 0}</div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Glyph Char</label>
+                                    <input
+                                        value={glyph}
+                                        onChange={(e) => setGlyph(e.target.value.slice(0, 1) || "█")}
+                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-cyan-500 focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-bold text-center font-mono"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Splits</label>
+                                    <input
+                                        type="number"
+                                        value={numTextboxes}
+                                        min={1}
+                                        onChange={(e) => setNumTextboxes(Math.max(1, Number(e.target.value)))}
+                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-cyan-500 focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-bold text-center"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Background Fill</label>
+                                <div className="flex items-center gap-2 p-2 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border border-transparent">
+                                    <input
+                                        type="color"
+                                        value={bgColor}
+                                        onChange={(e) => setBgColor(e.target.value)}
+                                        className="w-10 h-10 rounded-xl border-none cursor-pointer bg-transparent"
+                                    />
+                                    <span className="text-sm font-mono text-gray-600 dark:text-gray-300 uppercase">{bgColor}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]">
+                                <span className="text-sm font-bold text-gray-700 dark:text-gray-200">RichText Wrappers</span>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked={richText} onChange={(e) => setRichText(e.target.checked)} className="sr-only peer" />
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none dark:bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                                </label>
                             </div>
                         </div>
 
-                        <div className="p-3 text-xs text-slate-500 dark:text-slate-300">Notes: This runs fully in the browser using a hidden canvas. For large images & high scales this can be memory intensive — reduce scale% or crop images if needed. This tool was translated from <a href="https://github.com/quitism"><u>quitism</u></a>'s python script</div>
-                    </aside>
-                </main>
+                        <button
+                            onClick={generate}
+                            className="w-full mt-6 py-4 rounded-2xl bg-[#1D1D1F] dark:bg-white text-white dark:text-black font-extrabold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2"
+                        >
+                            <span className="text-cyan-400 dark:text-cyan-600"><ImageIcon size={20} /></span>
+                            Generate Output
+                        </button>
+                    </div>
+                </motion.div>
+
+                {/* Right Column: Output */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+                    className="lg:col-span-7 flex flex-col gap-6"
+                >
+                    <div className="flex-1 bg-white dark:bg-[#1C1C1E] rounded-3xl p-1 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E] flex flex-col relative overflow-hidden h-[500px]">
+                        <div className="absolute top-0 inset-x-0 h-12 bg-gradient-to-b from-white dark:from-[#1C1C1E] to-transparent z-10 pointer-events-none" />
+                        <div className="bg-[#1C1C1E] rounded-[1.4rem] w-full h-full p-6 overflow-auto custom-scrollbar font-mono text-xs leading-relaxed break-all relative group">
+                            {generated ? (
+                                <div className="text-green-400 selection:bg-green-500/30 selection:text-green-200">
+                                    {generated}
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center h-full text-gray-600 dark:text-gray-500 gap-3 opacity-50">
+                                    <ImageIcon size={48} strokeWidth={1} />
+                                    <p className="text-sm font-medium">Output will appear here...</p>
+                                </div>
+                            )}
+                        </div>
+                        <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2 pointer-events-none">
+                            {warning && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-yellow-500/10 backdrop-blur-md border border-yellow-500/20 text-yellow-500 px-4 py-2 rounded-xl text-xs font-bold pointer-events-auto">
+                                    ⚠️  {warning}
+                                </motion.div>
+                            )}
+                            {generated && (
+                                <span className="bg-[#000000]/60 backdrop-blur-md text-gray-400 px-3 py-1 rounded-lg text-xs font-mono pointer-events-auto">
+                                    Length: {generated.length.toLocaleString()} chars
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 shadow-lg border border-gray-100 dark:border-[#2C2C2E]">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Output Filename</label>
+                            <div className="mt-2 flex gap-2">
+                                <input
+                                    value={fileName}
+                                    onChange={(e) => setFileName(e.target.value)}
+                                    className="flex-1 min-w-0 bg-transparent py-2 border-b-2 border-gray-100 dark:border-[#3A3A3C] focus:border-cyan-500 outline-none text-gray-800 dark:text-gray-200 font-medium transition-colors"
+                                />
+                                <span className="text-gray-400 py-2">.txt</span>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button
+                                onClick={copyToClipboard}
+                                disabled={!generated}
+                                className="flex-1 rounded-3xl bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold shadow-lg shadow-cyan-500/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                            >
+                                <Copy size={20} /> Copy
+                            </button>
+                            <button
+                                onClick={downloadTxt}
+                                disabled={!generated}
+                                className="flex-1 rounded-3xl bg-gray-100 dark:bg-[#2C2C2E] hover:bg-gray-200 dark:hover:bg-[#3A3A3C] disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 dark:text-white font-bold border border-gray-200 dark:border-[#3A3A3C] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                            >
+                                <Download size={20} /> Download
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
         </div>
     );

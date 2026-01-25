@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const initialJson = [
   {
@@ -792,6 +793,7 @@ export default function CatWebVisualizer() {
     input.click();
   }, [centerViewportOnFirstBlock]);
 
+  /* --- Render Actions (Recursive) --- */
   const renderList = useCallback((list, eventIndex, actions) => {
     let elements = [];
     for (let i = 0; i < list.length; i++) {
@@ -799,52 +801,54 @@ export default function CatWebVisualizer() {
       const blockData = node.type === "action" ? node.action : node.opener;
       const actionIndex = node.startIndex;
       const template = actionTypes[blockData.id] || { text: blockData.text };
+
       if (blockData.id !== "25") {
         elements.push(
-          <div
+          <motion.div
             key={blockData.globalid || actionIndex}
             draggable
             onDragStart={(e) => onActionDragStart(e, eventIndex, actionIndex)}
             onDragOver={onActionDragOver}
             onDrop={(e) => onActionDrop(e, eventIndex, actionIndex)}
-            className="bg-slate-100 dark:bg-slate-700 rounded p-2 text-sm border border-slate-200 dark:border-slate-600"
+            whileHover={{ scale: 1.01 }}
+            className="bg-gray-50 dark:bg-[#2C2C2E]/50 rounded-xl p-3 text-sm border border-gray-100 dark:border-[#3A3A3C] shadow-sm mb-2 group relative transition-colors hover:border-apple-blue/50 dark:hover:border-apple-blue/50"
             onContextMenu={(e) => {
               e.preventDefault();
               setContextMenu({ x: e.pageX, y: e.pageY, type: 'action', eventIndex, actionIndex });
             }}
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1">
-                <div className="font-medium text-indigo-600 dark:text-indigo-400">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 font-medium text-gray-800 dark:text-gray-200">
+                <div className="leading-relaxed">
                   {template.text.map((seg, si) => {
                     const dataSeg = blockData.text[si];
-                    return typeof seg === "object" && dataSeg ? dataSeg.value : seg;
-                  }).join(" ")}
-                </div>
-                <div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-                  {blockData.text.map((seg, si) => (
-                    <span key={si} className="inline-block mr-1">
-                      {typeof seg === "object" ? (
-                        <input
-                          className="bg-white dark:bg-slate-800 px-1 py-0.5 rounded text-xs w-28 border border-slate-300 dark:border-slate-600"
-                          value={seg.value}
-                          onChange={(e) => onEditValue(eventIndex, actionIndex, si, e.target.value)}
-                        />
-                      ) : (
-                        <span>{seg}</span>
-                      )}
-                    </span>
-                  ))}
+                    const val = typeof seg === "object" && dataSeg ? dataSeg.value : seg;
+
+                    // Static text
+                    if (typeof seg === "string") return <span key={si} className="mr-1 opacity-90">{val}</span>;
+
+                    // Input/Variable
+                    return (
+                      <input
+                        key={si}
+                        className="inline-block mx-1 bg-white dark:bg-[#1C1C1E] px-2 py-1 rounded-lg text-xs min-w-[60px] max-w-[120px] border border-gray-200 dark:border-[#505055] focus:border-apple-blue focus:ring-2 focus:ring-apple-blue/20 outline-none transition-all text-center font-mono text-apple-blue font-bold shadow-inner"
+                        value={blockData.text[si]?.value || ""}
+                        onChange={(e) => onEditValue(eventIndex, actionIndex, si, e.target.value)}
+                        onClick={(e) => e.stopPropagation()} // Prevent drag start when clicking input
+                      />
+                    );
+                  })}
                 </div>
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">#{actionIndex}</div>
+              <div className="text-[10px] uppercase font-bold text-gray-300 dark:text-gray-600 select-none">#{actionIndex}</div>
             </div>
-          </div>
+          </motion.div>
         );
       }
+
       if (node.type === "scope") {
         elements.push(
-          <div key={`inner-${i}`} className="pl-4 border-l-2 border-indigo-500">
+          <div key={`inner-${i}`} className="pl-4 ml-2 border-l-2 border-dashed border-gray-200 dark:border-[#3A3A3C] my-1">
             {renderList(node.inner, eventIndex, actions)}
           </div>
         );
@@ -858,6 +862,8 @@ export default function CatWebVisualizer() {
     return renderList(tree, eventIndex, actions);
   }, [renderList]);
 
+
+  /* --- Context Menu Logic Unchanged --- */
   const handleDelete = useCallback((type, eventIndex, actionIndex) => {
     setData(prev => {
       const next = JSON.parse(JSON.stringify(prev));
@@ -876,12 +882,12 @@ export default function CatWebVisualizer() {
       const next = JSON.parse(JSON.stringify(prev));
       if (type === 'event') {
         const original = next[selectedScriptIndex].content[eventIndex];
-        const duplicate = {...original, globalid: Math.random().toString(36).slice(2, 9), x: original.x + 20, y: original.y + 20};
-        duplicate.actions = duplicate.actions.map(a => ({...a, globalid: Math.random().toString(36).slice(2, 9)}));
+        const duplicate = { ...original, globalid: Math.random().toString(36).slice(2, 9), x: original.x + 20, y: original.y + 20 };
+        duplicate.actions = duplicate.actions.map(a => ({ ...a, globalid: Math.random().toString(36).slice(2, 9) }));
         next[selectedScriptIndex].content.push(duplicate);
       } else if (type === 'action') {
         const original = next[selectedScriptIndex].content[eventIndex].actions[actionIndex];
-        const duplicate = {...original, globalid: Math.random().toString(36).slice(2, 9)};
+        const duplicate = { ...original, globalid: Math.random().toString(36).slice(2, 9) };
         next[selectedScriptIndex].content[eventIndex].actions.push(duplicate);
       }
       return next;
@@ -900,123 +906,179 @@ export default function CatWebVisualizer() {
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);
 
+  /* --- Main UI Render --- */
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col">
-      <header className="p-6 bg-white dark:bg-slate-800 shadow">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">CatWeb Script Visualizer</h1>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Script: {script.alias || script.globalid}</p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setData(JSON.parse(JSON.stringify(initialJson)))}
-              className="px-4 py-2 rounded bg-slate-500 text-white hover:bg-slate-600 transition text-sm"
-            >
-              Reset
-            </button>
-            <button
-              onClick={exportJson}
-              className="px-4 py-2 rounded bg-indigo-500 text-white hover:bg-indigo-400 transition text-sm"
-            >
-              Export JSON
-            </button>
-            <button
-              onClick={importJson}
-              className="px-4 py-2 rounded bg-indigo-500 text-white hover:bg-indigo-400 transition text-sm"
-            >
-              Import JSON
-            </button>
-          </div>
-        </div>
-      </header>
-      <main className="flex-1 relative overflow-hidden">
+    <div className="h-[calc(100vh-64px)] bg-[#F5F5F7] dark:bg-[#000000] flex flex-col relative overflow-hidden font-sans">
+
+      {/* Floating Toolbar Header */}
+      <div className="absolute top-6 left-6 right-6 z-20 pointer-events-none flex justify-between items-start">
+        <motion.div
+          initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+          className="pointer-events-auto bg-white/80 dark:bg-[#1C1C1E]/80 backdrop-blur-md border border-white/20 dark:border-[#2C2C2E] shadow-2xl rounded-3xl p-5 flex flex-col gap-1 min-w-[300px]"
+        >
+          <h1 className="text-xl font-extrabold tracking-tight text-[#1D1D1F] dark:text-white flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-green-500"></span>
+            Visual Script Editor
+          </h1>
+          <p className="text-xs font-medium text-gray-400 font-mono tracking-wide ml-5 uppercase">
+            {script.alias || script.globalid}
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
+          className="pointer-events-auto flex items-center gap-2 bg-white/80 dark:bg-[#1C1C1E]/80 backdrop-blur-md rounded-full padding p-2 shadow-2xl border border-white/20 dark:border-[#2C2C2E]"
+        >
+          <button
+            onClick={() => setData(JSON.parse(JSON.stringify(initialJson)))}
+            className="px-5 py-2.5 rounded-full text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors"
+            title="Reset Workspace"
+          >
+            Reset
+          </button>
+          <div className="w-px h-6 bg-gray-200 dark:bg-[#3A3A3C]"></div>
+          <button
+            onClick={importJson}
+            className="px-5 py-2.5 rounded-full text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors"
+          >
+            Import
+          </button>
+          <button
+            onClick={exportJson}
+            className="px-6 py-2.5 rounded-full bg-[#1D1D1F] dark:bg-white text-white dark:text-black text-sm font-bold hover:opacity-90 transition-opacity shadow-lg"
+          >
+            Export JSON
+          </button>
+        </motion.div>
+      </div>
+
+      <main className="flex-1 relative w-full h-full overflow-hidden cursor-grab active:cursor-grabbing" ref={gridRef}>
+        {/* Infinite Grid Background */}
         <div
-          ref={gridRef}
-          className="absolute inset-0 bg-[size:20px_20px] bg-[linear-gradient(to_right,rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)]"
-          style={{ transform: `translate(${canvasOffset.current.x}px, ${canvasOffset.current.y}px)` }}
+          className="absolute inset-0 bg-[size:40px_40px] opacity-20 pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle, #808080 1px, transparent 1px)',
+            transform: `translate(${canvasOffset.current.x}px, ${canvasOffset.current.y}px)`
+          }}
         />
+
+        {/* Canvas Layer */}
         <div
           ref={canvasRef}
-          className="absolute top-0 left-0 w-[10000px] h-[10000px] bg-transparent"
+          className="absolute top-0 left-0 w-[10000px] h-[10000px] bg-transparent transform-gpu"
           style={{ transform: `translate(${canvasOffset.current.x}px, ${canvasOffset.current.y}px)` }}
           onPointerDown={startCanvasDrag}
           onPointerUp={() => {
             canvasRef.current.style.cursor = 'grab';
-            gridRef.current.style.cursor = 'grab';
           }}
         >
           {script.content.map((blk, bi) => {
             const left = blk.x ?? 100;
             const top = blk.y ?? 100;
             const template = eventTypes[blk.id] || { text: blk.text };
+
             return (
-              <div
+              <motion.div
                 key={blk.globalid || bi}
-                className="absolute shadow-lg rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                style={{ left, top, width: blk.width || 320 }}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                layout
+                className="absolute shadow-2xl rounded-3xl border border-white/60 dark:border-[#2C2C2E] bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl flex flex-col overflow-hidden ring-1 ring-black/5 dark:ring-white/5 w-[360px]" // Fixed width slightly larger
+                style={{ left, top, width: Math.max(360, parseInt(blk.width) || 360) }}
                 onContextMenu={(e) => handleContextMenu(e, 'event', bi)}
               >
+                {/* Block Header */}
                 <div
                   onPointerDown={(e) => startDragBlock(e, bi)}
-                  className="cursor-grab select-none p-2 rounded-t-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white flex items-center justify-between"
+                  className={`
+                    cursor-grab active:cursor-grabbing select-none p-4 
+                    bg-gradient-to-r from-gray-50 to-white dark:from-[#2C2C2E] dark:to-[#1C1C1E]
+                    border-b border-gray-100 dark:border-[#2C2C2E]
+                    flex items-center justify-between
+                  `}
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-white" />
-                    <div className="text-sm font-medium">
-                      {Array.isArray(template.text) ? template.text.map((t, ti) => {
-                        const blkText = Array.isArray(blk.text) ? blk.text[ti] : blk.text;
-                        return typeof t === 'string' ? t : (blkText && typeof blkText === 'object' ? blkText.value : t.value);
-                      }).join(' ') : blk.text}
+                  <div className="flex items-center gap-3">
+                    <div className={`
+                            w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg
+                            ${bi === 0 ? "bg-gradient-to-tr from-green-400 to-emerald-600" : "bg-gradient-to-tr from-apple-blue to-purple-600"}
+                        `}>
+                      <span className="text-lg font-bold">{bi + 1}</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Event Block</span>
+                      <div className="text-sm font-extrabold text-gray-800 dark:text-gray-100 leading-tight">
+                        {Array.isArray(template.text) ? template.text.map((t, ti) => {
+                          const blkText = Array.isArray(blk.text) ? blk.text[ti] : blk.text;
+                          const val = typeof t === 'string' ? t : (blkText && typeof blkText === 'object' ? blkText.value : t.value);
+                          return <span key={ti} className="mr-1">{val}</span>;
+                        }) : blk.text}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="p-2 space-y-2">
-                  {blk.actions && blk.actions.length > 0 ? (
-                    renderActions(blk.actions, bi)
-                  ) : (
-                    <div className="text-xs text-slate-400 dark:text-slate-500">No actions</div>
-                  )}
-                  <div className="flex gap-2">
+
+                {/* Actions Content */}
+                <div className="p-4 space-y-3 min-h-[100px] bg-white/50 dark:bg-[#000000]/20">
+                  <div className="space-y-2">
+                    {blk.actions && blk.actions.length > 0 ? (
+                      renderActions(blk.actions, bi)
+                    ) : (
+                      <div className="text-center py-8 text-gray-400 text-xs italic border-2 border-dashed border-gray-200 dark:border-[#2C2C2E] rounded-xl">
+                        Drag actions here or add new ones
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-2 flex items-center gap-2">
                     <button
                       onClick={() => onAddAction(bi)}
-                      className="flex-1 px-2 py-1 rounded bg-indigo-500 text-white hover:bg-indigo-600 transition text-sm"
+                      className="flex-1 py-3 rounded-xl bg-gray-50 dark:bg-[#2C2C2E] text-apple-blue font-bold text-xs uppercase tracking-wider hover:bg-apple-blue hover:text-white transition-all shadow-sm active:scale-[0.98]"
                     >
                       + Add Action
                     </button>
-                    <div className="px-2 py-1 rounded bg-slate-200 dark:bg-slate-700 text-sm">w:{blk.width || 'auto'}</div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
       </main>
-      <footer className="p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
-        <div className="max-w-7xl mx-auto text-sm text-slate-600 dark:text-slate-400">
-          Tip: Drag the canvas to pan, drag a block by its header, or drag actions to reorder within/across blocks. Right-click blocks or actions to delete/duplicate.
-        </div>
-      </footer>
-      {contextMenu && (
-        <div
-          className="absolute z-50 bg-white dark:bg-slate-800 shadow-lg rounded p-2"
-          style={{ left: contextMenu.x, top: contextMenu.y }}
-        >
-          <button
-            onClick={() => handleDelete(contextMenu.type, contextMenu.eventIndex, contextMenu.actionIndex)}
-            className="w-full text-left px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-700"
+
+      {/* Context Menu */}
+      <AnimatePresence>
+        {contextMenu && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="fixed z-50 bg-white dark:bg-[#1C1C1E] shadow-2xl rounded-2xl p-1.5 min-w-[160px] border border-gray-100 dark:border-[#2C2C2E]"
+            style={{ left: contextMenu.x, top: contextMenu.y }}
           >
-            Delete
-          </button>
-          <button
-            onClick={() => handleDuplicate(contextMenu.type, contextMenu.eventIndex, contextMenu.actionIndex)}
-            className="w-full text-left px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-700"
-          >
-            Duplicate
-          </button>
+            <button
+              onClick={() => handleDuplicate(contextMenu.type, contextMenu.eventIndex, contextMenu.actionIndex)}
+              className="w-full text-left px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-200"
+            >
+              Duplicate
+            </button>
+            <div className="h-px bg-gray-100 dark:bg-[#2C2C2E] my-1"></div>
+            <button
+              onClick={() => handleDelete(contextMenu.type, contextMenu.eventIndex, contextMenu.actionIndex)}
+              className="w-full text-left px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors flex items-center gap-2"
+            >
+              Delete
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Footer Hint */}
+      <div className="absolute bottom-6 left-0 right-0 pointer-events-none flex justify-center">
+        <div className="bg-black/80 text-white/90 backdrop-blur-md px-4 py-2 rounded-full text-xs font-medium shadow-xl">
+          Right-click blocks to edit • Drag empty space to pan
         </div>
-      )}
+      </div>
     </div>
   );
 }
+
 

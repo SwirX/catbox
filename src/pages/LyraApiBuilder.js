@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import { motion } from "framer-motion";
 
 export default function LyraBuilder() {
     const BASE = "api.lyra.rbx/v1";
@@ -129,219 +130,254 @@ export default function LyraBuilder() {
 
 
     return (
-        <div className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-slate-900 dark:via-[#071028] dark:to-slate-900 dark:text-slate-900 dark:dark:text-slate-100 p-6">
-            <div className="max-w-5xl mx-auto">
-                <div className="flex items-center gap-4 mb-4">
-                    <h1 className="text-2xl font-semibold">🎵 Lyra API — URL Builder</h1>
-                    <span className="ml-auto dark:bg-slate-800 px-3 py-1 rounded-full text-sm dark:text-slate-300">Base: <code className="ml-2">{BASE}</code></span>
+        <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 pb-24">
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-4"
+            >
+                <div className="w-12 h-12 bg-gradient-to-tr from-pink-500 to-violet-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-pink-500/20">
+                    <span className="text-2xl">🎵</span>
                 </div>
+                <div>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#1D1D1F] dark:text-white">Lyra API Builder</h1>
+                    <p className="text-gray-500 dark:text-gray-400 font-medium">Construct complex API URLs visually.</p>
+                </div>
+                <div className="ml-auto hidden sm:block">
+                    <span className="bg-gray-100 dark:bg-[#2C2C2E] px-4 py-2 rounded-full text-xs font-mono font-medium text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-[#3A3A3C]">
+                        Base: <span className="text-apple-blue">{BASE}</span>
+                    </span>
+                </div>
+            </motion.div>
 
-                <div className="dark:bg-slate-800/60 border dark:border-slate-700 rounded-2xl p-5 shadow-lg">
-                    <div className="grid grid-cols-12 gap-4">
-                        {/* Left column - controls */}
-                        <div className="col-span-12 lg:col-span-7">
-                            <div className="grid grid-cols-12 gap-3">
-                                <div className="col-span-12 sm:col-span-6">
-                                    <label className="block text-sm font-medium dark:text-slate-300">Endpoint &lt;r&gt;</label>
-                                    <select
-                                        aria-label="Endpoint"
-                                        value={endpoint}
-                                        onChange={(e) => setEndpoint(e.target.value)}
-                                        className="mt-1 w-full rounded-lg dark:bg-slate-900 border dark:border-slate-700 p-2"
-                                    >
-                                        <option value="getsong">getsong</option>
-                                        <option value="rng">rng</option>
-                                        <option value="search">search</option>
-                                    </select>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                {/* Left column - controls */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
+                    className="md:col-span-7 space-y-6"
+                >
+                    <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E]">
+                        <h2 className="text-lg font-bold mb-6 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                            <span className="w-2 h-6 bg-apple-blue rounded-full"></span>
+                            Configuration
+                        </h2>
+
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Endpoint (r)</label>
+                                    <div className="relative">
+                                        <select
+                                            aria-label="Endpoint"
+                                            value={endpoint}
+                                            onChange={(e) => setEndpoint(e.target.value)}
+                                            className="w-full appearance-none px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium cursor-pointer"
+                                        >
+                                            <option value="getsong">getsong</option>
+                                            <option value="rng">rng</option>
+                                            <option value="search">search</option>
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="col-span-12 sm:col-span-6">
-                                    <label className="block text-sm font-medium dark:text-slate-300">Redirect URL &lt;rr&gt;</label>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Redirect URL (rr)</label>
                                     <input
                                         aria-label="Redirect URL"
                                         value={rr}
                                         onChange={(e) => setRr(e.target.value)}
                                         placeholder="example: musicplayer.rbx/play"
-                                        className="mt-1 w-full rounded-lg dark:bg-slate-900 border dark:border-slate-700 p-2"
+                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium"
                                     />
                                 </div>
+                            </div>
 
-                                {endpoint === "getsong" && (
-                                    <div className="col-span-12">
-                                        <label className="block text-sm font-medium dark:text-slate-300">Song ID &lt;id&gt;</label>
+                            {endpoint === "getsong" && (
+                                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-2 overflow-hidden">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Song ID (id)</label>
+                                    <input
+                                        value={id}
+                                        onChange={(e) => setId(e.target.value)}
+                                        placeholder="e.g. 12345678"
+                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium"
+                                    />
+                                </motion.div>
+                            )}
+
+                            {endpoint === "search" && (
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Query (q)</label>
                                         <input
-                                            value={id}
-                                            onChange={(e) => setId(e.target.value)}
-                                            placeholder="e.g. 123"
-                                            className="mt-1 w-full rounded-lg dark:bg-slate-900 border dark:border-slate-700 p-2"
+                                            value={q}
+                                            onChange={(e) => setQ(e.target.value)}
+                                            placeholder="e.g. dramatic suspense"
+                                            className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium"
                                         />
                                     </div>
-                                )}
 
-                                {endpoint === "search" && (
-                                    <>
-                                        <div className="col-span-12">
-                                            <label className="block text-sm font-medium dark:text-slate-300">Query &lt;q&gt;</label>
-                                            <input
-                                                value={q}
-                                                onChange={(e) => setQ(e.target.value)}
-                                                placeholder="e.g. night"
-                                                className="mt-1 w-full rounded-lg dark:bg-slate-900 border dark:border-slate-700 p-2"
-                                            />
-                                        </div>
-
-                                        <div className="col-span-12">
-                                            <label className="block text-sm font-medium dark:text-slate-300">Search fields &lt;f&gt; (optional)</label>
-                                            <div className="mt-2 flex gap-2 flex-wrap">
-                                                {ALL_F.map((key) => (
-                                                    <button
-                                                        key={key}
-                                                        onClick={() => toggleF(key)}
-                                                        className={`px-3 py-1 rounded-full text-sm border ${fSet.has(key) ? "bg-indigo-600/30 border-indigo-500" : "dark:bg-slate-900 dark:border-slate-700"}`}
-                                                    >
-                                                        {key} {" "}
-                                                        <span className="text-xs dark:text-slate-400">({key === "t" ? "title" : key === "a" ? "artist" : "genres"})</span>
-                                                    </button>
-                                                ))}
-                                                <div className="text-sm dark:text-slate-400 ml-auto">Selected: <strong className="dark:text-slate-100">{fSet.size === 3 ? "(all)" : Array.from(fSet).join("") || "(none)"}</strong></div>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-
-                                <div className="col-span-12 mt-2">
-                                    <div className="flex items-center justify-between">
-                                        <label className="block text-sm font-medium dark:text-slate-300">Return fields &lt;rf&gt; (order matters)</label>
-                                        <div className="flex gap-2">
-                                            <button onClick={resetRf} className="text-sm px-3 py-1 rounded dark:bg-slate-700">All (itagd)</button>
-                                            <button onClick={clearRf} className="text-sm px-3 py-1 rounded bg-transparent border dark:border-slate-700">Clear</button>
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Search Fields (f)</label>
+                                        <div className="flex gap-3 flex-wrap">
+                                            {ALL_F.map((key) => (
+                                                <button
+                                                    key={key}
+                                                    onClick={() => toggleF(key)}
+                                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all border-2 ${fSet.has(key)
+                                                        ? "bg-indigo-500/10 border-indigo-500/50 text-indigo-600 dark:text-indigo-400"
+                                                        : "bg-gray-50 dark:bg-[#2C2C2E] border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#3A3A3C]"
+                                                        }`}
+                                                >
+                                                    {key.toUpperCase()} <span className="text-xs opacity-60 ml-1 font-normal">({key === "t" ? "title" : key === "a" ? "artist" : "genres"})</span>
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
+                                </motion.div>
+                            )}
+                        </div>
+                    </div>
 
-                                    <div className="mt-3">
-                                        <DragDropContext onDragEnd={onDragEnd}>
-                                            <Droppable droppableId="rf-droppable" direction="horizontal">
-                                                {(provided) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.droppableProps}
-                                                        className="flex gap-2 flex-wrap"
-                                                    >
-                                                        {rf.map((k, idx) => {
-                                                            const meta = FIELD_META.find((m) => m.k === k);
-                                                            return (
-                                                                <Draggable key={k} draggableId={k} index={idx}>
-                                                                    {(prov) => (
-                                                                        <div
-                                                                            ref={prov.innerRef}
-                                                                            {...prov.draggableProps}
-                                                                            {...prov.dragHandleProps}
-                                                                            className="flex items-center gap-2 px-3 py-2 rounded-lg dark:bg-slate-900 border dark:border-slate-700"
-                                                                        >
-                                                                            <span className="font-semibold">{k}</span>
-                                                                            <span className="text-xs dark:text-slate-400">{meta?.label}</span>
-                                                                            <div className="flex gap-1 ml-2">
-                                                                                <button onClick={() => moveRfUp(idx)} className="text-xs">▲</button>
-                                                                                <button onClick={() => moveRfDown(idx)} className="text-xs">▼</button>
-                                                                            </div>
-                                                                            <button onClick={() => removeRf(idx)} className="ml-2 text-xs text-red-400">✕</button>
-                                                                        </div>
-                                                                    )}
-                                                                </Draggable>
-
-                                                            );
-                                                        })}
-
-                                                        {provided.placeholder}
-                                                    </div>
-                                                )}
-                                            </Droppable>
-                                        </DragDropContext>
-                                        <div className="mt-2 text-xs dark:text-slate-400">Current &lt;rf&gt;: <code className="ml-2">{rf.join("") || "(empty → defaults to itagd)"}</code></div>
-                                    </div>
-                                    <div className="mt-2 flex flex-wrap gap-2">
-                                        {FIELD_META.filter(f => !rf.includes(f.k)).map(f => (
-                                            <button
-                                                key={f.k}
-                                                onClick={() => setRf(prev => [...prev, f.k])}
-                                                className="px-2 py-1 text-xs rounded dark:bg-slate-700 hover:bg-indigo-600"
-                                            >
-                                                + {f.label}
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                </div>
-
-                                <div className="col-span-12 mt-4">
-                                    <div className="flex gap-2 flex-col sm:flex-row">
-                                        <button
-                                            onClick={() => copyToClipboard(fullUrl)}
-                                            className="w-full sm:w-auto px-4 py-2 rounded-lg bg-indigo-600 hover:opacity-95"
-                                        >
-                                            Copy URL
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                const qOnly = buildQuery.query || buildQuery.error;
-                                                copyToClipboard(qOnly || "");
-                                            }}
-                                            className="w-full sm:w-auto px-4 py-2 rounded-lg dark:bg-slate-700 border dark:border-slate-600"
-                                        >
-                                            Copy Query Only
-                                        </button>
-                                        <div className="ml-auto dark:text-sm dark:text-slate-300 flex items-center gap-2">{status && <span className="text-green-400">{status}</span>}</div>
-                                    </div>
-                                </div>
+                    <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E]">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                <span className="w-2 h-6 bg-purple-500 rounded-full"></span>
+                                Return Fields (rf)
+                            </h2>
+                            <div className="flex gap-2">
+                                <button onClick={resetRf} className="text-xs px-3 py-1.5 rounded-lg font-semibold bg-gray-100 dark:bg-[#2C2C2E] hover:bg-gray-200 dark:hover:bg-[#3A3A3C] transition-colors dark:text-gray-300">Reset</button>
+                                <button onClick={clearRf} className="text-xs px-3 py-1.5 rounded-lg font-semibold bg-red-50 dark:bg-red-900/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors">Clear</button>
                             </div>
                         </div>
 
-                        {/* Right column - preview / url */}
-                        <div className="col-span-12 lg:col-span-5">
-                            <div className="p-4 rounded-lg bg-gradient-to-b dark:from-slate-900/50 to-slate-900/30 border dark:border-slate-700 h-full flex flex-col gap-3">
-                                <div>
-                                    <label className="dark:text-sm dark:text-slate-300">Generated URL</label>
-                                    <div className="mt-2 p-3 dark:bg-slate-900 rounded-lg font-mono text-sm break-all">{fullUrl || <span className="dark:text-slate-500">{buildQuery.error || 'Fill required fields to generate URL'}</span>}</div>
-                                </div>
-
-                                <div>
-                                    <label className="dark:text-sm dark:text-slate-300">Quick examples</label>
-                                    <div className="mt-2 grid gap-2">
-                                        <button
-                                            onClick={() => {
-                                                setEndpoint("getsong"); setId("123"); setRr("example.rbx/use"); setRf(defaultRf);
-                                                showStatus("Example loaded");
-                                            }}
-                                            className="text-sm text-left px-3 py-2 rounded dark:bg-slate-800 border dark:dark:border-slate-700 w-full truncate"
+                        <div className="bg-gray-50 dark:bg-[#000000]/20 rounded-2xl p-4 border border-gray-100 dark:border-[#2C2C2E]/50">
+                            <DragDropContext onDragEnd={onDragEnd}>
+                                <Droppable droppableId="rf-droppable" direction="horizontal">
+                                    {(provided) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                            className="flex gap-3 flex-wrap min-h-[50px]"
                                         >
-                                            Getsong example → `?r=getsong&id=123&rr=example.rbx/use&rf=tag`
-                                        </button>
+                                            {rf.map((k, idx) => {
+                                                const meta = FIELD_META.find((m) => m.k === k);
+                                                return (
+                                                    <Draggable key={k} draggableId={k} index={idx}>
+                                                        {(prov, snapshot) => (
+                                                            <div
+                                                                ref={prov.innerRef}
+                                                                {...prov.draggableProps}
+                                                                {...prov.dragHandleProps}
+                                                                className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${snapshot.isDragging
+                                                                    ? "bg-white dark:bg-[#2C2C2E] shadow-xl scale-110 border-apple-blue z-50"
+                                                                    : "bg-white dark:bg-[#2C2C2E] shadow-sm border-gray-200 dark:border-[#3A3A3C] hover:border-gray-300 dark:hover:border-[#505055]"
+                                                                    }`}
+                                                            >
+                                                                <span className="font-bold text-gray-800 dark:text-gray-200">{k.toUpperCase()}</span>
+                                                                <span className="text-xs text-gray-400 font-medium">{meta?.label}</span>
+                                                                <button onClick={() => removeRf(idx)} className="ml-2 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 transition-colors">
+                                                                    <span className="sr-only">Remove</span>
+                                                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" transform="scale(0.5) translate(6,6)" /></svg>
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
 
-                                        <button
-                                            onClick={() => { setEndpoint("rng"); setRr("musicplayer.rbx/play"); setRf(["t", "a"]); showStatus("Example loaded"); }}
-                                            className="text-sm text-left px-3 py-2 rounded dark:bg-slate-800 border dark:border-slate-700 w-full truncate"
-                                        >
-                                            RNG example → `?r=rng&rr=musicplayer.rbx/play&rf=ta`
-                                        </button>
+                                                );
+                                            })}
 
-                                        <button
-                                            onClick={() => { setEndpoint("search"); setQ("night"); setFSet(new Set(["t", "a"])); setRr("example.rbx/use"); setRf(["t", "a", "g", "d", "i"]); showStatus("Example loaded"); }}
-                                            className="text-sm text-left px-3 py-2 rounded dark:bg-slate-800 border dark:border-slate-700 w-full truncate"
-                                        >
-                                            Search example → `?r=search&q=night&f=ta&rr=example.rbx/use&rf=tagd`
-                                        </button>
-                                    </div>
-                                </div>
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
+                        </div>
 
-                                <div className="mt-auto text-xs dark:text-slate-400">
-                                    Notes: &lt;r&gt; and &lt;rr&gt; required. If &lt;rf&gt; is empty → defaults to <strong>itagd</strong>. If &lt;f&gt; is empty in search → defaults to all. `§` separates multiple results, `;` separates fields.
-                                </div>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider py-1.5 self-center mr-2">Available:</span>
+                            {FIELD_META.filter(f => !rf.includes(f.k)).map(f => (
+                                <button
+                                    key={f.k}
+                                    onClick={() => setRf(prev => [...prev, f.k])}
+                                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 dark:bg-[#2C2C2E] hover:bg-apple-blue hover:text-white dark:hover:bg-apple-blue transition-colors text-gray-600 dark:text-gray-400"
+                                >
+                                    + {f.label} ({f.k})
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                        <button
+                            onClick={() => copyToClipboard(fullUrl)}
+                            className="flex-1 px-6 py-4 rounded-2xl bg-apple-blue hover:bg-blue-600 text-white font-bold text-lg shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                        >
+                            <span>Copy Full URL</span>
+                        </button>
+                        <button
+                            onClick={() => {
+                                const qOnly = buildQuery.query || buildQuery.error;
+                                copyToClipboard(qOnly || "");
+                            }}
+                            className="px-6 py-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border-2 border-gray-100 dark:border-[#2C2C2E] hover:bg-gray-50 dark:hover:bg-[#2C2C2E] text-gray-700 dark:text-gray-200 font-bold transition-all active:scale-[0.98]"
+                        >
+                            Query Only
+                        </button>
+                    </div>
+                </motion.div>
+
+                {/* Right column - preview / url */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
+                    className="md:col-span-5 h-full"
+                >
+                    <div className="sticky top-28 space-y-6">
+                        <div className="bg-[#1C1C1E] rounded-3xl p-6 shadow-2xl border border-[#2C2C2E] overflow-hidden text-gray-300">
+                            <div className="flex items-center justify-between mb-4">
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Generated URL</label>
+                                {status && <motion.span initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded-md">{status}</motion.span>}
+                            </div>
+                            <div className="p-4 bg-[#000000]/50 rounded-2xl font-mono text-sm break-all text-green-400 leading-relaxed border border-[#2C2C2E]/50">
+                                {fullUrl || <span className="text-gray-600 italic">{buildQuery.error || 'Configure options to generate...'}</span>}
+                            </div>
+                        </div>
+
+                        <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 shadow-xl border border-gray-100 dark:border-[#2C2C2E]">
+                            <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Quick Presets</h3>
+                            <div className="grid gap-3">
+                                <button
+                                    onClick={() => {
+                                        setEndpoint("getsong"); setId("12345678"); setRr("music.rbx/play"); setRf(defaultRf);
+                                        showStatus("Preset Loaded");
+                                    }}
+                                    className="group text-left p-4 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]/50 hover:bg-apple-blue hover:text-white transition-all duration-300"
+                                >
+                                    <div className="font-bold text-sm mb-1 group-hover:text-white dark:text-gray-200">Basic Song Fetch</div>
+                                    <div className="font-mono text-xs text-gray-400 group-hover:text-blue-100/80 truncate opacity-80">?r=getsong&id=...</div>
+                                </button>
+
+                                <button
+                                    onClick={() => { setEndpoint("rng"); setRr("game.rbx/random"); setRf(["t", "a", "d"]); showStatus("Preset Loaded"); }}
+                                    className="group text-left p-4 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]/50 hover:bg-purple-600 hover:text-white transition-all duration-300"
+                                >
+                                    <div className="font-bold text-sm mb-1 group-hover:text-white dark:text-gray-200">Random Song (RNG)</div>
+                                    <div className="font-mono text-xs text-gray-400 group-hover:text-purple-100/80 truncate opacity-80">?r=rng&rf=tad...</div>
+                                </button>
+
+                                <button
+                                    onClick={() => { setEndpoint("search"); setQ("epic orchestral"); setFSet(new Set(["t", "g"])); setRr("library.rbx/list"); setRf(["t", "a", "i"]); showStatus("Preset Loaded"); }}
+                                    className="group text-left p-4 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]/50 hover:bg-pink-600 hover:text-white transition-all duration-300"
+                                >
+                                    <div className="font-bold text-sm mb-1 group-hover:text-white dark:text-gray-200">Advanced Search</div>
+                                    <div className="font-mono text-xs text-gray-400 group-hover:text-pink-100/80 truncate opacity-80">?r=search&q=epic...</div>
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div className="text-sm dark:text-slate-500 mt-4">Part of <strong>CatBox</strong> — a CatWeb toolbox. Built with React + Tailwind, drag & drop via <em>@hello-pangea/dnd</em>. Responsive on phones/tablets/desktop.</div>
+                </motion.div>
             </div>
         </div>
     );

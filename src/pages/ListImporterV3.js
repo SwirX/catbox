@@ -36,28 +36,35 @@ function KeyValueModal({ isOpen, onClose, onSave, initial = { key: "", value: ""
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+        <motion.div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <motion.div className="bg-white dark:bg-slate-900 rounded-xl p-6 w-full max-w-md shadow-xl"
-            initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}>
-            <h3 className="text-lg font-semibold mb-4">{title}</h3>
-            <div className="space-y-3">
-              <input
-                className="w-full px-3 py-2 rounded bg-gray-100 dark:bg-slate-800"
-                placeholder="Key"
-                value={keyName}
-                onChange={e => setKeyName(e.target.value)}
-              />
-              <input
-                className="w-full px-3 py-2 rounded bg-gray-100 dark:bg-slate-800"
-                placeholder="Value (leave empty to create a nested struct)"
-                value={value}
-                onChange={e => setValue(e.target.value)}
-              />
+          <motion.div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-8 w-full max-w-md shadow-2xl border border-gray-100 dark:border-[#2C2C2E]"
+            initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}>
+            <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{title}</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Key</label>
+                <input
+                  className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-black transition-all outline-none"
+                  placeholder="e.g., username"
+                  value={keyName}
+                  onChange={e => setKeyName(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Value</label>
+                <input
+                  className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-black transition-all outline-none"
+                  placeholder="Value (leave empty for nested)"
+                  value={value}
+                  onChange={e => setValue(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="flex justify-end gap-2 mt-5">
-              <button onClick={onClose} className="px-4 py-2 rounded bg-gray-200 dark:bg-slate-700">Cancel</button>
-              <button onClick={handleSave} className="px-4 py-2 rounded bg-green-600 text-white">Save</button>
+            <div className="flex justify-end gap-3 mt-8">
+              <button onClick={onClose} className="px-6 py-2.5 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors">Cancel</button>
+              <button onClick={handleSave} className="px-6 py-2.5 rounded-xl font-medium bg-apple-blue text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30 transition-all">Save Field</button>
             </div>
           </motion.div>
         </motion.div>
@@ -66,6 +73,7 @@ function KeyValueModal({ isOpen, onClose, onSave, initial = { key: "", value: ""
   );
 }
 
+/* ---------------------- Recursive Struct Node ---------------------- */
 /* ---------------------- Recursive Struct Node ---------------------- */
 function StructNode({ node, onChange, defaultName, level = 0 }) {
   const [open, setOpen] = useState(true);
@@ -87,69 +95,106 @@ function StructNode({ node, onChange, defaultName, level = 0 }) {
   };
 
   return (
-    <div className={`rounded-lg border border-gray-200 dark:border-slate-700 p-3 bg-gray-50 dark:bg-slate-800 ${level > 0 ? "ml-4" : ""} text-gray-900 dark:text-gray-100`}>
-      <div className="flex items-center gap-2">
-        <button onClick={() => setOpen(!open)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700">
-          {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+    <div className={`rounded-3xl border border-gray-200 dark:border-[#2C2C2E]/50 p-5 bg-white dark:bg-[#1C1C1E]/50 ${level > 0 ? "ml-6 mt-3 shadow-none" : "shadow-sm border-b-4 border-b-gray-100 dark:border-b-[#2C2C2E]"} text-gray-900 dark:text-gray-100 transition-all`}>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setOpen(!open)}
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors"
+        >
+          {open ? <ChevronDown size={18} className="text-gray-500" /> : <ChevronRight size={18} className="text-gray-500" />}
         </button>
-        <span className="text-indigo-500 font-semibold">Struct</span>
+
+        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/20 px-3 py-1.5 rounded-lg">
+          <span className="text-indigo-600 dark:text-indigo-400 font-bold text-sm tracking-wide uppercase">Struct</span>
+        </div>
+
         <input
-          className="ml-2 px-2 py-1 rounded bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 dark:text-sm"
+          className="ml-1 px-3 py-1.5 rounded-lg bg-transparent hover:bg-gray-100 dark:hover:bg-[#2C2C2E] focus:bg-white dark:focus:bg-[#000000] border border-transparent focus:border-apple-blue transition-all outline-none font-medium"
           value={node.name || defaultName}
           onChange={e => rename(e.target.value)}
           placeholder={defaultName}
         />
-        <button onClick={() => setKvOpen(true)} className="ml-auto px-2 py-1 rounded bg-green-600 text-white text-xs flex items-center gap-1">
-          <Plus size={14} /> Add field
-        </button>
+
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={() => setKvOpen(true)}
+            className="px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-500/20 transition-colors flex items-center gap-1.5"
+          >
+            <Plus size={14} strokeWidth={2.5} />
+            <span className="hidden sm:inline">Add Field</span>
+          </button>
+        </div>
       </div>
 
-      {open && (
-        <div className="mt-3 space-y-2">
-          {Object.entries(node.fields || {}).map(([k, v]) => (
-            <div key={k} className="flex items-start gap-2">
-              <span className="font-mono text-xs mt-2">{k}:</span>
-              {typeof v === "object" && v && v.type === "struct" ? (
-                <StructNode
-                  node={v}
-                  onChange={(sub) => updateSub(k, sub)}
-                  defaultName={v.name || `item_${numberToLetters(0)}`}
-                  level={level + 1}
-                />
-              ) : (
-                <input
-                  className="flex-1 px-2 py-1 rounded bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700"
-                  value={String(v)}
-                  onChange={e => {
-                    const fields = { ...(node.fields || {}) };
-                    fields[k] = e.target.value;
-                    onChange({ ...node, fields });
-                  }}
-                />
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-4 space-y-3 pl-2">
+              {Object.entries(node.fields || {}).map(([k, v]) => (
+                <div key={k} className="group flex flex-col sm:flex-row sm:items-start gap-3 p-2 rounded-2xl hover:bg-gray-50 dark:hover:bg-[#2C2C2E]/30 transition-colors">
+                  <div className="mt-2 min-w-[120px]">
+                    <span className="font-mono text-xs font-semibold text-gray-500 bg-gray-100 dark:bg-[#2C2C2E] px-2 py-1 rounded">{k}</span>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    {typeof v === "object" && v && v.type === "struct" ? (
+                      <StructNode
+                        node={v}
+                        onChange={(sub) => updateSub(k, sub)}
+                        defaultName={v.name || `item_${numberToLetters(0)}`}
+                        level={level + 1}
+                      />
+                    ) : (
+                      <input
+                        className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-[#000000]/50 border border-gray-200 dark:border-[#2C2C2E] focus:border-apple-blue focus:ring-1 focus:ring-apple-blue transition-all outline-none text-sm"
+                        value={String(v)}
+                        onChange={e => {
+                          const fields = { ...(node.fields || {}) };
+                          fields[k] = e.target.value;
+                          onChange({ ...node, fields });
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity self-start sm:mt-1">
+                    <button onClick={() => {
+                      setEditingKey({ key: k, value: typeof v === "string" ? v : "" });
+                      setKvOpen(true);
+                    }} className="p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-500 transition-colors" title="Edit Key/Type">
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        const dup = JSON.parse(JSON.stringify(node));
+                        dup.name = `${node.name || defaultName}_copy`;
+                        onChange(dup, "duplicate");
+                      }}
+                      className="p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 text-purple-500 transition-colors" title="Duplicate Struct"
+                    >
+                      <Copy size={16} />
+                    </button>
+                    <button onClick={() => deleteField(k)} className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors" title="Delete Field">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {Object.keys(node.fields || {}).length === 0 && (
+                <div className="text-center py-6 text-gray-400 italic text-sm border-2 border-dashed border-gray-100 dark:border-[#2C2C2E] rounded-2xl">
+                  No fields yet. Click "Add Field" to start.
+                </div>
               )}
-              <button onClick={() => {
-                setEditingKey({ key: k, value: typeof v === "string" ? v : "" });
-                setKvOpen(true);
-              }} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700">
-                <Edit size={16} />
-              </button>
-              <button
-                onClick={() => {
-                  const dup = JSON.parse(JSON.stringify(node));
-                  dup.name = `${node.name || defaultName}_copy`;
-                  onChange(dup, "duplicate");
-                }}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700"
-              >
-                <Copy size={16} />
-              </button>
-              <button onClick={() => deleteField(k)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700">
-                <Trash2 size={16} className="text-red-500" />
-              </button>
             </div>
-          ))}
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <KeyValueModal
         isOpen={kvOpen}
@@ -224,10 +269,10 @@ export default function ListImporter() {
   };
   const deleteEntry = (id) => setEntries(prev => prev.filter(e => e.id !== id));
   const moveUp = (idx) => {
-    if (idx === 0) return; const copy = [...entries]; [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]]; setEntries(copy);
+    if (idx === 0) return; const copy = [...entries];[copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]]; setEntries(copy);
   };
   const moveDown = (idx) => {
-    if (idx === entries.length - 1) return; const copy = [...entries]; [copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]]; setEntries(copy);
+    if (idx === entries.length - 1) return; const copy = [...entries];[copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]]; setEntries(copy);
   };
 
   /* ------------ Import: Plain JSON (list or dict) ------------ */
@@ -415,102 +460,133 @@ export default function ListImporter() {
 
   /* ------------ Render ------------ */
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 text-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">List / Dictionary Importer</h1>
-
-      {/* Config */}
-      <div className="grid gap-4 md:grid-cols-2 mb-2">
-        <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100" value={tableName} onChange={e => setTableName(e.target.value)} placeholder="Main Table Name" />
-        <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100" value={fileName} onChange={e => setFileName(e.target.value)} placeholder="File Name (e.g., my_file.json)" />
+    <div className="space-y-6 max-w-5xl mx-auto pb-20">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-[#1D1D1F] dark:text-white mb-2">List Importer</h1>
+          <p className="text-gray-500 dark:text-gray-400">Convert lists and dictionaries into Catweb-ready JSON.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => { setImportType("plain"); setImportModalOpen(true); }} className="px-5 py-2.5 rounded-full bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-[#2C2C2E] text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#2C2C2E]/80 transition-colors flex items-center gap-2 shadow-sm dark:text-white">
+            <Upload size={16} /> Import JSON
+          </button>
+          <button onClick={() => { setImportType("catweb"); setImportModalOpen(true); }} className="px-5 py-2.5 rounded-full bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-[#2C2C2E] text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#2C2C2E]/80 transition-colors flex items-center gap-2 shadow-sm dark:text-white">
+            <Upload size={16} /> Undo/Import CW
+          </button>
+        </div>
       </div>
 
-      {/* List / Dictionary toggle */}
-      <div className="flex items-center gap-3 mb-4">
-        <span className="text-sm text-gray-900 dark:text-gray-100">Mode:</span>
-        <button onClick={() => setIsDict(false)} className={`px-3 py-1 rounded text-sm ${!isDict ? "bg-indigo-600 text-white" : "bg-gray-200 dark:bg-slate-700"}`}>List</button>
-        <button onClick={() => setIsDict(true)} className={`px-3 py-1 rounded text-sm ${isDict ? "bg-indigo-600 text-white" : "bg-gray-200 dark:bg-slate-700"}`}>Dictionary</button>
+      {/* Config Card */}
+      <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E]">
+        <div className="grid gap-6 md:grid-cols-2 mb-6">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">Table Name</label>
+            <input className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]/50 border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium" value={tableName} onChange={e => setTableName(e.target.value)} placeholder="Main Table Name" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">File Name</label>
+            <input className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]/50 border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium" value={fileName} onChange={e => setFileName(e.target.value)} placeholder="File Name (e.g., my_file.json)" />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between p-1 bg-gray-100 dark:bg-[#2C2C2E] rounded-2xl w-full sm:w-fit mb-6">
+          <button onClick={() => setIsDict(false)} className={`flex-1 sm:flex-none px-6 py-2 rounded-xl text-sm font-medium transition-all ${!isDict ? "bg-white dark:bg-[#1C1C1E] text-gray-900 dark:text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}>List Mode</button>
+          <button onClick={() => setIsDict(true)} className={`flex-1 sm:flex-none px-6 py-2 rounded-xl text-sm font-medium transition-all ${isDict ? "bg-white dark:bg-[#1C1C1E] text-gray-900 dark:text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}>Dictionary Mode</button>
+        </div>
+
+        {/* Advanced Toggle */}
+        <div className="border-t border-gray-100 dark:border-[#2C2C2E] pt-4">
+          <button onClick={() => setShowAdvanced(v => !v)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-apple-blue transition-colors font-medium">
+            <Settings size={16} /> {showAdvanced ? "Hide" : "Show"} Advanced Settings
+          </button>
+          <AnimatePresence initial={false}>
+            {showAdvanced && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                <div className="grid gap-4 md:grid-cols-3 mt-4 pt-2">
+                  <label className="text-sm text-gray-600 dark:text-gray-400 flex flex-col gap-1"><span className="text-xs font-semibold uppercase opacity-70">Inserts / Block</span><input type="number" value={insertsPerBlock} onChange={e => setInsertsPerBlock(+e.target.value)} className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-[#2C2C2E] dark:text-white" /></label>
+                  <label className="text-sm text-gray-600 dark:text-gray-400 flex flex-col gap-1"><span className="text-xs font-semibold uppercase opacity-70">X Step</span><input type="number" value={xStep} onChange={e => setXStep(+e.target.value)} className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-[#2C2C2E] dark:text-white" /></label>
+                  <label className="text-sm text-gray-600 dark:text-gray-400 flex flex-col gap-1"><span className="text-xs font-semibold uppercase opacity-70">X Max</span><input type="number" value={xMax} onChange={e => setXMax(+e.target.value)} className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-[#2C2C2E] dark:text-white" /></label>
+                  <label className="text-sm text-gray-600 dark:text-gray-400 flex flex-col gap-1"><span className="text-xs font-semibold uppercase opacity-70">Block Width</span><input type="number" value={blockWidth} onChange={e => setBlockWidth(+e.target.value)} className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-[#2C2C2E] dark:text-white" /></label>
+                  <label className="text-sm text-gray-600 dark:text-gray-400 flex flex-col gap-1"><span className="text-xs font-semibold uppercase opacity-70">Block Height</span><input type="number" value={blockHeight} onChange={e => setBlockHeight(+e.target.value)} className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-[#2C2C2E] dark:text-white" /></label>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* Advanced (unchanged) */}
-      <div className="mb-6">
-        <button onClick={() => setShowAdvanced(v => !v)} className="flex items-center gap-2 dark:text-sm px-3 py-2 rounded bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-gray-100">
-          <Settings size={16} /> {showAdvanced ? "Hide" : "Show"} Advanced Settings
-        </button>
-        <AnimatePresence initial={false}>
-          {showAdvanced && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-              <div className="grid gap-4 md:grid-cols-3 mt-3">
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">Inserts Per Block</span><input type="number" value={insertsPerBlock} onChange={e => setInsertsPerBlock(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">X Step</span><input type="number" value={xStep} onChange={e => setXStep(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">X Max</span><input type="number" value={xMax} onChange={e => setXMax(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">Block Width</span><input type="number" value={blockWidth} onChange={e => setBlockWidth(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">Block Height</span><input type="number" value={blockHeight} onChange={e => setBlockHeight(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* Add Entry Bar */}
+      <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-4 shadow-lg border border-gray-100 dark:border-[#2C2C2E] flex flex-col sm:flex-row gap-3 items-stretch">
+        {isDict && <input className="sm:w-40 px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-black dark:text-white transition-all outline-none" value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="Key" />}
+        <input className="flex-1 px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-black dark:text-white transition-all outline-none" value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder={isDict ? "Value (string)" : "New entry (string)"} />
+        <button onClick={addString} className="px-6 py-3 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-black font-semibold hover:opacity-90 transition-opacity whitespace-nowrap">Add String</button>
+        <button onClick={addStruct} className="px-6 py-3 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-500/20 transition-colors flex items-center justify-center gap-2 whitespace-nowrap"><Plus size={18} /> Struct</button>
       </div>
 
-      {/* Add Entry */}
-      <div className="flex gap-2 mb-4">
-        {isDict && <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100 w-36" value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="Key" />}
-        <input className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100" value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder={isDict ? "Value (string)" : "New entry (string)"} />
-        <button onClick={addString} className="px-4 py-2 rounded bg-indigo-600 text-white">Add String</button>
-        <button onClick={addStruct} className="px-4 py-2 rounded bg-purple-600 text-white flex items-center gap-1"><Plus size={16} /> Add Struct</button>
-      </div>
-
-      {/* Entries */}
-      <div className="flex flex-col gap-3 mb-6">
+      {/* Entries List */}
+      <div className="space-y-4">
         {entries.map((entry, idx) => (
-          <div key={entry.id} className="p-3 rounded bg-gray-100 dark:bg-slate-800">
+          <motion.div layout key={entry.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-[#1C1C1E] p-4 rounded-3xl border border-gray-100 dark:border-[#2C2C2E] shadow-sm hover:shadow-md transition-shadow">
             {entry.type === "string" ? (
-              <div className="flex items-center gap-2">
-                {isDict && <span className="font-mono text-sm w-24">{entry.key}:</span>}
-                <input className="flex-1 px-3 py-2 rounded bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700" value={entry.value} onChange={e => editString(entry.id, e.target.value)} />
-                <button onClick={() => moveUp(idx)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><ArrowUp size={16} /></button>
-                <button onClick={() => moveDown(idx)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><ArrowDown size={16} /></button>
-                <button onClick={() => deleteEntry(entry.id)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><Trash2 size={16} className="text-red-500" /></button>
+              <div className="flex items-center gap-3">
+                {isDict && <div className="px-3 py-1 bg-gray-100 dark:bg-[#2C2C2E] rounded-lg font-mono text-sm font-semibold text-gray-600 dark:text-gray-300">{entry.key}</div>}
+                <input className="flex-1 px-3 py-2 rounded-xl bg-transparent hover:bg-gray-50 dark:hover:bg-[#2C2C2E] focus:bg-white dark:focus:bg-black border border-transparent focus:border-apple-blue dark:text-white transition-all outline-none" value={entry.value} onChange={e => editString(entry.id, e.target.value)} />
+                <div className="flex items-center gap-1">
+                  <button onClick={() => moveUp(idx)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2C2C2E] text-gray-500 dark:text-gray-400"><ArrowUp size={16} /></button>
+                  <button onClick={() => moveDown(idx)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2C2C2E] text-gray-500 dark:text-gray-400"><ArrowDown size={16} /></button>
+                  <button onClick={() => deleteEntry(entry.id)} className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500"><Trash2 size={16} /></button>
+                </div>
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-50 dark:border-[#2C2C2E]/50">
                   <div className="flex items-center gap-2">
-                    {isDict && <span className="font-mono text-sm text-indigo-400">{entry.key}:</span>}
+                    {isDict && <span className="font-mono text-xs font-bold text-gray-400 uppercase tracking-wide">{entry.key}</span>}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => moveUp(idx)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><ArrowUp size={16} /></button>
-                    <button onClick={() => moveDown(idx)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><ArrowDown size={16} /></button>
-                    <button onClick={() => deleteEntry(entry.id)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><Trash2 size={16} className="text-red-500" /></button>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => moveUp(idx)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2C2C2E] text-gray-500 dark:text-gray-400"><ArrowUp size={16} /></button>
+                    <button onClick={() => moveDown(idx)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2C2C2E] text-gray-500 dark:text-gray-400"><ArrowDown size={16} /></button>
+                    <button onClick={() => deleteEntry(entry.id)} className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500"><Trash2 size={16} /></button>
                   </div>
                 </div>
                 <StructNode node={entry} defaultName={entry.name} onChange={(node) => updateStruct(entry.id, node)} />
               </>
             )}
-          </div>
+          </motion.div>
         ))}
+        {entries.length === 0 && (
+          <div className="py-12 text-center text-gray-400 bg-white dark:bg-[#1C1C1E] rounded-3xl border-2 border-dashed border-gray-100 dark:border-[#2C2C2E]">
+            Add some strings or structs to get started.
+          </div>
+        )}
       </div>
 
-      {/* Import */}
-      <div className="flex gap-2 mb-6 text-gray-900 dark:text-gray-100">
-        <button onClick={() => { setImportType("plain"); setImportModalOpen(true); }} className="px-4 py-2 rounded bg-gray-200 dark:bg-slate-700 flex items-center gap-1"><Upload size={16} /> Import JSON</button>
-        <button onClick={() => { setImportType("catweb"); setImportModalOpen(true); }} className="px-4 py-2 rounded bg-gray-200 dark:bg-slate-700 flex items-center gap-1"><Upload size={16} /> Import Catweb</button>
+      {/* Generate Button Fixed or Sticky? Let's keep it at bottom for now but styled */}
+      <div className="sticky bottom-6 z-20 flex justify-center pointer-events-none">
+        <button onClick={generateJson} className="pointer-events-auto px-8 py-4 rounded-full bg-apple-blue hover:bg-blue-600 text-white font-bold shadow-2xl shadow-blue-500/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 backdrop-blur-md">
+          <Download size={20} /> Generate Catweb JSON
+        </button>
       </div>
-
-      {/* Generate */}
-      <button onClick={generateJson} className="px-6 py-2 rounded bg-green-600 text-white mb-4">Generate Catweb JSON</button>
 
       {generated && (
-        <div className="mb-6">
-          <pre className="dark:bg-gray-900 dark:text-green-300 text-gray-900 p-4 rounded overflow-x-auto text-xs max-h-64">{generated}</pre>
-          <div className="flex gap-2 mt-2">
-            <button onClick={copyJson} className="px-4 py-2 rounded bg-indigo-600 text-white flex items-center gap-1"><Copy size={16} /> Copy</button>
-            <button onClick={downloadJson} className="px-4 py-2 rounded bg-indigo-600 text-white flex items-center gap-1"><Download size={16} /> Download</button>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-[#1C1C1E] text-green-400 rounded-3xl p-6 shadow-2xl border border-[#2C2C2E] overflow-hidden">
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Output Preview</span>
+            <div className="flex gap-2">
+              <button onClick={copyJson} className="px-4 py-2 rounded-xl bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white text-xs font-medium transition-colors flex items-center gap-2"><Copy size={12} /> Copy</button>
+              <button onClick={downloadJson} className="px-4 py-2 rounded-xl bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white text-xs font-medium transition-colors flex items-center gap-2"><Download size={12} /> Download</button>
+            </div>
           </div>
-        </div>
+          <pre className="font-mono text-xs overflow-auto max-h-96 custom-scrollbar">{generated}</pre>
+        </motion.div>
       )}
 
       <JsonImportModal isOpen={importModalOpen} onClose={() => setImportModalOpen(false)} title={importType === "plain" ? "Import Plain JSON" : "Import Catweb JSON"} onImport={(rawJson) => { if (importType === "plain") importPlainList(rawJson); else importCatweb(rawJson); }} />
-      <div className="p-3 text-xs text-slate-500 dark:text-slate-300">Notes: Don't panic if the script seems empty in catweb, it's probably in the top left corner of the script canvas (You can change that in the advanced options) PS: if you break anything revert back to the default settings</div>
+      <div className="text-center pb-8 pt-4">
+        <p className="text-xs text-gray-400 dark:text-gray-600 max-w-lg mx-auto">
+          Pro Tip: You can adjust the block size and position in Advanced Settings. If the script appears empty in Catweb, check the top-left corner of the canvas.
+        </p>
+      </div>
     </div>
   );
 }
