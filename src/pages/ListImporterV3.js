@@ -38,14 +38,14 @@ function KeyValueModal({ isOpen, onClose, onSave, initial = { key: "", value: ""
       {isOpen && (
         <motion.div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <motion.div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-8 w-full max-w-md shadow-2xl border border-gray-100 dark:border-[#2C2C2E]"
+          <motion.div className="bg-surface rounded-3xl p-8 w-full max-w-md shadow-2xl border border-border"
             initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}>
-            <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{title}</h3>
+            <h3 className="text-2xl font-bold mb-6 text-text-primary">{title}</h3>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Key</label>
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1 mb-1 block">Key</label>
                 <input
-                  className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-black transition-all outline-none"
+                  className="w-full px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface transition-all outline-none text-text-primary"
                   placeholder="e.g., username"
                   value={keyName}
                   onChange={e => setKeyName(e.target.value)}
@@ -53,9 +53,9 @@ function KeyValueModal({ isOpen, onClose, onSave, initial = { key: "", value: ""
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1 mb-1 block">Value</label>
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1 mb-1 block">Value</label>
                 <input
-                  className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-black transition-all outline-none"
+                  className="w-full px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface transition-all outline-none text-text-primary"
                   placeholder="Value (leave empty for nested)"
                   value={value}
                   onChange={e => setValue(e.target.value)}
@@ -63,8 +63,8 @@ function KeyValueModal({ isOpen, onClose, onSave, initial = { key: "", value: ""
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-8">
-              <button onClick={onClose} className="px-6 py-2.5 rounded-xl font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors">Cancel</button>
-              <button onClick={handleSave} className="px-6 py-2.5 rounded-xl font-medium bg-apple-blue text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30 transition-all">Save Field</button>
+              <button onClick={onClose} className="px-6 py-2.5 rounded-xl font-medium text-text-secondary hover:bg-surface-hover transition-colors">Cancel</button>
+              <button onClick={handleSave} className="px-6 py-2.5 rounded-xl font-medium bg-accent text-white hover:bg-accent/80 shadow-lg shadow-accent/30 transition-all">Save Field</button>
             </div>
           </motion.div>
         </motion.div>
@@ -95,7 +95,7 @@ function StructNode({ node, onChange, defaultName, level = 0 }) {
   };
 
   return (
-    <div className={`rounded-3xl border border-gray-200 dark:border-[#2C2C2E]/50 p-5 bg-white dark:bg-[#1C1C1E]/50 ${level > 0 ? "ml-6 mt-3 shadow-none" : "shadow-sm border-b-4 border-b-gray-100 dark:border-b-[#2C2C2E]"} text-gray-900 dark:text-gray-100 transition-all`}>
+    <div className={`rounded-3xl border border-border p-5 bg-surface/50 ${level > 0 ? "ml-6 mt-3 shadow-none" : "shadow-sm border-b-4 border-b-border"} text-text-primary transition-all`}>
       <div className="flex items-center gap-3">
         <button
           onClick={() => setOpen(!open)}
@@ -109,7 +109,7 @@ function StructNode({ node, onChange, defaultName, level = 0 }) {
         </div>
 
         <input
-          className="ml-1 px-3 py-1.5 rounded-lg bg-transparent hover:bg-gray-100 dark:hover:bg-[#2C2C2E] focus:bg-white dark:focus:bg-[#000000] border border-transparent focus:border-apple-blue transition-all outline-none font-medium"
+          className="ml-1 px-3 py-1.5 rounded-lg bg-transparent hover:bg-surface-hover focus:bg-surface border border-transparent focus:border-accent transition-all outline-none font-medium text-text-primary"
           value={node.name || defaultName}
           onChange={e => rename(e.target.value)}
           placeholder={defaultName}
@@ -463,29 +463,29 @@ export default function ListImporter() {
     <div className="space-y-6 max-w-5xl mx-auto pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-[#1D1D1F] dark:text-white mb-2">List Importer</h1>
-          <p className="text-gray-500 dark:text-gray-400">Convert lists and dictionaries into Catweb-ready JSON.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-text-primary mb-2">List Importer</h1>
+          <p className="text-text-secondary">Convert lists and dictionaries into Catweb-ready JSON.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => { setImportType("plain"); setImportModalOpen(true); }} className="px-5 py-2.5 rounded-full bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-[#2C2C2E] text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#2C2C2E]/80 transition-colors flex items-center gap-2 shadow-sm dark:text-white">
+          <button onClick={() => { setImportType("plain"); setImportModalOpen(true); }} className="px-5 py-2.5 rounded-full bg-surface border border-border text-sm font-medium hover:bg-surface-hover transition-colors flex items-center gap-2 shadow-sm text-text-primary">
             <Upload size={16} /> Import JSON
           </button>
-          <button onClick={() => { setImportType("catweb"); setImportModalOpen(true); }} className="px-5 py-2.5 rounded-full bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-[#2C2C2E] text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#2C2C2E]/80 transition-colors flex items-center gap-2 shadow-sm dark:text-white">
+          <button onClick={() => { setImportType("catweb"); setImportModalOpen(true); }} className="px-5 py-2.5 rounded-full bg-surface border border-border text-sm font-medium hover:bg-surface-hover transition-colors flex items-center gap-2 shadow-sm text-text-primary">
             <Upload size={16} /> Undo/Import CW
           </button>
         </div>
       </div>
 
       {/* Config Card */}
-      <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E]">
+      <div className="bg-surface rounded-3xl p-6 shadow-xl shadow-gray-200/50 dark:shadow-none border border-border">
         <div className="grid gap-6 md:grid-cols-2 mb-6">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">Table Name</label>
-            <input className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]/50 border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium" value={tableName} onChange={e => setTableName(e.target.value)} placeholder="Main Table Name" />
+            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Table Name</label>
+            <input className="w-full px-4 py-3 rounded-2xl bg-primary/50 border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-medium" value={tableName} onChange={e => setTableName(e.target.value)} placeholder="Main Table Name" />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">File Name</label>
-            <input className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]/50 border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium" value={fileName} onChange={e => setFileName(e.target.value)} placeholder="File Name (e.g., my_file.json)" />
+            <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">File Name</label>
+            <input className="w-full px-4 py-3 rounded-2xl bg-primary/50 border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-medium" value={fileName} onChange={e => setFileName(e.target.value)} placeholder="File Name (e.g., my_file.json)" />
           </div>
         </div>
 
@@ -495,8 +495,8 @@ export default function ListImporter() {
         </div>
 
         {/* Advanced Toggle */}
-        <div className="border-t border-gray-100 dark:border-[#2C2C2E] pt-4">
-          <button onClick={() => setShowAdvanced(v => !v)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-apple-blue transition-colors font-medium">
+        <div className="border-t border-border pt-4">
+          <button onClick={() => setShowAdvanced(v => !v)} className="flex items-center gap-2 text-sm text-text-secondary hover:text-accent transition-colors font-medium">
             <Settings size={16} /> {showAdvanced ? "Hide" : "Show"} Advanced Settings
           </button>
           <AnimatePresence initial={false}>
@@ -516,21 +516,21 @@ export default function ListImporter() {
       </div>
 
       {/* Add Entry Bar */}
-      <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-4 shadow-lg border border-gray-100 dark:border-[#2C2C2E] flex flex-col sm:flex-row gap-3 items-stretch">
-        {isDict && <input className="sm:w-40 px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-black dark:text-white transition-all outline-none" value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="Key" />}
-        <input className="flex-1 px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-black dark:text-white transition-all outline-none" value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder={isDict ? "Value (string)" : "New entry (string)"} />
-        <button onClick={addString} className="px-6 py-3 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-black font-semibold hover:opacity-90 transition-opacity whitespace-nowrap">Add String</button>
+      <div className="bg-surface rounded-3xl p-4 shadow-lg border border-border flex flex-col sm:flex-row gap-3 items-stretch">
+        {isDict && <input className="sm:w-40 px-4 py-3 rounded-2xl bg-primary border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none" value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="Key" />}
+        <input className="flex-1 px-4 py-3 rounded-2xl bg-primary border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none" value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder={isDict ? "Value (string)" : "New entry (string)"} />
+        <button onClick={addString} className="px-6 py-3 rounded-2xl bg-text-primary text-surface font-semibold hover:opacity-90 transition-opacity whitespace-nowrap">Add String</button>
         <button onClick={addStruct} className="px-6 py-3 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-500/20 transition-colors flex items-center justify-center gap-2 whitespace-nowrap"><Plus size={18} /> Struct</button>
       </div>
 
       {/* Entries List */}
       <div className="space-y-4">
         {entries.map((entry, idx) => (
-          <motion.div layout key={entry.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-[#1C1C1E] p-4 rounded-3xl border border-gray-100 dark:border-[#2C2C2E] shadow-sm hover:shadow-md transition-shadow">
+          <motion.div layout key={entry.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-surface p-4 rounded-3xl border border-border shadow-sm hover:shadow-md transition-shadow">
             {entry.type === "string" ? (
               <div className="flex items-center gap-3">
-                {isDict && <div className="px-3 py-1 bg-gray-100 dark:bg-[#2C2C2E] rounded-lg font-mono text-sm font-semibold text-gray-600 dark:text-gray-300">{entry.key}</div>}
-                <input className="flex-1 px-3 py-2 rounded-xl bg-transparent hover:bg-gray-50 dark:hover:bg-[#2C2C2E] focus:bg-white dark:focus:bg-black border border-transparent focus:border-apple-blue dark:text-white transition-all outline-none" value={entry.value} onChange={e => editString(entry.id, e.target.value)} />
+                {isDict && <div className="px-3 py-1 bg-surface-hover rounded-lg font-mono text-sm font-semibold text-text-secondary">{entry.key}</div>}
+                <input className="flex-1 px-3 py-2 rounded-xl bg-transparent hover:bg-surface-hover focus:bg-surface border border-transparent focus:border-accent text-text-primary transition-all outline-none" value={entry.value} onChange={e => editString(entry.id, e.target.value)} />
                 <div className="flex items-center gap-1">
                   <button onClick={() => moveUp(idx)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2C2C2E] text-gray-500 dark:text-gray-400"><ArrowUp size={16} /></button>
                   <button onClick={() => moveDown(idx)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2C2C2E] text-gray-500 dark:text-gray-400"><ArrowDown size={16} /></button>
@@ -563,7 +563,7 @@ export default function ListImporter() {
 
       {/* Generate Button Fixed or Sticky? Let's keep it at bottom for now but styled */}
       <div className="sticky bottom-6 z-20 flex justify-center pointer-events-none">
-        <button onClick={generateJson} className="pointer-events-auto px-8 py-4 rounded-full bg-apple-blue hover:bg-blue-600 text-white font-bold shadow-2xl shadow-blue-500/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 backdrop-blur-md">
+        <button onClick={generateJson} className="pointer-events-auto px-8 py-4 rounded-full bg-accent hover:bg-accent/90 text-white font-bold shadow-2xl shadow-accent/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 backdrop-blur-md">
           <Download size={20} /> Generate Catweb JSON
         </button>
       </div>

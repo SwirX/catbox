@@ -12,7 +12,17 @@ module.exports = {
         '5xl': '2.5rem',
       },
       colors: {
-        // Apple-inspired distinct dark grays
+        primary: "rgb(var(--bg-primary) / <alpha-value>)",
+        surface: "rgb(var(--bg-surface) / <alpha-value>)",
+        "surface-hover": "rgb(var(--bg-hover) / <alpha-value>)",
+        text: {
+          primary: "rgb(var(--text-primary) / <alpha-value>)",
+          secondary: "rgb(var(--text-secondary) / <alpha-value>)",
+        },
+        accent: "rgb(var(--accent) / <alpha-value>)",
+        border: "rgb(var(--border) / <alpha-value>)",
+
+        // Apple-inspired distinct dark grays (Legacy/Fallbacks)
         apple: {
           base: "#000000",
           card: "#1C1C1E",

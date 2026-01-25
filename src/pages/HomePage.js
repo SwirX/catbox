@@ -27,16 +27,16 @@ export default function HomePage() {
                 className="text-center space-y-6 max-w-4xl mx-auto"
             >
                 <div className="flex items-center justify-center mb-6">
-                    <div className="w-20 h-20 bg-gradient-to-tr from-apple-blue to-purple-600 rounded-3xl shadow-2xl flex items-center justify-center text-white rotate-[-10deg] hover:rotate-0 transition-transform duration-500">
+                    <div className="w-20 h-20 bg-gradient-to-tr from-accent to-purple-600 rounded-3xl shadow-2xl flex items-center justify-center text-white rotate-[-10deg] hover:rotate-0 transition-transform duration-500">
                         <Layers size={40} />
                     </div>
                 </div>
 
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-[#1D1D1F] dark:text-white">
-                    Welcome to <span className="text-apple-blue">Catbox</span>
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-text-primary">
+                    Welcome to <span className="text-accent">Catbox</span>
                 </h1>
 
-                <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed">
+                <p className="text-xl md:text-2xl text-text-secondary font-medium max-w-2xl mx-auto leading-relaxed">
                     Premium tools for your Catweb workflow. <br className="hidden md:block" />Designed for speed, built for creators.
                 </p>
             </motion.section>
@@ -47,7 +47,7 @@ export default function HomePage() {
                 animate="show"
             >
                 <div className="flex items-center justify-between mb-8 px-2">
-                    <h2 className="text-3xl font-bold tracking-tight text-[#1D1D1F] dark:text-white">All Tools</h2>
+                    <h2 className="text-3xl font-bold tracking-tight text-text-primary">All Tools</h2>
                     {/* Optional: Add filter or view options here */}
                 </div>
 

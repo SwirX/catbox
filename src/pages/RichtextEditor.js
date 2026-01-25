@@ -52,8 +52,8 @@ const ToolbarButton = ({ isActive, onClick, icon, label, showChevron, className 
         className={`
             flex items-center justify-center gap-1 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors border
             ${isActive
-                ? 'bg-indigo-100 border-indigo-200 text-indigo-700 dark:bg-indigo-900/50 dark:border-indigo-700 dark:text-indigo-300'
-                : 'bg-white border-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:bg-transparent dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'
+                ? 'bg-accent/10 border-accent/20 text-accent'
+                : 'bg-surface border-transparent text-text-secondary hover:bg-surface-hover hover:text-text-primary'
             }
             ${className}
         `}
@@ -66,13 +66,13 @@ const ToolbarButton = ({ isActive, onClick, icon, label, showChevron, className 
 
 const Popover = ({ title, className = '', children }) => (
     <div className={`
-        absolute top-full left-0 mt-2 p-3 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 z-50
+        absolute top-full left-0 mt-2 p-3 bg-surface rounded-xl shadow-2xl border border-border z-50
         flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200
         ${className}
     `}>
         {title && (
-            <div className="pb-2 mb-1 border-b border-slate-100 dark:border-slate-700/50">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{title}</span>
+            <div className="pb-2 mb-1 border-b border-border">
+                <span className="text-xs font-bold uppercase tracking-wider text-text-secondary">{title}</span>
             </div>
         )}
         <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
@@ -289,13 +289,13 @@ const RichTextEditor = () => {
             {/* Title & Copy Action */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="space-y-1">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-[#1D1D1F] dark:text-white flex items-center gap-3">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-text-primary flex items-center gap-3">
                         <span className="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30">
                             <Palette size={24} />
                         </span>
                         Rich Text Editor
                     </h1>
-                    <p className="text-gray-500 dark:text-gray-400 font-medium ml-1">Create polished formatted text for Roblox UIs.</p>
+                    <p className="text-text-secondary font-medium ml-1">Create polished formatted text for Roblox UIs.</p>
                 </div>
 
                 <button
@@ -304,7 +304,7 @@ const RichTextEditor = () => {
                         flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm shadow-xl transition-all duration-300 transform active:scale-95 border
                         ${copied
                             ? 'bg-green-500 border-green-400 text-white shadow-green-500/30 ring-4 ring-green-500/20'
-                            : 'bg-[#1D1D1F] dark:bg-apple-blue border-transparent text-white hover:opacity-90 shadow-2xl'
+                            : 'bg-text-primary border-transparent text-surface hover:opacity-90 shadow-2xl'
                         }
                     `}
                 >
@@ -314,18 +314,18 @@ const RichTextEditor = () => {
             </div>
 
             {/* Main Editor Card */}
-            <div className="bg-white dark:bg-[#1C1C1E] rounded-[2rem] shadow-2xl border border-gray-100 dark:border-[#2C2C2E] overflow-visible flex flex-col z-20 h-[700px] transition-all">
+            <div className="bg-surface rounded-[2rem] shadow-2xl border border-border overflow-visible flex flex-col z-20 h-[700px] transition-all">
 
                 {/* Visual Toolbar */}
-                <div className="px-3 py-3 border-b border-gray-100 dark:border-[#2C2C2E] bg-gray-50/80 dark:bg-[#2C2C2E]/40 backdrop-blur-xl rounded-t-[2rem] flex flex-wrap gap-1.5 items-center relative select-none z-30">
+                <div className="px-3 py-3 border-b border-border bg-primary/80 backdrop-blur-xl rounded-t-[2rem] flex flex-wrap gap-1.5 items-center relative select-none z-30">
 
                     {/* Clear */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-[#000000]/20 p-1 rounded-2xl border border-gray-200/50 dark:border-[#3A3A3C]">
+                    <div className="flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <ToolbarButton icon={<Eraser size={18} />} onClick={() => exec('removeFormat')} title="Clear Formatting" />
                     </div>
 
                     {/* Font Dropdown */}
-                    <div className="relative flex items-center gap-1 bg-white dark:bg-[#000000]/20 p-1 rounded-2xl border border-gray-200/50 dark:border-[#3A3A3C]">
+                    <div className="relative flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <div className="relative">
                             <ToolbarButton
                                 label={editorFormats.fontName || 'Font Family'}
@@ -339,12 +339,12 @@ const RichTextEditor = () => {
                                     {ROBLOX_FONTS.map(font => (
                                         <button
                                             key={font}
-                                            className="text-left w-full px-4 py-2.5 text-sm rounded-xl hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors flex items-center justify-between group"
+                                            className="text-left w-full px-4 py-2.5 text-sm rounded-xl hover:bg-surface-hover transition-colors flex items-center justify-between group"
                                             style={{ fontFamily: font }}
                                             onClick={() => exec('fontName', font)}
                                         >
                                             {font}
-                                            {editorFormats.fontName === font && <Check size={14} className="text-apple-blue" />}
+                                            {editorFormats.fontName === font && <Check size={14} className="text-accent" />}
                                         </button>
                                     ))}
                                 </Popover>
@@ -352,11 +352,11 @@ const RichTextEditor = () => {
                         </div>
 
                         {/* Size Dropdown */}
-                        <div className="w-px h-6 bg-gray-200 dark:bg-[#3A3A3C] mx-1" />
+                        <div className="w-px h-6 bg-border mx-1" />
 
                         <div className="relative">
                             <ToolbarButton
-                                label={FONT_SIZES.find(s => s.value == editorFormats.fontSize)?.label || 'Size'}
+                                label={FONT_SIZES.find(s => s.value === editorFormats.fontSize)?.label || 'Size'}
                                 showChevron
                                 onClick={() => setActivePopup(activePopup === 'size' ? null : 'size')}
                                 isActive={activePopup === 'size'}
@@ -370,8 +370,8 @@ const RichTextEditor = () => {
                                             className="flex justify-between items-center w-full px-4 py-2.5 text-sm rounded-xl hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors group"
                                             onClick={() => exec('fontSize', size.value)}
                                         >
-                                            <span className={(editorFormats.fontSize == size.value) ? "font-bold text-apple-blue" : ""}>{size.label}</span>
-                                            <span className="text-[10px] text-gray-400 font-mono bg-gray-100 dark:bg-[#000000]/40 px-1.5 py-0.5 rounded">{size.px}</span>
+                                            <span className={(editorFormats.fontSize === size.value) ? "font-bold text-accent" : ""}>{size.label}</span>
+                                            <span className="text-[10px] text-text-secondary font-mono bg-primary px-1.5 py-0.5 rounded">{size.px}</span>
                                         </button>
                                     ))}
                                 </Popover>
@@ -380,7 +380,7 @@ const RichTextEditor = () => {
                     </div>
 
                     {/* Base Styles */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-[#000000]/20 p-1 rounded-2xl border border-gray-200/50 dark:border-[#3A3A3C]">
+                    <div className="flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <ToolbarButton icon={<Bold size={18} />} isActive={editorFormats.bold} onClick={() => exec('bold')} title="Bold" />
                         <ToolbarButton icon={<Italic size={18} />} isActive={editorFormats.italic} onClick={() => exec('italic')} title="Italic" />
                         <ToolbarButton icon={<Underline size={18} />} isActive={editorFormats.underline} onClick={() => exec('underline')} title="Underline" />
@@ -388,7 +388,7 @@ const RichTextEditor = () => {
                     </div>
 
                     {/* Colors & Highlights */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-[#000000]/20 p-1 rounded-2xl border border-gray-200/50 dark:border-[#3A3A3C]">
+                    <div className="flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <div className="relative">
                             <ToolbarButton
                                 icon={<div className="flex flex-col items-center justify-center gap-0.5">
@@ -451,7 +451,7 @@ const RichTextEditor = () => {
                     </div>
 
                     {/* Effects */}
-                    <div className="flex items-center gap-1 bg-white dark:bg-[#000000]/20 p-1 rounded-2xl border border-gray-200/50 dark:border-[#3A3A3C]">
+                    <div className="flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <div className="relative">
                             <ToolbarButton
                                 icon={<Droplet size={18} />}
@@ -501,10 +501,10 @@ const RichTextEditor = () => {
                     </div>
 
                     {/* Align */}
-                    <div className="flex bg-white dark:bg-[#000000]/20 border border-gray-200/50 dark:border-[#3A3A3C] rounded-2xl p-1">
-                        <button className={`p-2 rounded-xl transition-all ${editorFormats.justifyLeft ? 'bg-gray-100 dark:bg-[#3A3A3C] text-black dark:text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`} onClick={() => exec('justifyLeft')}><AlignLeft size={18} /></button>
-                        <button className={`p-2 rounded-xl transition-all ${editorFormats.justifyCenter ? 'bg-gray-100 dark:bg-[#3A3A3C] text-black dark:text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`} onClick={() => exec('justifyCenter')}><AlignCenter size={18} /></button>
-                        <button className={`p-2 rounded-xl transition-all ${editorFormats.justifyRight ? 'bg-gray-100 dark:bg-[#3A3A3C] text-black dark:text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`} onClick={() => exec('justifyRight')}><AlignRight size={18} /></button>
+                    <div className="flex bg-surface border border-border rounded-2xl p-1">
+                        <button className={`p-2 rounded-xl transition-all ${editorFormats.justifyLeft ? 'bg-surface-hover text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`} onClick={() => exec('justifyLeft')}><AlignLeft size={18} /></button>
+                        <button className={`p-2 rounded-xl transition-all ${editorFormats.justifyCenter ? 'bg-surface-hover text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`} onClick={() => exec('justifyCenter')}><AlignCenter size={18} /></button>
+                        <button className={`p-2 rounded-xl transition-all ${editorFormats.justifyRight ? 'bg-surface-hover text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`} onClick={() => exec('justifyRight')}><AlignRight size={18} /></button>
                     </div>
 
                 </div>
@@ -514,7 +514,7 @@ const RichTextEditor = () => {
                     <div
                         ref={editorRef}
                         contentEditable
-                        className="h-full p-8 outline-none prose dark:prose-invert max-w-none w-full overflow-y-auto custom-scrollbar text-lg leading-relaxed text-gray-800 dark:text-gray-200"
+                        className="h-full p-8 outline-none prose dark:prose-invert max-w-none w-full overflow-y-auto custom-scrollbar text-lg leading-relaxed text-text-primary"
                         onInput={updateActiveFormats}
                         onMouseUp={updateActiveFormats}
                         onKeyUp={updateActiveFormats}
@@ -532,8 +532,8 @@ const RichTextEditor = () => {
             </div>
 
             <div className="text-center pb-8">
-                <p className="text-sm text-gray-400 dark:text-gray-600 flex items-center justify-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-apple-blue"></span>
+                <p className="text-sm text-text-secondary flex items-center justify-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
                     Formatting is visual only. Copying transforms to Roblox XML automatically.
                 </p>
             </div>

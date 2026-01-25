@@ -27,22 +27,22 @@ export default function JsonImportModal({ isOpen, onClose, onImport, title }) {
                     exit={{ opacity: 0 }}
                 >
                     <motion.div
-                        className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-8 w-full max-w-2xl shadow-2xl border border-gray-100 dark:border-[#2C2C2E]"
+                        className="bg-surface rounded-3xl p-8 w-full max-w-2xl shadow-2xl border border-border"
                         initial={{ scale: 0.9, y: 20 }}
                         animate={{ scale: 1, y: 0 }}
                         exit={{ scale: 0.9, y: 20 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
                     >
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{title || "Import JSON"}</h2>
-                            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                            <h2 className="text-2xl font-bold text-text-primary">{title || "Import JSON"}</h2>
+                            <button onClick={onClose} className="p-2 rounded-full hover:bg-surface-hover transition-colors">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-secondary"><path d="M18 6L6 18M6 6l12 12" /></svg>
                             </button>
                         </div>
 
                         <div className="relative">
                             <textarea
-                                className="w-full h-80 p-4 rounded-2xl bg-gray-50 dark:bg-[#000000]/30 border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] text-sm font-mono text-gray-900 dark:text-gray-200 focus:outline-none transition-all resize-none custom-scrollbar"
+                                className="w-full h-80 p-4 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface text-sm font-mono text-text-primary focus:outline-none transition-all resize-none custom-scrollbar"
                                 value={rawJson}
                                 onChange={(e) => setRawJson(e.target.value)}
                                 placeholder="Paste your JSON here..."
@@ -56,13 +56,13 @@ export default function JsonImportModal({ isOpen, onClose, onImport, title }) {
                         <div className="flex justify-end gap-3 mt-8">
                             <button
                                 onClick={onClose}
-                                className="px-6 py-2.5 rounded-xl font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors"
+                                className="px-6 py-2.5 rounded-xl font-medium text-text-secondary hover:bg-surface-hover transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleImport}
-                                className="px-8 py-2.5 rounded-xl font-bold bg-apple-blue text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30 transition-all active:scale-95"
+                                className="px-8 py-2.5 rounded-xl font-bold bg-accent text-white hover:bg-accent/80 shadow-lg shadow-accent/30 transition-all active:scale-95"
                             >
                                 Import Data
                             </button>

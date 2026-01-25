@@ -811,14 +811,14 @@ export default function CatWebVisualizer() {
             onDragOver={onActionDragOver}
             onDrop={(e) => onActionDrop(e, eventIndex, actionIndex)}
             whileHover={{ scale: 1.01 }}
-            className="bg-gray-50 dark:bg-[#2C2C2E]/50 rounded-xl p-3 text-sm border border-gray-100 dark:border-[#3A3A3C] shadow-sm mb-2 group relative transition-colors hover:border-apple-blue/50 dark:hover:border-apple-blue/50"
+            className="bg-surface rounded-xl p-3 text-sm border border-border shadow-sm mb-2 group relative transition-colors hover:border-accent/50"
             onContextMenu={(e) => {
               e.preventDefault();
               setContextMenu({ x: e.pageX, y: e.pageY, type: 'action', eventIndex, actionIndex });
             }}
           >
             <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 font-medium text-gray-800 dark:text-gray-200">
+              <div className="flex-1 font-medium text-text-primary">
                 <div className="leading-relaxed">
                   {template.text.map((seg, si) => {
                     const dataSeg = blockData.text[si];
@@ -831,7 +831,7 @@ export default function CatWebVisualizer() {
                     return (
                       <input
                         key={si}
-                        className="inline-block mx-1 bg-white dark:bg-[#1C1C1E] px-2 py-1 rounded-lg text-xs min-w-[60px] max-w-[120px] border border-gray-200 dark:border-[#505055] focus:border-apple-blue focus:ring-2 focus:ring-apple-blue/20 outline-none transition-all text-center font-mono text-apple-blue font-bold shadow-inner"
+                        className="inline-block mx-1 bg-primary px-2 py-1 rounded-lg text-xs min-w-[60px] max-w-[120px] border border-border focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all text-center font-mono text-accent font-bold shadow-inner"
                         value={blockData.text[si]?.value || ""}
                         onChange={(e) => onEditValue(eventIndex, actionIndex, si, e.target.value)}
                         onClick={(e) => e.stopPropagation()} // Prevent drag start when clicking input
@@ -840,7 +840,7 @@ export default function CatWebVisualizer() {
                   })}
                 </div>
               </div>
-              <div className="text-[10px] uppercase font-bold text-gray-300 dark:text-gray-600 select-none">#{actionIndex}</div>
+              <div className="text-[10px] uppercase font-bold text-text-secondary select-none">#{actionIndex}</div>
             </div>
           </motion.div>
         );
@@ -848,7 +848,7 @@ export default function CatWebVisualizer() {
 
       if (node.type === "scope") {
         elements.push(
-          <div key={`inner-${i}`} className="pl-4 ml-2 border-l-2 border-dashed border-gray-200 dark:border-[#3A3A3C] my-1">
+          <div key={`inner-${i}`} className="pl-4 ml-2 border-l-2 border-dashed border-border my-1">
             {renderList(node.inner, eventIndex, actions)}
           </div>
         );
@@ -908,30 +908,30 @@ export default function CatWebVisualizer() {
 
   /* --- Main UI Render --- */
   return (
-    <div className="h-[calc(100vh-64px)] bg-[#F5F5F7] dark:bg-[#000000] flex flex-col relative overflow-hidden font-sans">
+    <div className="h-[calc(100vh-64px)] bg-primary flex flex-col relative overflow-hidden font-sans">
 
       {/* Floating Toolbar Header */}
       <div className="absolute top-6 left-6 right-6 z-20 pointer-events-none flex justify-between items-start">
         <motion.div
           initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-          className="pointer-events-auto bg-white/80 dark:bg-[#1C1C1E]/80 backdrop-blur-md border border-white/20 dark:border-[#2C2C2E] shadow-2xl rounded-3xl p-5 flex flex-col gap-1 min-w-[300px]"
+          className="pointer-events-auto bg-surface/80 backdrop-blur-md border border-border/50 shadow-2xl rounded-3xl p-5 flex flex-col gap-1 min-w-[300px]"
         >
-          <h1 className="text-xl font-extrabold tracking-tight text-[#1D1D1F] dark:text-white flex items-center gap-2">
+          <h1 className="text-xl font-extrabold tracking-tight text-text-primary flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-green-500"></span>
             Visual Script Editor
           </h1>
-          <p className="text-xs font-medium text-gray-400 font-mono tracking-wide ml-5 uppercase">
+          <p className="text-xs font-medium text-text-secondary font-mono tracking-wide ml-5 uppercase">
             {script.alias || script.globalid}
           </p>
         </motion.div>
 
         <motion.div
           initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
-          className="pointer-events-auto flex items-center gap-2 bg-white/80 dark:bg-[#1C1C1E]/80 backdrop-blur-md rounded-full padding p-2 shadow-2xl border border-white/20 dark:border-[#2C2C2E]"
+          className="pointer-events-auto flex items-center gap-2 bg-surface/80 backdrop-blur-md rounded-full padding p-2 shadow-2xl border border-border/50"
         >
           <button
             onClick={() => setData(JSON.parse(JSON.stringify(initialJson)))}
-            className="px-5 py-2.5 rounded-full text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors"
+            className="px-5 py-2.5 rounded-full text-sm font-bold text-text-secondary hover:bg-surface-hover transition-colors"
             title="Reset Workspace"
           >
             Reset
@@ -945,7 +945,7 @@ export default function CatWebVisualizer() {
           </button>
           <button
             onClick={exportJson}
-            className="px-6 py-2.5 rounded-full bg-[#1D1D1F] dark:bg-white text-white dark:text-black text-sm font-bold hover:opacity-90 transition-opacity shadow-lg"
+            className="px-6 py-2.5 rounded-full bg-text-primary text-surface text-sm font-bold hover:opacity-90 transition-opacity shadow-lg"
           >
             Export JSON
           </button>
@@ -983,7 +983,7 @@ export default function CatWebVisualizer() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 layout
-                className="absolute shadow-2xl rounded-3xl border border-white/60 dark:border-[#2C2C2E] bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl flex flex-col overflow-hidden ring-1 ring-black/5 dark:ring-white/5 w-[360px]" // Fixed width slightly larger
+                className="absolute shadow-2xl rounded-3xl border border-border/60 bg-surface/95 backdrop-blur-xl flex flex-col overflow-hidden ring-1 ring-black/5 dark:ring-white/5 w-[360px]" // Fixed width slightly larger
                 style={{ left, top, width: Math.max(360, parseInt(blk.width) || 360) }}
                 onContextMenu={(e) => handleContextMenu(e, 'event', bi)}
               >
@@ -992,21 +992,21 @@ export default function CatWebVisualizer() {
                   onPointerDown={(e) => startDragBlock(e, bi)}
                   className={`
                     cursor-grab active:cursor-grabbing select-none p-4 
-                    bg-gradient-to-r from-gray-50 to-white dark:from-[#2C2C2E] dark:to-[#1C1C1E]
-                    border-b border-gray-100 dark:border-[#2C2C2E]
+                    bg-surface-hover
+                    border-b border-border
                     flex items-center justify-between
                   `}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`
                             w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-lg
-                            ${bi === 0 ? "bg-gradient-to-tr from-green-400 to-emerald-600" : "bg-gradient-to-tr from-apple-blue to-purple-600"}
+                            ${bi === 0 ? "bg-gradient-to-tr from-green-400 to-emerald-600" : "bg-gradient-to-tr from-accent to-purple-600"}
                         `}>
                       <span className="text-lg font-bold">{bi + 1}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Event Block</span>
-                      <div className="text-sm font-extrabold text-gray-800 dark:text-gray-100 leading-tight">
+                      <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">Event Block</span>
+                      <div className="text-sm font-extrabold text-text-primary leading-tight">
                         {Array.isArray(template.text) ? template.text.map((t, ti) => {
                           const blkText = Array.isArray(blk.text) ? blk.text[ti] : blk.text;
                           const val = typeof t === 'string' ? t : (blkText && typeof blkText === 'object' ? blkText.value : t.value);
@@ -1018,12 +1018,12 @@ export default function CatWebVisualizer() {
                 </div>
 
                 {/* Actions Content */}
-                <div className="p-4 space-y-3 min-h-[100px] bg-white/50 dark:bg-[#000000]/20">
+                <div className="p-4 space-y-3 min-h-[100px] bg-primary/20">
                   <div className="space-y-2">
                     {blk.actions && blk.actions.length > 0 ? (
                       renderActions(blk.actions, bi)
                     ) : (
-                      <div className="text-center py-8 text-gray-400 text-xs italic border-2 border-dashed border-gray-200 dark:border-[#2C2C2E] rounded-xl">
+                      <div className="text-center py-8 text-text-secondary text-xs italic border-2 border-dashed border-border rounded-xl">
                         Drag actions here or add new ones
                       </div>
                     )}
@@ -1032,7 +1032,7 @@ export default function CatWebVisualizer() {
                   <div className="pt-2 flex items-center gap-2">
                     <button
                       onClick={() => onAddAction(bi)}
-                      className="flex-1 py-3 rounded-xl bg-gray-50 dark:bg-[#2C2C2E] text-apple-blue font-bold text-xs uppercase tracking-wider hover:bg-apple-blue hover:text-white transition-all shadow-sm active:scale-[0.98]"
+                      className="flex-1 py-3 rounded-xl bg-surface-hover text-accent font-bold text-xs uppercase tracking-wider hover:bg-accent hover:text-white transition-all shadow-sm active:scale-[0.98]"
                     >
                       + Add Action
                     </button>
@@ -1051,16 +1051,16 @@ export default function CatWebVisualizer() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed z-50 bg-white dark:bg-[#1C1C1E] shadow-2xl rounded-2xl p-1.5 min-w-[160px] border border-gray-100 dark:border-[#2C2C2E]"
+            className="fixed z-50 bg-surface shadow-2xl rounded-2xl p-1.5 min-w-[160px] border border-border"
             style={{ left: contextMenu.x, top: contextMenu.y }}
           >
             <button
               onClick={() => handleDuplicate(contextMenu.type, contextMenu.eventIndex, contextMenu.actionIndex)}
-              className="w-full text-left px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#2C2C2E] transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-200"
+              className="w-full text-left px-4 py-2 rounded-xl text-sm font-medium hover:bg-surface-hover transition-colors flex items-center gap-2 text-text-primary"
             >
               Duplicate
             </button>
-            <div className="h-px bg-gray-100 dark:bg-[#2C2C2E] my-1"></div>
+            <div className="h-px bg-border my-1"></div>
             <button
               onClick={() => handleDelete(contextMenu.type, contextMenu.eventIndex, contextMenu.actionIndex)}
               className="w-full text-left px-4 py-2 rounded-xl text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors flex items-center gap-2"
@@ -1073,7 +1073,7 @@ export default function CatWebVisualizer() {
 
       {/* Footer Hint */}
       <div className="absolute bottom-6 left-0 right-0 pointer-events-none flex justify-center">
-        <div className="bg-black/80 text-white/90 backdrop-blur-md px-4 py-2 rounded-full text-xs font-medium shadow-xl">
+        <div className="bg-surface/80 border border-border text-text-secondary backdrop-blur-md px-4 py-2 rounded-full text-xs font-medium shadow-xl">
           Right-click blocks to edit • Drag empty space to pan
         </div>
       </div>

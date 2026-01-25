@@ -58,7 +58,7 @@ export default function LyraBuilder() {
         if (rf.length && rf.join("") !== defaultRf.join("")) params.set("rf", rf.join(""));
 
         return { query: "?" + params.toString(), error: null };
-    }, [endpoint, rr, id, q, fSet, rf]);
+    }, [endpoint, rr, id, q, fSet, rf, defaultRf, ALL_F.length]);
 
     const fullUrl = buildQuery.query ? `${BASE}${buildQuery.query}` : buildQuery.error || "";
 
@@ -108,23 +108,7 @@ export default function LyraBuilder() {
         setRf([]);
     }
 
-    function moveRfUp(index) {
-        if (index === 0) return;
-        setRf((prev) => {
-            const copy = [...prev];
-            [copy[index - 1], copy[index]] = [copy[index], copy[index - 1]];
-            return copy;
-        });
-    }
 
-    function moveRfDown(index) {
-        setRf((prev) => {
-            if (index === prev.length - 1) return prev;
-            const copy = [...prev];
-            [copy[index + 1], copy[index]] = [copy[index], copy[index + 1]];
-            return copy;
-        });
-    }
 
 
 
@@ -136,16 +120,16 @@ export default function LyraBuilder() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-4"
             >
-                <div className="w-12 h-12 bg-gradient-to-tr from-pink-500 to-violet-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-pink-500/20">
+                <div className="w-12 h-12 bg-gradient-to-tr from-accent to-violet-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-accent/20">
                     <span className="text-2xl">🎵</span>
                 </div>
                 <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-[#1D1D1F] dark:text-white">Lyra API Builder</h1>
-                    <p className="text-gray-500 dark:text-gray-400 font-medium">Construct complex API URLs visually.</p>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-text-primary">Lyra API Builder</h1>
+                    <p className="text-text-secondary font-medium">Construct complex API URLs visually.</p>
                 </div>
                 <div className="ml-auto hidden sm:block">
-                    <span className="bg-gray-100 dark:bg-[#2C2C2E] px-4 py-2 rounded-full text-xs font-mono font-medium text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-[#3A3A3C]">
-                        Base: <span className="text-apple-blue">{BASE}</span>
+                    <span className="bg-surface border border-border px-4 py-2 rounded-full text-xs font-mono font-medium text-text-secondary">
+                        Base: <span className="text-accent">{BASE}</span>
                     </span>
                 </div>
             </motion.div>
@@ -156,22 +140,22 @@ export default function LyraBuilder() {
                     initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
                     className="md:col-span-7 space-y-6"
                 >
-                    <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E]">
-                        <h2 className="text-lg font-bold mb-6 text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                            <span className="w-2 h-6 bg-apple-blue rounded-full"></span>
+                    <div className="bg-surface rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-border">
+                        <h2 className="text-lg font-bold mb-6 text-text-primary flex items-center gap-2">
+                            <span className="w-2 h-6 bg-accent rounded-full"></span>
                             Configuration
                         </h2>
 
                         <div className="space-y-6">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Endpoint (r)</label>
+                                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">Endpoint (r)</label>
                                     <div className="relative">
                                         <select
                                             aria-label="Endpoint"
                                             value={endpoint}
                                             onChange={(e) => setEndpoint(e.target.value)}
-                                            className="w-full appearance-none px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium cursor-pointer"
+                                            className="w-full appearance-none px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-medium cursor-pointer"
                                         >
                                             <option value="getsong">getsong</option>
                                             <option value="rng">rng</option>
@@ -190,7 +174,7 @@ export default function LyraBuilder() {
                                         value={rr}
                                         onChange={(e) => setRr(e.target.value)}
                                         placeholder="example: musicplayer.rbx/play"
-                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium"
+                                        className="w-full px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-medium"
                                     />
                                 </div>
                             </div>
@@ -202,7 +186,7 @@ export default function LyraBuilder() {
                                         value={id}
                                         onChange={(e) => setId(e.target.value)}
                                         placeholder="e.g. 12345678"
-                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium"
+                                        className="w-full px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-medium"
                                     />
                                 </motion.div>
                             )}
@@ -215,7 +199,7 @@ export default function LyraBuilder() {
                                             value={q}
                                             onChange={(e) => setQ(e.target.value)}
                                             placeholder="e.g. dramatic suspense"
-                                            className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-apple-blue focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-medium"
+                                            className="w-full px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-medium"
                                         />
                                     </div>
 
@@ -241,9 +225,9 @@ export default function LyraBuilder() {
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E]">
+                    <div className="bg-surface rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-border">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                            <h2 className="text-lg font-bold text-text-primary flex items-center gap-2">
                                 <span className="w-2 h-6 bg-purple-500 rounded-full"></span>
                                 Return Fields (rf)
                             </h2>
@@ -272,12 +256,12 @@ export default function LyraBuilder() {
                                                                 {...prov.draggableProps}
                                                                 {...prov.dragHandleProps}
                                                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${snapshot.isDragging
-                                                                    ? "bg-white dark:bg-[#2C2C2E] shadow-xl scale-110 border-apple-blue z-50"
-                                                                    : "bg-white dark:bg-[#2C2C2E] shadow-sm border-gray-200 dark:border-[#3A3A3C] hover:border-gray-300 dark:hover:border-[#505055]"
+                                                                    ? "bg-surface shadow-xl scale-110 border-accent z-50"
+                                                                    : "bg-surface shadow-sm border-border hover:border-gray-300"
                                                                     }`}
                                                             >
-                                                                <span className="font-bold text-gray-800 dark:text-gray-200">{k.toUpperCase()}</span>
-                                                                <span className="text-xs text-gray-400 font-medium">{meta?.label}</span>
+                                                                <span className="font-bold text-text-primary">{k.toUpperCase()}</span>
+                                                                <span className="text-xs text-text-secondary font-medium">{meta?.label}</span>
                                                                 <button onClick={() => removeRf(idx)} className="ml-2 p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 transition-colors">
                                                                     <span className="sr-only">Remove</span>
                                                                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" transform="scale(0.5) translate(6,6)" /></svg>
@@ -302,7 +286,7 @@ export default function LyraBuilder() {
                                 <button
                                     key={f.k}
                                     onClick={() => setRf(prev => [...prev, f.k])}
-                                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 dark:bg-[#2C2C2E] hover:bg-apple-blue hover:text-white dark:hover:bg-apple-blue transition-colors text-gray-600 dark:text-gray-400"
+                                    className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-surface-hover hover:bg-accent hover:text-white transition-colors text-text-secondary"
                                 >
                                     + {f.label} ({f.k})
                                 </button>
@@ -313,7 +297,7 @@ export default function LyraBuilder() {
                     <div className="flex gap-3 pt-2">
                         <button
                             onClick={() => copyToClipboard(fullUrl)}
-                            className="flex-1 px-6 py-4 rounded-2xl bg-apple-blue hover:bg-blue-600 text-white font-bold text-lg shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                            className="flex-1 px-6 py-4 rounded-2xl bg-accent hover:bg-accent/80 text-white font-bold text-lg shadow-lg shadow-accent/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                         >
                             <span>Copy Full URL</span>
                         </button>
@@ -322,7 +306,7 @@ export default function LyraBuilder() {
                                 const qOnly = buildQuery.query || buildQuery.error;
                                 copyToClipboard(qOnly || "");
                             }}
-                            className="px-6 py-4 rounded-2xl bg-white dark:bg-[#1C1C1E] border-2 border-gray-100 dark:border-[#2C2C2E] hover:bg-gray-50 dark:hover:bg-[#2C2C2E] text-gray-700 dark:text-gray-200 font-bold transition-all active:scale-[0.98]"
+                            className="px-6 py-4 rounded-2xl bg-surface border-2 border-border hover:bg-surface-hover text-text-primary font-bold transition-all active:scale-[0.98]"
                         >
                             Query Only
                         </button>
@@ -345,18 +329,18 @@ export default function LyraBuilder() {
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 shadow-xl border border-gray-100 dark:border-[#2C2C2E]">
-                            <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Quick Presets</h3>
+                        <div className="bg-surface rounded-3xl p-6 shadow-xl border border-border">
+                            <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider mb-4">Quick Presets</h3>
                             <div className="grid gap-3">
                                 <button
                                     onClick={() => {
                                         setEndpoint("getsong"); setId("12345678"); setRr("music.rbx/play"); setRf(defaultRf);
                                         showStatus("Preset Loaded");
                                     }}
-                                    className="group text-left p-4 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]/50 hover:bg-apple-blue hover:text-white transition-all duration-300"
+                                    className="group text-left p-4 rounded-2xl bg-surface-hover hover:bg-accent hover:text-white transition-all duration-300"
                                 >
-                                    <div className="font-bold text-sm mb-1 group-hover:text-white dark:text-gray-200">Basic Song Fetch</div>
-                                    <div className="font-mono text-xs text-gray-400 group-hover:text-blue-100/80 truncate opacity-80">?r=getsong&id=...</div>
+                                    <div className="font-bold text-sm mb-1 group-hover:text-white text-text-primary">Basic Song Fetch</div>
+                                    <div className="font-mono text-xs text-text-secondary group-hover:text-blue-100/80 truncate opacity-80">?r=getsong&id=...</div>
                                 </button>
 
                                 <button

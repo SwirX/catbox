@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Download, Copy, Image as ImageIcon, Trash } from "lucide-react";
 
 export default function ImageRichTextExporterHEXRLEV2() {
@@ -163,12 +163,12 @@ export default function ImageRichTextExporterHEXRLEV2() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-4"
             >
-                <div className="w-12 h-12 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-cyan-500/20">
+                <div className="w-12 h-12 bg-gradient-to-tr from-accent to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-accent/20">
                     <ImageIcon size={24} strokeWidth={2.5} />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-[#1D1D1F] dark:text-white">Image to RichText</h1>
-                    <p className="text-gray-500 dark:text-gray-400 font-medium">Convert images to HEX-encoded RichText for Roblox.</p>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-text-primary">Image to RichText</h1>
+                    <p className="text-text-secondary font-medium">Convert images to HEX-encoded RichText for Roblox.</p>
                 </div>
             </motion.div>
 
@@ -178,14 +178,14 @@ export default function ImageRichTextExporterHEXRLEV2() {
                     initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
                     className="lg:col-span-5 space-y-6"
                 >
-                    <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E]">
+                    <div className="bg-surface rounded-3xl p-8 shadow-xl shadow-gray-200/50 dark:shadow-none border border-border">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                                <span className="w-2 h-6 bg-cyan-500 rounded-full"></span>
+                            <h2 className="text-lg font-bold text-text-primary flex items-center gap-2">
+                                <span className="w-2 h-6 bg-accent rounded-full"></span>
                                 Configuration
                             </h2>
                             {info && info.orig.w > 0 && (
-                                <span className="px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 text-xs font-bold font-mono">
+                                <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold font-mono">
                                     Original: {info.orig.w}×{info.orig.h}
                                 </span>
                             )}
@@ -198,8 +198,8 @@ export default function ImageRichTextExporterHEXRLEV2() {
                             className={`
                                 group relative w-full h-48 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden
                                 ${imageSrc
-                                    ? "border-cyan-500 bg-cyan-50/10 dark:border-cyan-500/50"
-                                    : "border-gray-200 dark:border-[#3A3A3C] hover:border-cyan-400 hover:bg-gray-50 dark:hover:bg-[#2C2C2E]"
+                                    ? "border-accent bg-accent/10"
+                                    : "border-border hover:border-accent hover:bg-surface-hover"
                                 }
                             `}
                         >
@@ -222,11 +222,11 @@ export default function ImageRichTextExporterHEXRLEV2() {
                                 </>
                             ) : (
                                 <div className="text-center space-y-2 p-4">
-                                    <div className="w-12 h-12 bg-gray-100 dark:bg-[#2C2C2E] rounded-full flex items-center justify-center mx-auto text-gray-400 group-hover:text-cyan-500 transition-colors">
+                                    <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto text-text-secondary group-hover:text-accent transition-colors">
                                         <ImageIcon size={24} />
                                     </div>
-                                    <p className="font-bold text-gray-600 dark:text-gray-300">Click to upload image</p>
-                                    <p className="text-xs text-gray-400">or drop file here</p>
+                                    <p className="font-bold text-text-primary">Click to upload image</p>
+                                    <p className="text-xs text-text-secondary">or drop file here</p>
                                 </div>
                             )}
                         </div>
@@ -234,74 +234,74 @@ export default function ImageRichTextExporterHEXRLEV2() {
                         <div className="mt-6 space-y-5">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Scale (%)</label>
+                                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">Scale (%)</label>
                                     <input
                                         type="number"
                                         value={scalePercent}
                                         onChange={(e) => setScalePercent(Math.max(1, Number(e.target.value)))}
-                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-cyan-500 focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-bold text-center"
+                                        className="w-full px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-bold text-center"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Aspect Ratio</label>
+                                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">Aspect Ratio</label>
                                     <input
                                         type="number"
                                         step="0.1"
                                         value={aspect}
                                         onChange={(e) => setAspect(Math.max(0.01, Number(e.target.value)))}
-                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-cyan-500 focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-bold text-center"
+                                        className="w-full px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-bold text-center"
                                     />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Glyph Char</label>
+                                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">Glyph Char</label>
                                     <input
                                         value={glyph}
                                         onChange={(e) => setGlyph(e.target.value.slice(0, 1) || "█")}
-                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-cyan-500 focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-bold text-center font-mono"
+                                        className="w-full px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-bold text-center font-mono"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Splits</label>
+                                    <label className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">Splits</label>
                                     <input
                                         type="number"
                                         value={numTextboxes}
                                         min={1}
                                         onChange={(e) => setNumTextboxes(Math.max(1, Number(e.target.value)))}
-                                        className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border-2 border-transparent focus:border-cyan-500 focus:bg-white dark:focus:bg-[#000000] dark:text-white transition-all outline-none font-bold text-center"
+                                        className="w-full px-4 py-3 rounded-2xl bg-primary border-2 border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none font-bold text-center"
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Background Fill</label>
-                                <div className="flex items-center gap-2 p-2 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E] border border-transparent">
+                                <label className="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">Background Fill</label>
+                                <div className="flex items-center gap-2 p-2 rounded-2xl bg-primary border border-transparent">
                                     <input
                                         type="color"
                                         value={bgColor}
                                         onChange={(e) => setBgColor(e.target.value)}
                                         className="w-10 h-10 rounded-xl border-none cursor-pointer bg-transparent"
                                     />
-                                    <span className="text-sm font-mono text-gray-600 dark:text-gray-300 uppercase">{bgColor}</span>
+                                    <span className="text-sm font-mono text-text-primary uppercase">{bgColor}</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-[#2C2C2E]">
-                                <span className="text-sm font-bold text-gray-700 dark:text-gray-200">RichText Wrappers</span>
+                            <div className="flex items-center justify-between p-4 rounded-2xl bg-primary">
+                                <span className="text-sm font-bold text-text-primary">RichText Wrappers</span>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" checked={richText} onChange={(e) => setRichText(e.target.checked)} className="sr-only peer" />
-                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none dark:bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none dark:bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
                                 </label>
                             </div>
                         </div>
 
                         <button
                             onClick={generate}
-                            className="w-full mt-6 py-4 rounded-2xl bg-[#1D1D1F] dark:bg-white text-white dark:text-black font-extrabold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2"
+                            className="w-full mt-6 py-4 rounded-2xl bg-text-primary text-surface font-extrabold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2"
                         >
-                            <span className="text-cyan-400 dark:text-cyan-600"><ImageIcon size={20} /></span>
+                            <span className="text-accent"><ImageIcon size={20} /></span>
                             Generate Output
                         </button>
                     </div>
@@ -312,15 +312,15 @@ export default function ImageRichTextExporterHEXRLEV2() {
                     initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
                     className="lg:col-span-7 flex flex-col gap-6"
                 >
-                    <div className="flex-1 bg-white dark:bg-[#1C1C1E] rounded-3xl p-1 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-[#2C2C2E] flex flex-col relative overflow-hidden h-[500px]">
-                        <div className="absolute top-0 inset-x-0 h-12 bg-gradient-to-b from-white dark:from-[#1C1C1E] to-transparent z-10 pointer-events-none" />
+                    <div className="flex-1 bg-surface rounded-3xl p-1 shadow-xl shadow-gray-200/50 dark:shadow-none border border-border flex flex-col relative overflow-hidden h-[500px]">
+                        <div className="absolute top-0 inset-x-0 h-12 bg-gradient-to-b from-surface to-transparent z-10 pointer-events-none" />
                         <div className="bg-[#1C1C1E] rounded-[1.4rem] w-full h-full p-6 overflow-auto custom-scrollbar font-mono text-xs leading-relaxed break-all relative group">
                             {generated ? (
                                 <div className="text-green-400 selection:bg-green-500/30 selection:text-green-200">
                                     {generated}
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center justify-center h-full text-gray-600 dark:text-gray-500 gap-3 opacity-50">
+                                <div className="flex flex-col items-center justify-center h-full text-text-secondary gap-3 opacity-50">
                                     <ImageIcon size={48} strokeWidth={1} />
                                     <p className="text-sm font-medium">Output will appear here...</p>
                                 </div>
@@ -341,15 +341,15 @@ export default function ImageRichTextExporterHEXRLEV2() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="bg-white dark:bg-[#1C1C1E] rounded-3xl p-6 shadow-lg border border-gray-100 dark:border-[#2C2C2E]">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Output Filename</label>
+                        <div className="bg-surface rounded-3xl p-6 shadow-lg border border-border">
+                            <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Output Filename</label>
                             <div className="mt-2 flex gap-2">
                                 <input
                                     value={fileName}
                                     onChange={(e) => setFileName(e.target.value)}
-                                    className="flex-1 min-w-0 bg-transparent py-2 border-b-2 border-gray-100 dark:border-[#3A3A3C] focus:border-cyan-500 outline-none text-gray-800 dark:text-gray-200 font-medium transition-colors"
+                                    className="flex-1 min-w-0 bg-transparent py-2 border-b-2 border-border focus:border-accent outline-none text-text-primary font-medium transition-colors"
                                 />
-                                <span className="text-gray-400 py-2">.txt</span>
+                                <span className="text-text-secondary py-2">.txt</span>
                             </div>
                         </div>
 
@@ -357,14 +357,14 @@ export default function ImageRichTextExporterHEXRLEV2() {
                             <button
                                 onClick={copyToClipboard}
                                 disabled={!generated}
-                                className="flex-1 rounded-3xl bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold shadow-lg shadow-cyan-500/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                                className="flex-1 rounded-3xl bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold shadow-lg shadow-accent/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                             >
                                 <Copy size={20} /> Copy
                             </button>
                             <button
                                 onClick={downloadTxt}
                                 disabled={!generated}
-                                className="flex-1 rounded-3xl bg-gray-100 dark:bg-[#2C2C2E] hover:bg-gray-200 dark:hover:bg-[#3A3A3C] disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 dark:text-white font-bold border border-gray-200 dark:border-[#3A3A3C] transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                                className="flex-1 rounded-3xl bg-primary hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed text-text-primary font-bold border border-border transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                             >
                                 <Download size={20} /> Download
                             </button>
