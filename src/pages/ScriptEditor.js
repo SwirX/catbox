@@ -351,7 +351,7 @@ export default function ScriptEditor() {
           style={{
             width: isFullscreen ? "100%" : "900px",
             maxWidth: "100%",
-            height: isFullscreen ? "100%" : "600px",
+            height: isFullscreen ? "100%" : "700px",
             gap: GAP,
           }}
         >

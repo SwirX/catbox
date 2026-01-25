@@ -1,5 +1,13 @@
 # Catbox Changelog
 
+## 1.7.2
+- Done a UI overhaul for the whole website
+- Added new themes
+- Remade the Script Editor (Exporting not working yet)
+- Remade the Rich Text Editor
+- Added Figma Exporter
+- Fixed some bugs
+
 ## 1.7.1
 - Updated the List Importer to support JSON objects and not only JSON arrays.
 

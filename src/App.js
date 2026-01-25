@@ -9,6 +9,8 @@ import JsonCleaner from "./pages/JsonCleaner";
 import Layout from "./components/Layout";
 import ScriptEditor from "./pages/ScriptEditor";
 import RichTextEditor from "./pages/RichtextEditor";
+import AIDocsPage from "./pages/AIDocsPage";
+import FigmaExporter from "./pages/FigmaExporter";
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
             <Route path="/image-exporter-v3" element={<ImageRichTextExporterHEXRLEV2 />} />
             <Route path="/json-cleaner" element={<JsonCleaner />} />
             <Route path="/rich-text-editor" element={<RichTextEditor />} />
+            <Route path="/ai-docs" element={<AIDocsPage />} />
+            <Route path="/figma-exporter" element={<FigmaExporter />} />
           </Routes>
         </Layout>
       } />

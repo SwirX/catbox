@@ -1,5 +1,5 @@
 import ToolCard from "../components/ToolCard";
-import { Code, FileJson, ImageIcon, Send, WholeWordIcon, Type, Layers } from "lucide-react";
+import { Code, FileJson, ImageIcon, Send, WholeWordIcon, Type, Layers, BookOpen, Figma } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function HomePage() {
@@ -98,6 +98,22 @@ export default function HomePage() {
                             title="Lyra API Builder"
                             description="Interactive URL builder for The Lyra API. Construct requests visually."
                             path="/lyra-api-builder"
+                        />
+                    </motion.div>
+                    <motion.div variants={item}>
+                        <ToolCard
+                            icon={<BookOpen size={24} />}
+                            title="AI Documentation"
+                            description="CatWeb spec files for AI assistants. Download or copy for your prompts."
+                            path="/ai-docs"
+                        />
+                    </motion.div>
+                    <motion.div variants={item}>
+                        <ToolCard
+                            icon={<Figma size={24} />}
+                            title="Figma Exporter"
+                            description="Convert Figma designs to CatWeb JSON. Map layers to elements automatically."
+                            path="/figma-exporter"
                         />
                     </motion.div>
                 </div>
