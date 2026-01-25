@@ -374,13 +374,6 @@ For the complete specification with all IDs and examples, download this file.
     },
 ];
 
-// Full content for downloads - these are the actual file contents
-const FULL_DOCS = {
-    catui: `/home/swirx/dev/projects/web/catbox/CatWeb-Docs/CatUI.md`,
-    catdocs: `/home/swirx/dev/projects/web/catbox/CatWeb-Docs/CatDocs.md`,
-    catscript: `/home/swirx/dev/projects/web/catbox/CatWeb-Docs/CatScript.md`,
-};
-
 export default function AIDocsPage() {
     const [copiedId, setCopiedId] = useState(null);
 

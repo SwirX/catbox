@@ -2,10 +2,6 @@ import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Figma, Download, Copy, Check, RefreshCw, Eye, ChevronRight, ChevronDown, AlertCircle } from "lucide-react";
 
-// Figma API credentials
-const FIGMA_CLIENT_ID = "o6UoQyaJ5pHvhRjda6dPl4";
-const FIGMA_CLIENT_SECRET = "upzBr4t8pdtmM2F6yBkZmazaqYGcfC";
-
 // Helper to generate unique globalids
 const generateId = () => Math.random().toString(36).substr(2, 6);
 
@@ -203,7 +199,6 @@ export default function FigmaExporter() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [copied, setCopied] = useState(false);
-    const [activeTab, setActiveTab] = useState("tree");
 
     // Extract file key from Figma URL
     const extractFileKey = (url) => {

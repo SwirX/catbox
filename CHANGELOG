@@ -1,12 +1,20 @@
 # Catbox Changelog
 
 ## 1.7.2
-- Done a UI overhaul for the whole website
-- Added new themes
-- Remade the Script Editor (Exporting not working yet)
-- Remade the Rich Text Editor
-- Added Figma Exporter
-- Fixed some bugs
+- **Website UI Overhaul**: Complete redesign with modern aesthetics, glassmorphism, and improved navigation.
+- **AI Documentation Branding**: New dedicated page for AI-ready documentation (Credits to @sytesn).
+- **Figma Exporter**:
+    - Automatic conversion of Figma layers to CatWeb JSON.
+    - Implemented **relative UDim2 normalization** for accurate positions.
+    - Added **UIAspectRatioConstraint** generation to preserve design proportions.
+- **Script Editor Improvements**: 
+    - Increased viewport height to 700px.
+    - Better layout handling for non-fullscreen mode.
+- **Security & Reliability**:
+    - Moved API credentials to `.env` architecture.
+    - Cleaned up unused code to resolve Vercel build/linting errors.
+    - Fixed various UI bugs and theme inconsistencies.
+- Added new themes and refined existing ones.
 
 ## 1.7.1
 - Updated the List Importer to support JSON objects and not only JSON arrays.

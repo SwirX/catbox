@@ -38,7 +38,6 @@ export default function ScriptEditor() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const [isDarkTheme, setIsDarkTheme] = useState(true);
-  const [clipboard, setClipboard] = useState(null);
   const [canvasPastePos, setCanvasPastePos] = useState(null);
 
   useEffect(() => {
@@ -176,7 +175,6 @@ export default function ScriptEditor() {
     const event = script.content.find((e) => e.globalid === eventId);
     if (event) {
       const eventCopy = JSON.parse(JSON.stringify(event));
-      setClipboard({ type: "event", data: eventCopy });
       navigator.clipboard.writeText(JSON.stringify(eventCopy, null, 2));
     }
   }, [data, selectedScriptIndex]);

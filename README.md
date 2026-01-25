@@ -23,8 +23,10 @@ Catbox streamlines your Catweb workflow by combining multiple essential tools in
 - **Image Exporter** – Convert images into Roblox rich text for use in text labels without uploading to Roblox.  
 - **Image Exporter V3** – Latest iteration with RLE and hex code compression. Validates row/column lengths. Some large images may exceed Catweb textbox limits.  
 - **Json Cleaner** – Cleans Catweb JSON by embedding variables into scripts to bypass Roblox filtering.  
-- **Script Editor** – (WIP, dev branch) Web-based script editor resembling Catweb's in-game editor.  
-- **Rich Text Editor** – (WIP, dev branch) WYSIWYG rich text editor that outputs Roblox-compatible rich text.
+- **AI Documentation** – Hosted CatWeb specification files for AI assistants. Download or copy `CatUI`, `CatDocs`, and `CatScript` specs.
+- **Figma Exporter** – Convert Figma designs directly to CatWeb JSON. Handles relative UDim2 normalization and aspect ratio preservation.
+- **Script Editor** – (WIP) Web-based script editor resembling Catweb's in-game editor. Taller 700px viewport for better workflow.
+- **Rich Text Editor** – (WIP) WYSIWYG rich text editor that outputs Roblox-compatible rich text.
 
 > **Note:** Image Exporter V2 exists but is deprecated and hidden from the homepage.
 
@@ -52,7 +54,7 @@ Visit [Catbox Live](https://sxcatbox.vercel.app/) and use any of the available t
    ```
 4. Open your browser at `http://localhost:3000` to view Catbox locally.
 
-> No environment variables needed. The site runs fully with the default setup.
+> **Note:** Copy `.env.example` to `.env` to configure optional tool credentials (e.g., Figma API). The site runs with reduced functionality without them.
 
 ## Tech Stack
 
@@ -81,6 +83,7 @@ Catbox is open-source under the [Creative Commons Attribution-NonCommercial 4.0 
 
 ## Credits
 - Image Exporter (original [Python version](https://github.com/quitism/catweb/blob/main/ascii.py)) by [quitism](https://github.com/quitism)
+- AI Documentation files by [sytesn](https://github.com/quitism) (quitism)
 - Inspiration and ideas from Catweb community
 
 ## Contact

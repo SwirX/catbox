@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LyraBuilder from "./pages/LyraApiBuilder";
 import ImageRichTextExporter from "./pages/ImageExporter";

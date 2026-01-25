@@ -1,5 +1,4 @@
 import React from "react";
-import { STYLING } from "./Constants";
 
 const BlockInput = ({ type, value, onChange, label, className = "" }) => {
     const handleChange = (e) => {

@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { CATEGORIES, ACTION_TYPES, EVENT_TYPES, STYLING } from "./Constants";
+import { CATEGORIES, ACTION_TYPES, EVENT_TYPES } from "./Constants";
 import Icon from "./Icon";
 
 const BlockPalette = ({ onDragStart, onDeleteDrop }) => {
