@@ -42,12 +42,14 @@ export default function ThemeToggle() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-3 w-64 p-2 rounded-2xl bg-surface border border-border shadow-xl z-50 backdrop-blur-xl"
+                        className="absolute right-0 mt-3 w-80 sm:w-96 max-h-[80vh] flex flex-col rounded-2xl bg-surface border border-border shadow-2xl z-50 backdrop-blur-xl overflow-hidden"
                     >
-                        <div className="px-3 py-2 text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
-                            Select Theme
+                        <div className="p-4 border-b border-border bg-surface/50 backdrop-blur-md">
+                            <h3 className="text-sm font-bold text-text-primary">Select Theme</h3>
+                            <p className="text-xs text-text-secondary mt-0.5">Choose a visual style</p>
                         </div>
-                        <div className="space-y-1 max-h-[60vh] overflow-y-auto custom-scrollbar">
+
+                        <div className="overflow-y-auto custom-scrollbar p-2 grid grid-cols-1 gap-1">
                             {Object.entries(definedThemes).map(([key, themeData]) => (
                                 <button
                                     key={key}
@@ -55,17 +57,29 @@ export default function ThemeToggle() {
                                         setTheme(key);
                                         setIsOpen(false);
                                     }}
-                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${theme === key
-                                        ? "bg-accent text-white"
-                                        : "text-text-primary hover:bg-surface-hover"
+                                    className={`relative flex items-center gap-3 px-3 py-3 rounded-xl transition-all border border-transparent ${theme === key
+                                            ? "bg-accent/10 border-accent/50 ring-1 ring-accent/20"
+                                            : "hover:bg-surface-hover border-transparent"
                                         }`}
                                 >
-                                    <div
-                                        className="w-4 h-4 rounded-full border border-white/20 shadow-sm"
-                                        style={{ backgroundColor: themeData.colors.background }}
-                                    />
-                                    <span className="flex-1 text-left">{themeData.name}</span>
-                                    {theme === key && <Check size={16} />}
+                                    {/* Palette Preview */}
+                                    <div className="flex -space-x-1 shrink-0">
+                                        <div className="w-6 h-6 rounded-full border border-border shadow-sm" style={{ backgroundColor: themeData.colors.background }} title="Background" />
+                                        <div className="w-6 h-6 rounded-full border border-border shadow-sm" style={{ backgroundColor: themeData.colors.surface }} title="Surface" />
+                                        <div className="w-6 h-6 rounded-full border border-border shadow-sm" style={{ backgroundColor: themeData.colors.accent }} title="Accent" />
+                                    </div>
+
+                                    <div className="flex-1 text-left min-w-0">
+                                        <div className={`text-sm font-semibold truncate ${theme === key ? 'text-accent' : 'text-text-primary'}`}>
+                                            {themeData.name}
+                                        </div>
+                                    </div>
+
+                                    {theme === key && (
+                                        <div className="text-accent shrink-0 bg-accent/10 p-1 rounded-full">
+                                            <Check size={14} strokeWidth={3} />
+                                        </div>
+                                    )}
                                 </button>
                             ))}
                         </div>
