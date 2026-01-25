@@ -1,12 +1,14 @@
 # Catbox Changelog
 
-## [Unreleased]
-### 1.7.0-beta+1
-- Added Rich Text Editor (available in the dev branch)
+## 1.7.1
+- Updated the List Importer to support JSON objects and not only JSON arrays.
+
+## 1.7.0-beta+1
+- Added Rich Text Editor (available in the dev, added for preview)
 - General bug fixes and code refactoring for improved stability
 
-### 1.7.0-beta
-- Introduced Script Editor (work-in-progress, dev branch)
+## 1.7.0-beta
+- Introduced Script Editor (work-in-progress, dev, added for preview)
 
 ## 1.6.3
 - Added Json Cleaner tool for optimized Catweb JSON handling

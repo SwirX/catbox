@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Download, Copy, Edit, Trash2, ArrowUp, ArrowDown, Upload, Plus, ChevronDown, ChevronRight, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import JsonImportModal from "../components/ListJsonImport";
-// import KeyValueModal from "../components/KeyValueModal"
 
 /* ---------------------- Helpers ---------------------- */
 const numberToLetters = (n) => {
@@ -194,381 +193,245 @@ export default function ListImporter() {
 
   const [entries, setEntries] = useState([]);
   const [newEntry, setNewEntry] = useState("");
+  const [newKey, setNewKey] = useState("");          // <-- dictionary key
   const [generated, setGenerated] = useState(null);
 
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [importType, setImportType] = useState("plain");
 
+  /* ------------ mode toggle ------------ */
+  const [isDict, setIsDict] = useState(false);
 
+  /* ------------ CRUD helpers ------------ */
   const addString = () => {
     if (!newEntry.trim()) return;
-    setEntries(prev => [...prev, { id: makeId(), type: "string", value: newEntry.trim() }]);
-    setNewEntry("");
+    setEntries(prev => [...prev, { id: makeId(), type: "string", value: newEntry.trim(), key: newKey.trim() || `key_${prev.length}` }]);
+    setNewEntry(""); setNewKey("");
   };
 
   const addStruct = () => {
     const letter = numberToLetters(entries.filter(e => e.type === "struct").length);
     const name = `item_${letter}`;
-    setEntries(prev => [...prev, { id: makeId(), type: "struct", name, fields: {} }]);
+    setEntries(prev => [...prev, { id: makeId(), type: "struct", name, fields: {}, key: newKey.trim() || `key_${prev.length}` }]);
+    setNewKey("");
   };
 
   const editString = (id, val) => {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, value: val } : e));
   };
-
   const updateStruct = (id, newStruct) => {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, ...newStruct } : e));
   };
-
   const deleteEntry = (id) => setEntries(prev => prev.filter(e => e.id !== id));
   const moveUp = (idx) => {
-    if (idx === 0) return;
-    const copy = [...entries];
-    [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]];
-    setEntries(copy);
+    if (idx === 0) return; const copy = [...entries]; [copy[idx - 1], copy[idx]] = [copy[idx], copy[idx - 1]]; setEntries(copy);
   };
   const moveDown = (idx) => {
-    if (idx === entries.length - 1) return;
-    const copy = [...entries];
-    [copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]];
-    setEntries(copy);
+    if (idx === entries.length - 1) return; const copy = [...entries]; [copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]]; setEntries(copy);
   };
 
-  /* ---------------------- Import: Plain JSON ---------------------- */
+  /* ------------ Import: Plain JSON (list or dict) ------------ */
   const importPlainList = (raw) => {
     try {
-      const arr = JSON.parse(raw);
-      if (!Array.isArray(arr)) throw new Error("Not an array");
-      let structCount = 0;
-      const mapped = arr.map((v) => {
-        if (v && typeof v === "object") {
-          const name = `item_${numberToLetters(structCount++)}`;
-          const toStruct = (obj, fallbackName) => ({
-            type: "struct",
-            name: fallbackName,
-            fields: Object.fromEntries(Object.entries(obj).map(([k, val], idx) => {
-              if (val && typeof val === "object") {
-                return [k, toStruct(val, k)];
-              }
-              return [k, String(val)];
-            }))
-          });
-          return { id: makeId(), ...toStruct(v, name) };
-        } else {
-          return { id: makeId(), type: "string", value: String(v) };
-        }
-      });
-      setEntries(mapped);
-    } catch (e) {
-      alert("Invalid list JSON");
-    }
+      const parsed = JSON.parse(raw);
+      const isDictMode = !Array.isArray(parsed);
+      setIsDict(isDictMode);
+
+      if (isDictMode) {
+        const rebuilt = Object.entries(parsed).map(([k, v]) => {
+          if (v && typeof v === "object" && !Array.isArray(v)) {
+            const toStruct = (obj, fallbackName) => ({
+              type: "struct",
+              name: fallbackName,
+              fields: Object.fromEntries(Object.entries(obj).map(([kk, vv]) => {
+                if (vv && typeof vv === "object" && !Array.isArray(vv)) return [kk, toStruct(vv, kk)];
+                return [kk, String(vv)];
+              }))
+            });
+            return { id: makeId(), key: k, ...toStruct(v, k) };
+          } else {
+            return { id: makeId(), type: "string", key: k, value: String(v) };
+          }
+        });
+        setEntries(rebuilt);
+      } else {
+        /* old list behaviour */
+        let structCount = 0;
+        const mapped = parsed.map((v) => {
+          if (v && typeof v === "object") {
+            const name = `item_${numberToLetters(structCount++)}`;
+            const toStruct = (obj, fallbackName) => ({
+              type: "struct",
+              name: fallbackName,
+              fields: Object.fromEntries(Object.entries(obj).map(([k, val], idx) => {
+                if (val && typeof val === "object") return [k, toStruct(val, k)];
+                return [k, String(val)];
+              }))
+            });
+            return { id: makeId(), ...toStruct(v, name) };
+          } else {
+            return { id: makeId(), type: "string", value: String(v) };
+          }
+        });
+        setEntries(mapped);
+      }
+    } catch (e) { alert("Invalid JSON"); }
   };
 
-  /* ---------------------- Import: Catweb JSON (reverse) ---------------------- */
+  /* ------------ Import: Catweb JSON (reverse) ------------ */
   const importCatweb = (raw) => {
     try {
       const scripts = JSON.parse(raw);
-
-      const tables = {};
-      const inserts = [];
-      const created = new Set();
-      let mainTable = null;
+      const tables = {}; const inserts = []; const created = new Set(); let mainTable = null;
 
       scripts.forEach(sc => {
         (sc.content || []).forEach(block => {
           (block.actions || []).forEach(act => {
             const t = act.text || [];
-
             if (t[0] === "Create table" && t[1]?.value) {
-              const tbl = t[1].value;
-              created.add(tbl);
-              if (!tables[tbl]) tables[tbl] = {};
-              if (!mainTable) mainTable = tbl;
+              const tbl = t[1].value; created.add(tbl); if (!tables[tbl]) tables[tbl] = {}; if (!mainTable) mainTable = tbl;
             }
-
             if (t[0] === "Set entry" && t[1]?.value && t[3]?.value && t[5]) {
-              const key = t[1].value;
-              const tbl = t[3].value;
-              const valNode = t[5];
-              const val = valNode?.value ?? "";
-              if (!tables[tbl]) tables[tbl] = {};
-              tables[tbl][key] = String(val);
+              const key = t[1].value; const tbl = t[3].value; const valNode = t[5]; const val = valNode?.value ?? "";
+              if (!tables[tbl]) tables[tbl] = {}; tables[tbl][key] = String(val);
             }
-
             if (t[0] === "Insert" && t[5]?.value) {
-              const arrName = t[5].value;
-              if (arrName === mainTable) {
-                const valNode = t[1];
-                const val = valNode?.value ?? "";
-                inserts.push(val);
-              }
+              const arrName = t[5].value; if (arrName === mainTable) inserts.push(t[1]?.value ?? "");
             }
           });
         });
       });
+
+      /* decide mode */
+      const hasInsert = scripts.some(sc => (sc.content || []).some(b => (b.actions || []).some(a => (a.text || [])[0] === "Insert")));
+      setIsDict(!hasInsert);
 
       const toStructNode = (tblName, obj) => {
         const node = { id: makeId(), type: "struct", name: tblName, fields: {} };
         for (const [k, v] of Object.entries(obj)) {
-          if (created.has(v) && tables[v]) {
-            node.fields[k] = toStructNode(v, tables[v]);
-          } else {
-            node.fields[k] = String(v);
-          }
+          if (created.has(v) && tables[v]) node.fields[k] = toStructNode(v, tables[v]);
+          else node.fields[k] = String(v);
         }
         return node;
       };
 
-      const rebuilt = inserts.map(val => {
-        if (created.has(val)) {
-          const rawObj = tables[val] || {};
-          return toStructNode(val, rawObj);
-        } else {
+      if (hasInsert) { /* list mode */
+        const rebuilt = inserts.map(val => {
+          if (created.has(val)) return toStructNode(val, tables[val] || {});
           return { id: makeId(), type: "string", value: String(val) };
-        }
-      });
-
-      setEntries(rebuilt);
+        });
+        setEntries(rebuilt);
+      } else { /* dictionary mode */
+        const rebuilt = Object.entries(tables[mainTable] || {}).map(([k, v]) => {
+          if (created.has(v)) return { id: makeId(), key: k, ...toStructNode(v, tables[v] || {}) };
+          return { id: makeId(), type: "string", key: k, value: String(v) };
+        });
+        setEntries(rebuilt);
+      }
       if (mainTable) setTableName(mainTable);
-    } catch (e) {
-      alert("Invalid Catweb JSON");
-      console.log(e);
-    }
+    } catch (e) { alert("Invalid Catweb JSON"); console.error(e); }
   };
 
-
-  /* ---------------------- Generate Catweb JSON ---------------------- */
+  /* ------------ Generator ------------ */
   const generateJson = () => {
     const usedIds = new Set();
-    const randomId = () => {
-      while (true) {
-        const rid = Math.random().toString(36).slice(2, 8);
-        if (!usedIds.has(rid)) { usedIds.add(rid); return rid; }
-      }
-    };
+    const randomId = () => { while (true) { const rid = Math.random().toString(36).slice(2, 8); if (!usedIds.has(rid)) { usedIds.add(rid); return rid; } } };
 
     const actionsAll = [];
-
-    actionsAll.push({
-      id: "54",
-      text: ["Create table", { value: tableName, t: "string", l: "table" }],
-      globalid: randomId()
-    });
+    actionsAll.push({ id: "54", text: ["Create table", { value: tableName, t: "string", l: "table" }], globalid: randomId() });
 
     const createStructTable = (node, fallbackName) => {
       const name = (node.name && node.name.trim()) ? node.name.trim() : (fallbackName || `item_${numberToLetters(0)}`);
-      actionsAll.push({
-        id: "54",
-        text: ["Create table", { value: name, t: "string", l: "table" }],
-        globalid: randomId()
-      });
-
+      actionsAll.push({ id: "54", text: ["Create table", { value: name, t: "string", l: "table" }], globalid: randomId() });
       for (const [k, v] of Object.entries(node.fields || {})) {
         if (v && typeof v === "object" && v.type === "struct") {
           const childTableName = createStructTable(v, k);
-          actionsAll.push({
-            id: "55",
-            text: ["Set entry", { value: k, t: "string", l: "entry" }, "of", { value: name, t: "string", l: "table" }, "to", { value: childTableName, l: "any", t: "string" }],
-            globalid: randomId()
-          });
+          actionsAll.push({ id: "55", text: ["Set entry", { value: k, t: "string", l: "entry" }, "of", { value: name, t: "string", l: "table" }, "to", { value: childTableName, l: "any", t: "string" }], globalid: randomId() });
         } else {
-          actionsAll.push({
-            id: "55",
-            text: ["Set entry", { value: k, t: "string", l: "entry" }, "of", { value: name, t: "string", l: "table" }, "to", { value: String(v), l: "any", t: "string" }],
-            globalid: randomId()
-          });
+          actionsAll.push({ id: "55", text: ["Set entry", { value: k, t: "string", l: "entry" }, "of", { value: name, t: "string", l: "table" }, "to", { value: String(v), l: "any", t: "string" }], globalid: randomId() });
         }
       }
-
       return name;
     };
 
     const weightedInserts = [];
-    let autoStructCounter = 0;
-
-    entries.forEach((e, i) => {
+    entries.forEach((e) => {
       if (e.type === "string") {
-        weightedInserts.push({
-          weight: 1,
-          build: () => ([
-            {
-              id: "89",
-              text: ["Insert", { value: String(e.value), t: "string", l: "any" }, "at position", { t: "number", l: "number?" }, "of", { value: tableName, t: "string", l: "array" }],
-              globalid: randomId()
-            }
-          ])
-        });
+        if (isDict) {
+          weightedInserts.push({ weight: 1, build: () => [{ id: "55", text: ["Set entry", { value: e.key, t: "string", l: "entry" }, "of", { value: tableName, t: "string", l: "table" }, "to", { value: String(e.value), l: "any", t: "string" }], globalid: randomId() }] });
+        } else {
+          weightedInserts.push({ weight: 1, build: () => [{ id: "89", text: ["Insert", { value: String(e.value), t: "string", l: "any" }, "at position", { t: "number", l: "number?" }, "of", { value: tableName, t: "string", l: "array" }], globalid: randomId() }] });
+        }
       } else if (e.type === "struct") {
-        let name = e.name && e.name.trim() ? e.name.trim() : `item_${numberToLetters(autoStructCounter++)}`;
+        const name = e.name && e.name.trim() ? e.name.trim() : `item_${numberToLetters(0)}`;
         const build = () => {
-          // const beforeLen = actionsAll.length;
-          const actualName = createStructTable({ ...e, name }, name);
-          return [
-            {
-              id: "89",
-              text: ["Insert", { value: actualName, t: "string", l: "any" }, "at position", { t: "number", l: "number?" }, "of", { value: tableName, t: "string", l: "array" }],
-              globalid: randomId()
-            }
-          ];
+          const builtName = createStructTable({ ...e, name }, name);
+          if (isDict) {
+            return [{ id: "55", text: ["Set entry", { value: e.key, t: "string", l: "entry" }, "of", { value: tableName, t: "string", l: "table" }, "to", { value: builtName, l: "any", t: "string" }], globalid: randomId() }];
+          } else {
+            return [{ id: "89", text: ["Insert", { value: builtName, t: "string", l: "any" }, "at position", { t: "number", l: "number?" }, "of", { value: tableName, t: "string", l: "array" }], globalid: randomId() }];
+          }
         };
         weightedInserts.push({ weight: 25, build });
       }
     });
 
-    const contents = [];
-    let actionsChunk = [];
-    let weightSum = 0;
-    const pushChunk = (x, y) => {
-      if (actionsChunk.length === 0) return;
-      contents.push({
-        y: String(y),
-        x: String(x),
-        globalid: randomId(),
-        id: "0",
-        text: ["When Website loaded..."],
-        actions: actionsChunk,
-        width: String(blockWidth)
-      });
-      actionsChunk = [];
-      weightSum = 0;
-    };
-
-    let blockCount = 0, x = 0, y = 0;
-    actionsChunk.push(actionsAll[0]);
-    for (let i = 0; i < weightedInserts.length; i++) {
-      const { weight, /*build*/ } = weightedInserts[i];
-      if (weightSum + weight > insertsPerBlock) {
-        pushChunk(x, y);
-        blockCount++;
-        x = blockCount * xStep;
-        if (x > xMax) { x = 0; y += blockHeight; }
-      }
-
-      // const built = build();
-    }
-
+    /* same tiling logic as before */
     const contents2 = [];
-    actionsChunk = [{ ...actionsAll[0] }];
-    weightSum = 0;
-    blockCount = 0; x = 0; y = 0;
-
-    const buildStructActions = (node, fallbackName) => {
-      const name = (node.name && node.name.trim()) ? node.name.trim() : (fallbackName || `item_${numberToLetters(0)}`);
-      const acc = [];
-      acc.push({
-        id: "54",
-        text: ["Create table", { value: name, t: "string", l: "table" }],
-        globalid: randomId()
-      });
-      for (const [k, v] of Object.entries(node.fields || {})) {
-        if (v && typeof v === "object" && v.type === "struct") {
-          const child = buildStructActions(v, k);
-          acc.push(...child.actions);
-          acc.push({
-            id: "55",
-            text: ["Set entry", { value: k, t: "string", l: "entry" }, "of", { value: name, t: "string", l: "table" }, "to", { value: child.name, l: "any", t: "string" }],
-            globalid: randomId()
-          });
-        } else {
-          acc.push({
-            id: "55",
-            text: ["Set entry", { value: k, t: "string", l: "entry" }, "of", { value: name, t: "string", l: "table" }, "to", { value: String(v), l: "any", t: "string" }],
-            globalid: randomId()
-          });
-        }
-      }
-      return { name, actions: acc };
-    };
+    let actionsChunk = [{ ...actionsAll[0] }];
+    let weightSum = 0; let blockCount = 0; let x = 0; let y = 0;
 
     const flushChunk = () => {
-      contents2.push({
-        y: String(y),
-        x: String(x),
-        globalid: randomId(),
-        id: "0",
-        text: ["When Website loaded..."],
-        actions: actionsChunk,
-        width: String(blockWidth)
-      });
-      actionsChunk = [];
-      weightSum = 0;
+      contents2.push({ y: String(y), x: String(x), globalid: randomId(), id: "0", text: ["When Website loaded..."], actions: actionsChunk, width: String(blockWidth) });
+      actionsChunk = []; weightSum = 0;
     };
 
-    for (const e of entries) {
-      const weight = (e.type === "struct") ? 25 : 1;
-      if (weightSum + weight > insertsPerBlock && actionsChunk.length > 0) {
-        flushChunk();
-        blockCount++;
-        x = blockCount * xStep;
-        if (x > xMax) { x = 0; y += blockHeight; }
+    for (const e of weightedInserts) {
+      const w = e.weight;
+      if (weightSum + w > insertsPerBlock && actionsChunk.length > 0) {
+        flushChunk(); blockCount++; x = blockCount * xStep; if (x > xMax) { x = 0; y += blockHeight; }
       }
       if (actionsChunk.length === 0 && contents2.length === 0) {
-        actionsChunk.push({
-          id: "54",
-          text: ["Create table", { value: tableName, t: "string", l: "table" }],
-          globalid: randomId()
-        });
+        actionsChunk.push({ ...actionsAll[0] });
       }
-
-      if (e.type === "string") {
-        actionsChunk.push({
-          id: "89",
-          text: ["Insert", { value: String(e.value), t: "string", l: "any" }, "at position", { t: "number", l: "number?" }, "of", { value: tableName, t: "string", l: "array" }],
-          globalid: randomId()
-        });
-      } else {
-        const name = e.name && e.name.trim() ? e.name.trim() : `item_${numberToLetters(0)}`;
-        const built = buildStructActions({ ...e, name }, name);
-        actionsChunk.push(...built.actions);
-        actionsChunk.push({
-          id: "89",
-          text: ["Insert", { value: built.name, t: "string", l: "any" }, "at position", { t: "number", l: "number?" }, "of", { value: tableName, t: "string", l: "array" }],
-          globalid: randomId()
-        });
-      }
-      weightSum += weight;
+      const built = e.build();
+      actionsChunk.push(...built);
+      weightSum += w;
     }
-
     if (actionsChunk.length > 0) flushChunk();
 
-    const scripts = [
-      {
-        class: "script",
-        content: contents2,
-        globalid: Math.random().toString(36).slice(2, 8),
-        alias: fileName.replace(/\.json$/, "")
-      }
-    ];
-
+    const scripts = [{ class: "script", content: contents2, globalid: Math.random().toString(36).slice(2, 8), alias: fileName.replace(/\.json$/, "") }];
     setGenerated(JSON.stringify(scripts, null, 2));
   };
 
-  /* ---------------------- Export helpers ---------------------- */
+  /* ------------ Export helpers ------------ */
   const copyJson = () => { if (generated) navigator.clipboard.writeText(generated); };
   const downloadJson = () => {
     if (!generated) return;
     const blob = new Blob([generated], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    a.click();
+    const a = document.createElement("a"); a.href = url; a.download = fileName; a.click();
   };
 
-  /* ---------------------- Render ---------------------- */
+  /* ------------ Render ------------ */
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 text-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">List Importer</h1>
+      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">List / Dictionary Importer</h1>
 
       {/* Config */}
       <div className="grid gap-4 md:grid-cols-2 mb-2">
-        <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
-          value={tableName} onChange={e => setTableName(e.target.value)} placeholder="Main Table Name" />
-        <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
-          value={fileName} onChange={e => setFileName(e.target.value)} placeholder="File Name (e.g., my_file.json)" />
+        <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100" value={tableName} onChange={e => setTableName(e.target.value)} placeholder="Main Table Name" />
+        <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100" value={fileName} onChange={e => setFileName(e.target.value)} placeholder="File Name (e.g., my_file.json)" />
       </div>
 
-      {/* Advanced */}
+      {/* List / Dictionary toggle */}
+      <div className="flex items-center gap-3 mb-4">
+        <span className="text-sm text-gray-900 dark:text-gray-100">Mode:</span>
+        <button onClick={() => setIsDict(false)} className={`px-3 py-1 rounded text-sm ${!isDict ? "bg-indigo-600 text-white" : "bg-gray-200 dark:bg-slate-700"}`}>List</button>
+        <button onClick={() => setIsDict(true)} className={`px-3 py-1 rounded text-sm ${isDict ? "bg-indigo-600 text-white" : "bg-gray-200 dark:bg-slate-700"}`}>Dictionary</button>
+      </div>
+
+      {/* Advanced (unchanged) */}
       <div className="mb-6">
         <button onClick={() => setShowAdvanced(v => !v)} className="flex items-center gap-2 dark:text-sm px-3 py-2 rounded bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-gray-100">
           <Settings size={16} /> {showAdvanced ? "Hide" : "Show"} Advanced Settings
@@ -577,31 +440,11 @@ export default function ListImporter() {
           {showAdvanced && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
               <div className="grid gap-4 md:grid-cols-3 mt-3">
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                  <span className="w-40">Inserts Per Block</span>
-                  <input type="number" value={insertsPerBlock} onChange={e => setInsertsPerBlock(+e.target.value)}
-                    className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" />
-                </label>
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                  <span className="w-40">X Step</span>
-                  <input type="number" value={xStep} onChange={e => setXStep(+e.target.value)}
-                    className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" />
-                </label>
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                  <span className="w-40">X Max</span>
-                  <input type="number" value={xMax} onChange={e => setXMax(+e.target.value)}
-                    className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" />
-                </label>
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                  <span className="w-40">Block Width</span>
-                  <input type="number" value={blockWidth} onChange={e => setBlockWidth(+e.target.value)}
-                    className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" />
-                </label>
-                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                  <span className="w-40">Block Height</span>
-                  <input type="number" value={blockHeight} onChange={e => setBlockHeight(+e.target.value)}
-                    className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" />
-                </label>
+                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">Inserts Per Block</span><input type="number" value={insertsPerBlock} onChange={e => setInsertsPerBlock(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
+                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">X Step</span><input type="number" value={xStep} onChange={e => setXStep(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
+                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">X Max</span><input type="number" value={xMax} onChange={e => setXMax(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
+                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">Block Width</span><input type="number" value={blockWidth} onChange={e => setBlockWidth(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
+                <label className="text-sm text-gray-900 dark:text-gray-100 flex items-center gap-2"><span className="w-40">Block Height</span><input type="number" value={blockHeight} onChange={e => setBlockHeight(+e.target.value)} className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" /></label>
               </div>
             </motion.div>
           )}
@@ -610,8 +453,8 @@ export default function ListImporter() {
 
       {/* Add Entry */}
       <div className="flex gap-2 mb-4">
-        <input className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
-          value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder="New entry (string)" />
+        {isDict && <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100 w-36" value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="Key" />}
+        <input className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100" value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder={isDict ? "Value (string)" : "New entry (string)"} />
         <button onClick={addString} className="px-4 py-2 rounded bg-indigo-600 text-white">Add String</button>
         <button onClick={addStruct} className="px-4 py-2 rounded bg-purple-600 text-white flex items-center gap-1"><Plus size={16} /> Add Struct</button>
       </div>
@@ -622,11 +465,8 @@ export default function ListImporter() {
           <div key={entry.id} className="p-3 rounded bg-gray-100 dark:bg-slate-800">
             {entry.type === "string" ? (
               <div className="flex items-center gap-2">
-                <input
-                  className="flex-1 px-3 py-2 rounded bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700"
-                  value={entry.value}
-                  onChange={e => editString(entry.id, e.target.value)}
-                />
+                {isDict && <span className="font-mono text-sm w-24">{entry.key}:</span>}
+                <input className="flex-1 px-3 py-2 rounded bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700" value={entry.value} onChange={e => editString(entry.id, e.target.value)} />
                 <button onClick={() => moveUp(idx)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><ArrowUp size={16} /></button>
                 <button onClick={() => moveDown(idx)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><ArrowDown size={16} /></button>
                 <button onClick={() => deleteEntry(entry.id)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><Trash2 size={16} className="text-red-500" /></button>
@@ -635,12 +475,7 @@ export default function ListImporter() {
               <>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    {/* <span className="dark:text-sm text-indigo-400">Struct Name:</span>
-                    <input
-                      className="px-2 py-1 rounded bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700"
-                      value={entry.name}
-                      onChange={e => updateStruct(entry.id, { ...entry, name: e.target.value })}
-                    /> */}
+                    {isDict && <span className="font-mono text-sm text-indigo-400">{entry.key}:</span>}
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => moveUp(idx)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><ArrowUp size={16} /></button>
@@ -648,11 +483,7 @@ export default function ListImporter() {
                     <button onClick={() => deleteEntry(entry.id)} className="p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-900 dark:text-gray-100"><Trash2 size={16} className="text-red-500" /></button>
                   </div>
                 </div>
-                <StructNode
-                  node={entry}
-                  defaultName={entry.name}
-                  onChange={(node) => updateStruct(entry.id, node)}
-                />
+                <StructNode node={entry} defaultName={entry.name} onChange={(node) => updateStruct(entry.id, node)} />
               </>
             )}
           </div>
@@ -661,20 +492,8 @@ export default function ListImporter() {
 
       {/* Import */}
       <div className="flex gap-2 mb-6 text-gray-900 dark:text-gray-100">
-        <button
-          onClick={() => { setImportType("plain"); setImportModalOpen(true); }}
-          className="px-4 py-2 rounded bg-gray-200 dark:bg-slate-700 flex items-center gap-1"
-        >
-          <Upload size={16} /> Import JSON
-        </button>
-
-        <button
-          onClick={() => { setImportType("catweb"); setImportModalOpen(true,); }}
-          className="px-4 py-2 rounded bg-gray-200 dark:bg-slate-700 flex items-center gap-1"
-        >
-          <Upload size={16} /> Import Catweb
-        </button>
-
+        <button onClick={() => { setImportType("plain"); setImportModalOpen(true); }} className="px-4 py-2 rounded bg-gray-200 dark:bg-slate-700 flex items-center gap-1"><Upload size={16} /> Import JSON</button>
+        <button onClick={() => { setImportType("catweb"); setImportModalOpen(true); }} className="px-4 py-2 rounded bg-gray-200 dark:bg-slate-700 flex items-center gap-1"><Upload size={16} /> Import Catweb</button>
       </div>
 
       {/* Generate */}
@@ -689,15 +508,8 @@ export default function ListImporter() {
           </div>
         </div>
       )}
-      <JsonImportModal
-        isOpen={importModalOpen}
-        onClose={() => setImportModalOpen(false)}
-        title={importType === "plain" ? "Import Plain JSON" : "Import Catweb JSON"}
-        onImport={(rawJson) => {
-          if (importType === "plain") importPlainList(rawJson);
-          else importCatweb(rawJson);
-        }}
-      />
+
+      <JsonImportModal isOpen={importModalOpen} onClose={() => setImportModalOpen(false)} title={importType === "plain" ? "Import Plain JSON" : "Import Catweb JSON"} onImport={(rawJson) => { if (importType === "plain") importPlainList(rawJson); else importCatweb(rawJson); }} />
       <div className="p-3 text-xs text-slate-500 dark:text-slate-300">Notes: Don't panic if the script seems empty in catweb, it's probably in the top left corner of the script canvas (You can change that in the advanced options) PS: if you break anything revert back to the default settings</div>
     </div>
   );

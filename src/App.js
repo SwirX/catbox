@@ -4,7 +4,7 @@ import LyraBuilder from "./pages/LyraApiBuilder";
 import ImageRichTextExporter from "./pages/ImageExporter";
 import ImageRichTextExporterHEXRLE from "./pages/ImageExporterV2";
 import ImageRichTextExporterHEXRLEV2 from "./pages/ImageExporterV3";
-import ListImporter from "./pages/ListImporterV2";
+import ListImporter from "./pages/ListImporterV3";
 import JsonCleaner from "./pages/JsonCleaner";
 import Layout from "./components/Layout";
 import ScriptEditor from "./pages/ScriptEditor";
