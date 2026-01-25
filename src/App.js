@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LyraBuilder from "./pages/LyraApiBuilder";
 import ImageRichTextExporter from "./pages/ImageExporter";
@@ -12,18 +12,25 @@ import RichTextEditor from "./pages/RichtextEditor";
 
 export default function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/lyra-api-builder" element={<LyraBuilder />} />
-        <Route path="/list-importer" element={<ListImporter />} />
-        <Route path="/image-exporter" element={<ImageRichTextExporter />} />
-        <Route path="/image-exporter-v2" element={<ImageRichTextExporterHEXRLE />} />
-        <Route path="/image-exporter-v3" element={<ImageRichTextExporterHEXRLEV2 />} />
-        <Route path="/json-cleaner" element={<JsonCleaner />} />
-        <Route path="/script-editor" element={<ScriptEditor />} />
-        <Route path="/rich-text-editor" element={<RichTextEditor />} />
-      </Routes>
-    </Layout>
+    <Routes>
+      {/* Script Editor with its own layout handling for fullscreen */}
+      <Route path="/script-editor" element={<ScriptEditor />} />
+
+      {/* All other routes with Layout */}
+      <Route path="*" element={
+        <Layout>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/lyra-api-builder" element={<LyraBuilder />} />
+            <Route path="/list-importer" element={<ListImporter />} />
+            <Route path="/image-exporter" element={<ImageRichTextExporter />} />
+            <Route path="/image-exporter-v2" element={<ImageRichTextExporterHEXRLE />} />
+            <Route path="/image-exporter-v3" element={<ImageRichTextExporterHEXRLEV2 />} />
+            <Route path="/json-cleaner" element={<JsonCleaner />} />
+            <Route path="/rich-text-editor" element={<RichTextEditor />} />
+          </Routes>
+        </Layout>
+      } />
+    </Routes>
   );
 }
