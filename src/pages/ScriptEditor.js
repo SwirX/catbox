@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Layers, Home } from "lucide-react";
+import { Layers, Home, X, Copy, Check, Download } from "lucide-react";
 import BlockPalette from "../components/ScriptEditor/BlockPalette";
 import Canvas from "../components/ScriptEditor/Canvas";
 import ContextMenu from "../components/ScriptEditor/ContextMenu";
@@ -30,6 +30,97 @@ const initialJson = [
 
 const generateId = () => Math.random().toString(36).substr(2, 6);
 
+// Convert internal editor format to CatWeb-compliant JSON
+// Based on actual CatWeb exports (not just docs)
+const convertToCatWebFormat = (editorData) => {
+  const convertTextArray = (textArr) => {
+    if (!Array.isArray(textArr)) return textArr;
+    return textArr.map(item => {
+      if (typeof item === 'string') return item;
+      if (typeof item === 'object' && item !== null) {
+        // Convert to CatWeb format: value, l (if exists), t
+        const converted = {};
+
+        // Value comes first
+        if (item.value !== undefined) {
+          converted.value = item.value;
+        } else {
+          converted.value = "";
+        }
+
+        // Label (l) - only add if present and meaningful
+        const label = item.l !== undefined ? item.l : item.label;
+        if (label !== undefined) {
+          converted.l = label;
+        }
+
+        // Type (t)
+        const type = item.t !== undefined ? item.t : item.type;
+        if (type !== undefined) {
+          converted.t = type;
+        }
+
+        return converted;
+      }
+      return item;
+    });
+  };
+
+  const convertAction = (action) => {
+    // CatWeb action format: id, text, globalid, t (always "0")
+    const cleanAction = {
+      id: action.id,
+      text: convertTextArray(action.text),
+      globalid: action.globalid,
+      t: action.t !== undefined ? action.t : "0"  // CatWeb adds "t": "0" to actions
+    };
+    // Only add help for comment actions (id: 124)
+    if (action.id === "124" && action.help) {
+      cleanAction.help = action.help;
+    }
+    return cleanAction;
+  };
+
+  const convertEvent = (event) => {
+    const cleanEvent = {
+      y: event.y,
+      x: event.x,
+      globalid: event.globalid,
+      id: event.id,
+      text: convertTextArray(event.text),
+      actions: (event.actions || []).map(convertAction),
+      width: event.width,
+    };
+    // Only add variable_overrides for function definitions (id: 6)
+    if (event.id === "6" && event.variable_overrides) {
+      cleanEvent.variable_overrides = event.variable_overrides;
+    }
+    return cleanEvent;
+  };
+
+  return editorData.map(script => {
+    const converted = {
+      enabled: script.enabled || "true",
+    };
+
+    // Preserve children (UI elements) if they exist
+    if (script.children && script.children.length > 0) {
+      converted.children = script.children;
+    }
+
+    converted.content = (script.content || []).map(convertEvent);
+    converted.class = script.class;
+    converted.globalid = script.globalid;
+
+    // Preserve alias if it exists
+    if (script.alias) {
+      converted.alias = script.alias;
+    }
+
+    return converted;
+  });
+};
+
 export default function ScriptEditor() {
   const [data, setData] = useState(initialJson);
   const [selectedScriptIndex] = useState(0);
@@ -39,6 +130,8 @@ export default function ScriptEditor() {
   const [contextMenu, setContextMenu] = useState(null);
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const [canvasPastePos, setCanvasPastePos] = useState(null);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportCopied, setExportCopied] = useState(false);
 
   useEffect(() => {
     const checkTheme = () => {
@@ -224,13 +317,31 @@ export default function ScriptEditor() {
   const handleReset = () => setData(initialJson);
 
   const handleExport = () => {
-    const json = JSON.stringify(data, null, 2);
+    setShowExportModal(true);
+  };
+
+  // Get CatWeb-spec-compliant export data
+  const getExportData = () => convertToCatWebFormat(data);
+
+  const handleExportCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(getExportData(), null, 2));
+      setExportCopied(true);
+      setTimeout(() => setExportCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  const handleExportDownload = () => {
+    const json = JSON.stringify(getExportData(), null, 2);
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = `${scriptName.replace(/\s+/g, "_")}.json`;
     a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleImport = () => {
@@ -442,6 +553,90 @@ export default function ScriptEditor() {
             options={buildContextMenuOptions()}
             onClose={() => { setContextMenu(null); setCanvasPastePos(null); }}
           />
+        )}
+
+        {/* Export Modal */}
+        {showExportModal && (
+          <div
+            className="fixed inset-0 z-[10000] flex items-center justify-center"
+            style={{ backgroundColor: "rgba(0,0,0,0.85)" }}
+            onClick={() => setShowExportModal(false)}
+          >
+            <div
+              className="relative w-full max-w-2xl max-h-[80vh] flex flex-col mx-4"
+              style={{
+                backgroundColor: "rgb(var(--bg-surface))",
+                borderRadius: STYLING.borderRadiusLg,
+                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                border: "1px solid rgb(var(--border))",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div
+                className="flex items-center justify-between px-6 py-4"
+                style={{ borderBottom: "1px solid rgb(var(--border))" }}
+              >
+                <h2 className="text-lg font-bold" style={{ color: "rgb(var(--text-primary))" }}>Export Script</h2>
+                <button
+                  onClick={() => setShowExportModal(false)}
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ color: "rgb(var(--text-secondary))" }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* JSON Preview */}
+              <div className="flex-1 overflow-auto p-4">
+                <pre
+                  className="text-xs font-mono p-4 rounded-xl overflow-auto max-h-[400px]"
+                  style={{
+                    backgroundColor: "rgb(var(--bg-primary))",
+                    color: "rgb(var(--text-secondary))",
+                    border: "1px solid rgb(var(--border))",
+                  }}
+                >
+                  {JSON.stringify(getExportData(), null, 2)}
+                </pre>
+              </div>
+
+              {/* Modal Footer */}
+              <div
+                className="flex items-center justify-between px-6 py-4"
+                style={{ borderTop: "1px solid rgb(var(--border))" }}
+              >
+                <p className="text-sm" style={{ color: "rgb(var(--text-secondary))" }}>
+                  {scriptName}.json
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleExportCopy}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all hover:scale-105"
+                    style={{
+                      backgroundColor: exportCopied ? "#22c55e" : "rgb(var(--bg-primary))",
+                      color: exportCopied ? "white" : "rgb(var(--text-primary))",
+                      border: "1px solid rgb(var(--border))",
+                    }}
+                  >
+                    {exportCopied ? <Check size={16} /> : <Copy size={16} />}
+                    {exportCopied ? "Copied!" : "Copy"}
+                  </button>
+                  <button
+                    onClick={handleExportDownload}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all hover:scale-105 hover:brightness-110"
+                    style={{
+                      backgroundColor: "rgb(var(--accent))",
+                      color: "#ffffff",
+                    }}
+                  >
+                    <Download size={16} />
+                    Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

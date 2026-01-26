@@ -1,6 +1,10 @@
 import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Figma, Download, Copy, Check, RefreshCw, Eye, ChevronRight, ChevronDown, AlertCircle } from "lucide-react";
+import { Figma, Download, Copy, Check, RefreshCw, Eye, ChevronRight, ChevronDown, AlertCircle, Info } from "lucide-react";
+
+// Standard Roblox viewport size
+const ROBLOX_WIDTH = 1920;
+const ROBLOX_HEIGHT = 1080;
 
 // Helper to generate unique globalids
 const generateId = () => Math.random().toString(36).substr(2, 6);
@@ -15,7 +19,7 @@ const figmaColorToHex = (color) => {
 };
 
 // Convert Figma node to CatWeb element
-const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, parentAbsolutePos = { x: 0, y: 0 }) => {
+const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, parentAbsolutePos = { x: 0, y: 0 }, rootSize = { width: 1920, height: 1080 }, useRobloxMode = false) => {
     if (!node) return null;
 
     const baseElement = {
@@ -37,14 +41,32 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
     const relX = absX - parentAbsolutePos.x;
     const relY = absY - parentAbsolutePos.y;
 
-    // Use 4-decimal scale for precision
-    const scaleX = (relX / parentSize.width).toFixed(4);
-    const scaleY = (relY / parentSize.height).toFixed(4);
-    const sizeScaleX = (width / parentSize.width).toFixed(4);
-    const sizeScaleY = (height / parentSize.height).toFixed(4);
+    if (useRobloxMode) {
+        // Roblox Mode: Normalize to 1920x1080 using offsets
+        // Scale factor from design to Roblox viewport
+        const scaleFactorX = ROBLOX_WIDTH / rootSize.width;
+        const scaleFactorY = ROBLOX_HEIGHT / rootSize.height;
 
-    baseElement.position = `{${scaleX},0},{${scaleY},0}`;
-    baseElement.size = `{${sizeScaleX},0},{${sizeScaleY},0}`;
+        // Use the smaller scale factor to maintain aspect ratio
+        const scaleFactor = Math.min(scaleFactorX, scaleFactorY);
+
+        const offsetX = Math.round(relX * scaleFactor);
+        const offsetY = Math.round(relY * scaleFactor);
+        const offsetWidth = Math.round(width * scaleFactor);
+        const offsetHeight = Math.round(height * scaleFactor);
+
+        baseElement.position = `{0,${offsetX}},{0,${offsetY}}`;
+        baseElement.size = `{0,${offsetWidth}},{0,${offsetHeight}}`;
+    } else {
+        // Scale Mode: Pure percentages for responsive layouts
+        const scaleX = (relX / parentSize.width).toFixed(4);
+        const scaleY = (relY / parentSize.height).toFixed(4);
+        const sizeScaleX = (width / parentSize.width).toFixed(4);
+        const sizeScaleY = (height / parentSize.height).toFixed(4);
+
+        baseElement.position = `{${scaleX},0},{${scaleY},0}`;
+        baseElement.size = `{${sizeScaleX},0},{${sizeScaleY},0}`;
+    }
 
     // Add Aspect Ratio Constraint to preserve design proportions
     if (width > 0 && height > 0) {
@@ -133,7 +155,7 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
         };
 
         node.children.forEach((child) => {
-            const convertedChild = convertNodeToCatWeb(child, nodeSize, nodeAbsPos);
+            const convertedChild = convertNodeToCatWeb(child, nodeSize, nodeAbsPos, rootSize, useRobloxMode);
             if (convertedChild) {
                 baseElement.children.push(convertedChild);
             }
@@ -199,6 +221,7 @@ export default function FigmaExporter() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [copied, setCopied] = useState(false);
+    const [useRobloxMode, setUseRobloxMode] = useState(false);
 
     // Extract file key from Figma URL
     const extractFileKey = (url) => {
@@ -254,7 +277,7 @@ export default function FigmaExporter() {
                     height: origin.height || 1080
                 };
 
-                const converted = convertNodeToCatWeb(rootNode, baseSize, origin);
+                const converted = convertNodeToCatWeb(rootNode, baseSize, origin, baseSize, useRobloxMode);
                 if (converted) {
                     // Wrap in proper CatWeb structure
                     const catwebOutput = [
@@ -276,7 +299,7 @@ export default function FigmaExporter() {
         } finally {
             setLoading(false);
         }
-    }, [figmaUrl, accessToken]);
+    }, [figmaUrl, accessToken, useRobloxMode]);
 
     const handleCopy = async () => {
         if (!catwebJson) return;
@@ -392,6 +415,32 @@ export default function FigmaExporter() {
                                 <span>{error}</span>
                             </div>
                         )}
+
+                        {/* Roblox Mode Toggle */}
+                        <div className="flex items-center justify-between p-4 bg-primary rounded-xl border border-border">
+                            <div className="flex items-center gap-3">
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={useRobloxMode}
+                                        onChange={(e) => setUseRobloxMode(e.target.checked)}
+                                        className="sr-only peer"
+                                    />
+                                    <div className="w-11 h-6 bg-surface-hover peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                </label>
+                                <div>
+                                    <span className="text-sm font-medium text-text-primary">Roblox Mode</span>
+                                    <p className="text-xs text-text-secondary">Normalize to 1920×1080 with offset coordinates</p>
+                                </div>
+                            </div>
+                            <div className="group relative">
+                                <Info size={16} className="text-text-secondary cursor-help" />
+                                <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-surface border border-border rounded-xl text-xs text-text-secondary opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10 shadow-xl">
+                                    <strong className="text-text-primary">Scale Mode:</strong> Uses percentages for responsive layouts.<br /><br />
+                                    <strong className="text-text-primary">Roblox Mode:</strong> Uses pixel offsets normalized to 1920×1080, ideal for CatWeb's fixed viewport.
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Results Section */}
