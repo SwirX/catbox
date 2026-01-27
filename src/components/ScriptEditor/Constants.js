@@ -31,7 +31,6 @@ export const COLORS = {
     color: "#e63946",
 };
 
-// SVG icon paths
 export const ICONS = {
     events: "M13 10V3L4 14h7v7l9-11h-7z",
     logic: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
@@ -64,172 +63,196 @@ export const ICONS = {
     edit: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
 };
 
-// Event IDs matching CatWeb spec v2.15.0.3
+const param = (t, l) => ({ value: "", t, l });
+
 export const EVENT_TYPES = {
-    "0": { id: "0", text: ["When website loaded..."], color: COLORS.events },
-    "1": { id: "1", text: ["When", { type: "object", label: "button" }, "pressed..."], color: COLORS.events },
-    "2": { id: "2", text: ["When", { type: "key", label: "key" }, "pressed..."], color: COLORS.events },
-    "3": { id: "3", text: ["When mouse enters", { type: "object", label: "object" }, "..."], color: COLORS.events },
-    "5": { id: "5", text: ["When mouse leaves", { type: "object", label: "object" }, "..."], color: COLORS.events },
-    "6": { id: "6", text: ["Define function", { type: "string", label: "function" }], color: COLORS.functions, hasOverrides: true },
-    "7": { id: "7", text: ["When", { type: "object", label: "donation" }, "bought..."], color: COLORS.events },
-    "8": { id: "8", text: ["When", { type: "object", label: "input" }, "submitted..."], color: COLORS.events },
-    "9": { id: "9", text: ["When message received..."], color: COLORS.network },
-    "10": { id: "10", text: ["When", { type: "object", label: "object" }, "changed..."], color: COLORS.events },
+    "0": {
+        id: "0",
+        text: ["When website loaded..."],
+        color: COLORS.events
+    },
+    "1": {
+        id: "1",
+        text: ["When ", param("object", "button"), " pressed..."],
+        color: COLORS.events
+    },
+    "2": {
+        id: "2",
+        text: ["When ", param("string", "key"), " pressed..."],
+        color: COLORS.events
+    },
+    "3": {
+        id: "3",
+        text: ["When mouse enters ", param("object", "object"), "..."],
+        color: COLORS.events
+    },
+    "5": {
+        id: "5",
+        text: ["When mouse leaves ", param("object", "object"), "..."],
+        color: COLORS.events
+    },
+    "6": {
+        id: "6",
+        text: ["Define function ", param("string", "function")],
+        color: COLORS.functions,
+        hasOverrides: true
+    },
+    "7": {
+        id: "7",
+        text: ["When ", param("object", "donation"), " bought..."],
+        color: COLORS.events
+    },
+    "8": {
+        id: "8",
+        text: ["When ", param("object", "input"), " submitted..."],
+        color: COLORS.events
+    },
+    "9": {
+        id: "9",
+        text: ["When message received..."],
+        color: COLORS.network
+    },
+    "10": {
+        id: "10",
+        text: ["When ", param("object", "object"), " changed..."],
+        color: COLORS.events
+    },
 };
 
-// Action IDs matching CatWeb spec v2.15.0.3
 export const ACTION_TYPES = {
-    // ===== Console =====
-    "0": { id: "0", text: ["Log", { type: "any", label: "any" }], category: "Console", color: COLORS.console },
-    "1": { id: "1", text: ["Warn", { type: "any", label: "any" }], category: "Console", color: COLORS.console },
-    "2": { id: "2", text: ["Error", { type: "any", label: "any" }], category: "Console", color: COLORS.console },
-    "124": { id: "124", text: [{ type: "string", label: "comment" }], category: "Console", color: COLORS.console },
+    "0": { id: "0", text: ["Log ", param("any", "any")], category: "Console", color: COLORS.console },
+    "1": { id: "1", text: ["Warn ", param("any", "any")], category: "Console", color: COLORS.console },
+    "2": { id: "2", text: ["Error ", param("any", "any")], category: "Console", color: COLORS.console },
+    "124": { id: "124", text: [param("string", "comment")], category: "Console", color: COLORS.console, allowsHelp: true },
 
-    // ===== Logic =====
-    "3": { id: "3", text: ["Wait", { type: "number", label: "number" }, "seconds"], category: "Logic", color: COLORS.logic },
-    "18": { id: "18", text: ["If", { type: "any", label: "any" }, "is equal to", { type: "any", label: "any" }], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "19": { id: "19", text: ["If", { type: "any", label: "any" }, "is not equal to", { type: "any", label: "any" }], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "20": { id: "20", text: ["If", { type: "any", label: "any" }, "is greater than", { type: "any", label: "any" }], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "21": { id: "21", text: ["If", { type: "any", label: "any" }, "is lower than", { type: "any", label: "any" }], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "26": { id: "26", text: ["If", { type: "string", label: "string" }, "contains", { type: "string", label: "string" }], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "29": { id: "29", text: ["If", { type: "string", label: "string" }, "doesn't contain", { type: "string", label: "string" }], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "30": { id: "30", text: ["If", { type: "string", label: "variable" }, "exists"], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "32": { id: "32", text: ["If", { type: "string", label: "variable" }, "doesn't exist"], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "33": { id: "33", text: ["If", { type: "string", label: "variable" }, "AND", { type: "string", label: "variable" }], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "34": { id: "34", text: ["If", { type: "string", label: "variable" }, "OR", { type: "string", label: "variable" }], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "35": { id: "35", text: ["If", { type: "string", label: "variable" }, "NOR", { type: "string", label: "variable" }], category: "Logic", color: COLORS.logic, shape: "opener" },
-    "36": { id: "36", text: ["If", { type: "string", label: "variable" }, "XOR", { type: "string", label: "variable" }], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "3": { id: "3", text: ["Wait ", param("number", "number"), " seconds"], category: "Logic", color: COLORS.logic },
+    "18": { id: "18", text: ["If ", param("any", "any"), " is equal to ", param("any", "any")], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "19": { id: "19", text: ["If ", param("any", "any"), " is not equal to ", param("any", "any")], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "20": { id: "20", text: ["If ", param("any", "any"), " is greater than ", param("any", "any")], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "21": { id: "21", text: ["If ", param("any", "any"), " is lower than ", param("any", "any")], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "26": { id: "26", text: ["If ", param("string", "string"), " contains ", param("string", "string")], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "29": { id: "29", text: ["If ", param("string", "string"), " doesn't contain ", param("string", "string")], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "30": { id: "30", text: ["If ", param("string", "variable"), " exists"], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "32": { id: "32", text: ["If ", param("string", "variable"), " doesn't exist"], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "33": { id: "33", text: ["If ", param("string", "variable"), " AND ", param("string", "variable")], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "34": { id: "34", text: ["If ", param("string", "variable"), " OR ", param("string", "variable")], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "35": { id: "35", text: ["If ", param("string", "variable"), " NOR ", param("string", "variable")], category: "Logic", color: COLORS.logic, shape: "opener" },
+    "36": { id: "36", text: ["If ", param("string", "variable"), " XOR ", param("string", "variable")], category: "Logic", color: COLORS.logic, shape: "opener" },
     "112": { id: "112", text: ["else"], category: "Logic", color: COLORS.logic, shape: "else" },
     "25": { id: "25", text: ["end"], category: "Logic", color: COLORS.logic, shape: "closer" },
 
-    // ===== Loops =====
-    "22": { id: "22", text: ["Repeat", { type: "number", label: "number" }, "times"], category: "Loops", color: COLORS.loops, shape: "opener" },
+    "22": { id: "22", text: ["Repeat ", param("number", "number"), " times"], category: "Loops", color: COLORS.loops, shape: "opener" },
     "23": { id: "23", text: ["Repeat forever"], category: "Loops", color: COLORS.loops, shape: "opener" },
     "24": { id: "24", text: ["Break"], category: "Loops", color: COLORS.loops },
 
-    // ===== Looks =====
-    "4": { id: "4", text: ["Make", { type: "object", label: "object" }, "invisible"], category: "Looks", color: COLORS.looks },
-    "5": { id: "5", text: ["Make", { type: "object", label: "object" }, "visible"], category: "Looks", color: COLORS.looks },
-    "10": { id: "10", text: ["Set", { type: "object", label: "object" }, "text to", { type: "string", label: "string" }], category: "Looks", color: COLORS.looks },
-    "16": { id: "16", text: ["Set", { type: "object", label: "object" }, "image to", { type: "string", label: "id" }], category: "Looks", color: COLORS.looks },
-    "17": { id: "17", text: ["Set", { type: "object", label: "object" }, "image to avatar of", { type: "string", label: "userid" }, { type: "string", label: "resolution?" }], category: "Looks", color: COLORS.looks },
-    "31": { id: "31", text: ["Set", { type: "string", label: "property" }, "of", { type: "object", label: "object" }, "to", { type: "any", label: "any" }], category: "Looks", color: COLORS.looks },
-    "39": { id: "39", text: ["Get", { type: "string", label: "property" }, "of", { type: "object", label: "object" }, "→", { type: "string", label: "variable" }], category: "Looks", color: COLORS.looks },
-    "40": { id: "40", text: ["Get text from", { type: "object", label: "input" }, "→", { type: "string", label: "variable" }], category: "Looks", color: COLORS.looks },
-    "88": { id: "88", text: ["Tween", { type: "string", label: "property" }, "of", { type: "object", label: "object" }, "to", { type: "any", label: "any" }, "-", { type: "number", label: "time" }, { type: "string", label: "style" }, { type: "string", label: "direction" }], category: "Looks", color: COLORS.looks },
-    "90": { id: "90", text: ["Duplicate", { type: "object", label: "object" }, "→", { type: "string", label: "variable" }], category: "Looks", color: COLORS.looks },
-    "91": { id: "91", text: ["Delete", { type: "object", label: "object" }], category: "Looks", color: COLORS.looks },
+    "4": { id: "4", text: ["Make ", param("object", "object"), " invisible"], category: "Looks", color: COLORS.looks },
+    "5": { id: "5", text: ["Make ", param("object", "object"), " visible"], category: "Looks", color: COLORS.looks },
+    "10": { id: "10", text: ["Set ", param("object", "object"), " text to ", param("string", "string")], category: "Looks", color: COLORS.looks },
+    "16": { id: "16", text: ["Set ", param("object", "object"), " image to ", param("string", "id")], category: "Looks", color: COLORS.looks },
+    "17": { id: "17", text: ["Set ", param("object", "object"), " image to avatar of ", param("string", "userid"), " ", param("string", "resolution?")], category: "Looks", color: COLORS.looks },
+    "31": { id: "31", text: ["Set ", param("string", "property"), " of ", param("object", "object"), " to ", param("any", "any")], category: "Looks", color: COLORS.looks },
+    "39": { id: "39", text: ["Get ", param("string", "property"), " of ", param("object", "object"), " → ", param("string", "variable")], category: "Looks", color: COLORS.looks },
+    "40": { id: "40", text: ["Get text from ", param("object", "input"), " → ", param("string", "variable")], category: "Looks", color: COLORS.looks },
+    "88": { id: "88", text: ["Tween ", param("string", "property"), " of ", param("object", "object"), " to ", param("any", "any"), " - ", param("number", "time"), " ", param("string", "style"), " ", param("string", "direction")], category: "Looks", color: COLORS.looks },
+    "90": { id: "90", text: ["Duplicate ", param("object", "object"), " → ", param("string", "variable")], category: "Looks", color: COLORS.looks },
+    "91": { id: "91", text: ["Delete ", param("object", "object")], category: "Looks", color: COLORS.looks },
     "116": { id: "116", text: ["If dark theme enabled"], category: "Looks", color: COLORS.looks, shape: "opener" },
 
-    // ===== Hierarchy =====
-    "41": { id: "41", text: ["Parent", { type: "object", label: "object" }, "under", { type: "object", label: "object" }], category: "Hierarchy", color: COLORS.hierarchy },
-    "42": { id: "42", text: ["Get parent of", { type: "object", label: "object" }, "→", { type: "string", label: "variable" }], category: "Hierarchy", color: COLORS.hierarchy },
-    "43": { id: "43", text: ["Find ancestor named", { type: "string", label: "string" }, "in", { type: "object", label: "object" }, "→", { type: "string", label: "variable" }], category: "Hierarchy", color: COLORS.hierarchy },
-    "44": { id: "44", text: ["Find child named", { type: "string", label: "string" }, "in", { type: "object", label: "object" }, "→", { type: "string", label: "variable" }], category: "Hierarchy", color: COLORS.hierarchy },
-    "45": { id: "45", text: ["Find descendant named", { type: "string", label: "string" }, "in", { type: "object", label: "object" }, "→", { type: "string", label: "variable" }], category: "Hierarchy", color: COLORS.hierarchy },
-    "46": { id: "46", text: ["Get children of", { type: "object", label: "object" }, "→", { type: "string", label: "table" }], category: "Hierarchy", color: COLORS.hierarchy },
-    "47": { id: "47", text: ["Get descendants of", { type: "object", label: "object" }, "→", { type: "string", label: "table" }], category: "Hierarchy", color: COLORS.hierarchy },
-    "48": { id: "48", text: ["If", { type: "object", label: "object" }, "is ancestor of", { type: "object", label: "object" }], category: "Hierarchy", color: COLORS.hierarchy, shape: "opener" },
-    "49": { id: "49", text: ["If", { type: "object", label: "object" }, "is child of", { type: "object", label: "object" }], category: "Hierarchy", color: COLORS.hierarchy, shape: "opener" },
-    "50": { id: "50", text: ["If", { type: "object", label: "object" }, "is descendant of", { type: "object", label: "object" }], category: "Hierarchy", color: COLORS.hierarchy, shape: "opener" },
+    "41": { id: "41", text: ["Parent ", param("object", "object"), " under ", param("object", "object")], category: "Hierarchy", color: COLORS.hierarchy },
+    "42": { id: "42", text: ["Get parent of ", param("object", "object"), " → ", param("string", "variable")], category: "Hierarchy", color: COLORS.hierarchy },
+    "43": { id: "43", text: ["Find ancestor named ", param("string", "string"), " in ", param("object", "object"), " → ", param("string", "variable")], category: "Hierarchy", color: COLORS.hierarchy },
+    "44": { id: "44", text: ["Find child named ", param("string", "string"), " in ", param("object", "object"), " → ", param("string", "variable")], category: "Hierarchy", color: COLORS.hierarchy },
+    "45": { id: "45", text: ["Find descendant named ", param("string", "string"), " in ", param("object", "object"), " → ", param("string", "variable")], category: "Hierarchy", color: COLORS.hierarchy },
+    "46": { id: "46", text: ["Get children of ", param("object", "object"), " → ", param("string", "table")], category: "Hierarchy", color: COLORS.hierarchy },
+    "47": { id: "47", text: ["Get descendants of ", param("object", "object"), " → ", param("string", "table")], category: "Hierarchy", color: COLORS.hierarchy },
+    "48": { id: "48", text: ["If ", param("object", "object"), " is ancestor of ", param("object", "object")], category: "Hierarchy", color: COLORS.hierarchy, shape: "opener" },
+    "49": { id: "49", text: ["If ", param("object", "object"), " is child of ", param("object", "object")], category: "Hierarchy", color: COLORS.hierarchy, shape: "opener" },
+    "50": { id: "50", text: ["If ", param("object", "object"), " is descendant of ", param("object", "object")], category: "Hierarchy", color: COLORS.hierarchy, shape: "opener" },
 
-    // ===== Navigation =====
-    "51": { id: "51", text: ["Get URL →", { type: "string", label: "variable" }], category: "Navigation", color: COLORS.navigation },
-    "52": { id: "52", text: ["Redirect to", { type: "string", label: "string" }], category: "Navigation", color: COLORS.navigation },
-    "53": { id: "53", text: ["Get query string parameter", { type: "string", label: "string" }, "→", { type: "string", label: "variable" }], category: "Navigation", color: COLORS.navigation },
+    "51": { id: "51", text: ["Get URL → ", param("string", "variable")], category: "Navigation", color: COLORS.navigation },
+    "52": { id: "52", text: ["Redirect to ", param("string", "string")], category: "Navigation", color: COLORS.navigation },
+    "53": { id: "53", text: ["Get query string parameter ", param("string", "string"), " → ", param("string", "variable")], category: "Navigation", color: COLORS.navigation },
 
-    // ===== Variables =====
-    "11": { id: "11", text: ["Set variable", { type: "string", label: "variable" }, "to", { type: "any", label: "any" }], category: "Variables", color: COLORS.variables },
-    "12": { id: "12", text: ["Increase", { type: "string", label: "variable" }, "by", { type: "number", label: "number" }], category: "Variables", color: COLORS.variables },
-    "13": { id: "13", text: ["Subtract", { type: "string", label: "variable" }, "by", { type: "number", label: "number" }], category: "Variables", color: COLORS.variables },
-    "14": { id: "14", text: ["Multiply", { type: "string", label: "variable" }, "by", { type: "number", label: "number" }], category: "Variables", color: COLORS.variables },
-    "15": { id: "15", text: ["Divide", { type: "string", label: "variable" }, "by", { type: "number", label: "number" }], category: "Variables", color: COLORS.variables },
-    "28": { id: "28", text: ["Delete", { type: "string", label: "variable" }], category: "Variables", color: COLORS.variables },
+    "11": { id: "11", text: ["Set variable ", param("string", "variable"), " to ", param("any", "any")], category: "Variables", color: COLORS.variables },
+    "12": { id: "12", text: ["Increase ", param("string", "variable"), " by ", param("number", "number")], category: "Variables", color: COLORS.variables },
+    "13": { id: "13", text: ["Subtract ", param("string", "variable"), " by ", param("number", "number")], category: "Variables", color: COLORS.variables },
+    "14": { id: "14", text: ["Multiply ", param("string", "variable"), " by ", param("number", "number")], category: "Variables", color: COLORS.variables },
+    "15": { id: "15", text: ["Divide ", param("string", "variable"), " by ", param("number", "number")], category: "Variables", color: COLORS.variables },
+    "28": { id: "28", text: ["Delete ", param("string", "variable")], category: "Variables", color: COLORS.variables },
 
-    // ===== Math =====
-    "27": { id: "27", text: ["Set", { type: "string", label: "var" }, "to random", { type: "number", label: "n" }, "-", { type: "number", label: "n" }], category: "Math", color: COLORS.math },
-    "37": { id: "37", text: ["Raise", { type: "string", label: "variable" }, "to the power of", { type: "number", label: "number" }], category: "Math", color: COLORS.math },
-    "38": { id: "38", text: [{ type: "string", label: "variable" }, "modulo", { type: "number", label: "number" }], category: "Math", color: COLORS.math },
-    "92": { id: "92", text: ["Round", { type: "string", label: "variable" }], category: "Math", color: COLORS.math },
-    "93": { id: "93", text: ["Floor", { type: "string", label: "variable" }], category: "Math", color: COLORS.math },
-    "94": { id: "94", text: ["Ceil", { type: "string", label: "variable" }], category: "Math", color: COLORS.math },
-    "114": { id: "114", text: ["Run math function", { type: "string", label: "function" }, { type: "tuple", label: "tuple" }, "→", { type: "string", label: "variable" }], category: "Math", color: COLORS.math },
+    "27": { id: "27", text: ["Set ", param("string", "variable"), " to random ", param("number", "number"), " - ", param("number", "number")], category: "Math", color: COLORS.math },
+    "37": { id: "37", text: ["Raise ", param("string", "variable"), " to the power of ", param("number", "number")], category: "Math", color: COLORS.math },
+    "38": { id: "38", text: [param("string", "variable"), " modulo ", param("number", "number")], category: "Math", color: COLORS.math },
+    "92": { id: "92", text: ["Round ", param("string", "variable")], category: "Math", color: COLORS.math },
+    "93": { id: "93", text: ["Floor ", param("string", "variable")], category: "Math", color: COLORS.math },
+    "94": { id: "94", text: ["Ceil ", param("string", "variable")], category: "Math", color: COLORS.math },
+    "114": { id: "114", text: ["Run math function ", param("string", "function"), " ", param("tuple", "tuple"), " → ", param("string", "variable")], category: "Math", color: COLORS.math },
 
-    // ===== Audio =====
-    "60": { id: "60", text: ["Play audio", { type: "string", label: "id" }, "→", { type: "string", label: "variable?" }], category: "Audio", color: COLORS.audio },
-    "61": { id: "61", text: ["Play looped audio", { type: "string", label: "id" }, "→", { type: "string", label: "variable?" }], category: "Audio", color: COLORS.audio },
-    "62": { id: "62", text: ["Set volume of", { type: "string", label: "variable" }, "to", { type: "number", label: "number" }], category: "Audio", color: COLORS.audio },
-    "63": { id: "63", text: ["Set speed of", { type: "string", label: "variable" }, "to", { type: "number", label: "number" }], category: "Audio", color: COLORS.audio },
-    "64": { id: "64", text: ["Set", { type: "string", label: "property" }, "of", { type: "string", label: "variable" }, "to", { type: "any", label: "any" }], category: "Audio", color: COLORS.audio },
-    "65": { id: "65", text: ["Get", { type: "string", label: "property" }, "of", { type: "string", label: "variable" }, "→", { type: "string", label: "variable" }], category: "Audio", color: COLORS.audio },
-    "66": { id: "66", text: ["Stop audio", { type: "string", label: "variable" }], category: "Audio", color: COLORS.audio },
-    "67": { id: "67", text: ["Pause audio", { type: "string", label: "variable" }], category: "Audio", color: COLORS.audio },
-    "68": { id: "68", text: ["Resume audio", { type: "string", label: "variable" }], category: "Audio", color: COLORS.audio },
+    "60": { id: "60", text: ["Play audio ", param("string", "id"), " → ", param("string", "variable?")], category: "Audio", color: COLORS.audio },
+    "61": { id: "61", text: ["Play looped audio ", param("string", "id"), " → ", param("string", "variable?")], category: "Audio", color: COLORS.audio },
+    "62": { id: "62", text: ["Set volume of ", param("string", "variable"), " to ", param("number", "number")], category: "Audio", color: COLORS.audio },
+    "63": { id: "63", text: ["Set speed of ", param("string", "variable"), " to ", param("number", "number")], category: "Audio", color: COLORS.audio },
+    "64": { id: "64", text: ["Set ", param("string", "property"), " of ", param("string", "variable"), " to ", param("any", "any")], category: "Audio", color: COLORS.audio },
+    "65": { id: "65", text: ["Get ", param("string", "property"), " of ", param("string", "variable"), " → ", param("string", "variable")], category: "Audio", color: COLORS.audio },
+    "66": { id: "66", text: ["Stop audio ", param("string", "variable")], category: "Audio", color: COLORS.audio },
+    "67": { id: "67", text: ["Pause audio ", param("string", "variable")], category: "Audio", color: COLORS.audio },
+    "68": { id: "68", text: ["Resume audio ", param("string", "variable")], category: "Audio", color: COLORS.audio },
     "69": { id: "69", text: ["Stop all audio"], category: "Audio", color: COLORS.audio },
 
-    // ===== Input =====
     "70": { id: "70", text: ["If left mouse button down"], category: "Input", color: COLORS.input, shape: "opener" },
     "71": { id: "71", text: ["If middle mouse button down"], category: "Input", color: COLORS.input, shape: "opener" },
     "72": { id: "72", text: ["If right mouse button down"], category: "Input", color: COLORS.input, shape: "opener" },
-    "73": { id: "73", text: ["If", { type: "key", label: "key" }, "down"], category: "Input", color: COLORS.input, shape: "opener" },
-    "74": { id: "74", text: ["Get viewport size →", { type: "string", label: "x" }, { type: "string", label: "y" }], category: "Input", color: COLORS.input },
-    "75": { id: "75", text: ["Get cursor position →", { type: "string", label: "x" }, { type: "string", label: "y" }], category: "Input", color: COLORS.input },
+    "73": { id: "73", text: ["If ", param("string", "key"), " down"], category: "Input", color: COLORS.input, shape: "opener" },
+    "74": { id: "74", text: ["Get viewport size → ", param("string", "x"), " ", param("string", "y")], category: "Input", color: COLORS.input },
+    "75": { id: "75", text: ["Get cursor position → ", param("string", "x"), " ", param("string", "y")], category: "Input", color: COLORS.input },
 
-    // ===== Network =====
-    "76": { id: "76", text: ["Broadcast", { type: "string", label: "message" }, "across page"], category: "Network", color: COLORS.network },
-    "77": { id: "77", text: ["Broadcast", { type: "string", label: "message" }, "across site"], category: "Network", color: COLORS.network },
-    "78": { id: "78", text: ["Get local username →", { type: "string", label: "variable" }], category: "Network", color: COLORS.network },
-    "79": { id: "79", text: ["Get local display name →", { type: "string", label: "variable" }], category: "Network", color: COLORS.network },
-    "80": { id: "80", text: ["Get local user ID →", { type: "string", label: "variable" }], category: "Network", color: COLORS.network },
+    "76": { id: "76", text: ["Broadcast ", param("string", "message"), " across page"], category: "Network", color: COLORS.network },
+    "77": { id: "77", text: ["Broadcast ", param("string", "message"), " across site"], category: "Network", color: COLORS.network },
+    "78": { id: "78", text: ["Get local username → ", param("string", "variable")], category: "Network", color: COLORS.network },
+    "79": { id: "79", text: ["Get local display name → ", param("string", "variable")], category: "Network", color: COLORS.network },
+    "80": { id: "80", text: ["Get local user ID → ", param("string", "variable")], category: "Network", color: COLORS.network },
 
-    // ===== Cookies =====
-    "81": { id: "81", text: ["Set", { type: "string", label: "cookie" }, "to", { type: "any", label: "any" }], category: "Cookies", color: COLORS.cookies },
-    "82": { id: "82", text: ["Increase", { type: "string", label: "cookie" }, "by", { type: "number", label: "number" }], category: "Cookies", color: COLORS.cookies },
-    "83": { id: "83", text: ["Delete", { type: "string", label: "cookie" }], category: "Cookies", color: COLORS.cookies },
-    "84": { id: "84", text: ["Get cookie", { type: "string", label: "cookie" }, "→", { type: "string", label: "variable" }], category: "Cookies", color: COLORS.cookies },
+    "81": { id: "81", text: ["Set ", param("string", "cookie"), " to ", param("any", "any")], category: "Cookies", color: COLORS.cookies },
+    "82": { id: "82", text: ["Increase ", param("string", "cookie"), " by ", param("number", "number")], category: "Cookies", color: COLORS.cookies },
+    "83": { id: "83", text: ["Delete ", param("string", "cookie")], category: "Cookies", color: COLORS.cookies },
+    "84": { id: "84", text: ["Get cookie ", param("string", "cookie"), " → ", param("string", "variable")], category: "Cookies", color: COLORS.cookies },
 
-    // ===== Time =====
-    "95": { id: "95", text: ["Get unix timestamp →", { type: "string", label: "variable" }], category: "Time", color: COLORS.time },
-    "96": { id: "96", text: ["Get server unix timestamp →", { type: "string", label: "variable" }], category: "Time", color: COLORS.time },
-    "97": { id: "97", text: ["Get tick →", { type: "string", label: "variable" }], category: "Time", color: COLORS.time },
-    "98": { id: "98", text: ["Get timezone →", { type: "string", label: "variable" }], category: "Time", color: COLORS.time },
-    "99": { id: "99", text: ["Format current date/time", { type: "string", label: "format" }, "→", { type: "string", label: "variable" }], category: "Time", color: COLORS.time },
-    "100": { id: "100", text: ["Format from unix", { type: "number", label: "number" }, { type: "string", label: "format" }, "→", { type: "string", label: "variable" }], category: "Time", color: COLORS.time },
+    "95": { id: "95", text: ["Get unix timestamp → ", param("string", "variable")], category: "Time", color: COLORS.time },
+    "96": { id: "96", text: ["Get server unix timestamp → ", param("string", "variable")], category: "Time", color: COLORS.time },
+    "97": { id: "97", text: ["Get tick → ", param("string", "variable")], category: "Time", color: COLORS.time },
+    "98": { id: "98", text: ["Get timezone → ", param("string", "variable")], category: "Time", color: COLORS.time },
+    "99": { id: "99", text: ["Format current date/time ", param("string", "format"), " → ", param("string", "variable")], category: "Time", color: COLORS.time },
+    "100": { id: "100", text: ["Format from unix ", param("number", "number"), " ", param("string", "format"), " → ", param("string", "variable")], category: "Time", color: COLORS.time },
 
-    // ===== Color =====
-    "101": { id: "101", text: ["Convert", { type: "string", label: "hex" }, "to RGB →", { type: "string", label: "variable" }], category: "Color", color: COLORS.color },
-    "102": { id: "102", text: ["Convert", { type: "string", label: "hex" }, "to HSV →", { type: "string", label: "variable" }], category: "Color", color: COLORS.color },
-    "103": { id: "103", text: ["Convert", { type: "string", label: "RGB" }, "to hex →", { type: "string", label: "variable" }], category: "Color", color: COLORS.color },
-    "104": { id: "104", text: ["Convert", { type: "string", label: "HSV" }, "to hex →", { type: "string", label: "variable" }], category: "Color", color: COLORS.color },
-    "105": { id: "105", text: ["Lerp", { type: "string", label: "hex" }, "to", { type: "string", label: "hex" }, "by", { type: "number", label: "alpha" }, "→", { type: "string", label: "variable" }], category: "Color", color: COLORS.color },
+    "101": { id: "101", text: ["Convert ", param("string", "hex"), " to RGB → ", param("string", "variable")], category: "Color", color: COLORS.color },
+    "102": { id: "102", text: ["Convert ", param("string", "hex"), " to HSV → ", param("string", "variable")], category: "Color", color: COLORS.color },
+    "103": { id: "103", text: ["Convert ", param("string", "RGB"), " to hex → ", param("string", "variable")], category: "Color", color: COLORS.color },
+    "104": { id: "104", text: ["Convert ", param("string", "HSV"), " to hex → ", param("string", "variable")], category: "Color", color: COLORS.color },
+    "105": { id: "105", text: ["Lerp ", param("string", "hex"), " to ", param("string", "hex"), " by ", param("number", "alpha"), " → ", param("string", "variable")], category: "Color", color: COLORS.color },
 
-    // ===== Strings =====
-    "106": { id: "106", text: ["Sub", { type: "string", label: "variable" }, { type: "number", label: "start" }, "-", { type: "number", label: "end" }], category: "Strings", color: COLORS.strings },
-    "107": { id: "107", text: ["Replace", { type: "string", label: "string" }, "in", { type: "string", label: "variable" }, "by", { type: "string", label: "string" }], category: "Strings", color: COLORS.strings },
-    "108": { id: "108", text: ["Get length of", { type: "string", label: "string" }, "→", { type: "string", label: "variable" }], category: "Strings", color: COLORS.strings },
-    "109": { id: "109", text: ["Split string", { type: "string", label: "string" }, { type: "string", label: "separator" }, "→", { type: "string", label: "table" }], category: "Strings", color: COLORS.strings },
-    "110": { id: "110", text: ["Lower", { type: "string", label: "string" }, "→", { type: "string", label: "variable" }], category: "Strings", color: COLORS.strings },
-    "111": { id: "111", text: ["Upper", { type: "string", label: "string" }, "→", { type: "string", label: "variable" }], category: "Strings", color: COLORS.strings },
-    "117": { id: "117", text: ["Concatenate", { type: "string", label: "string" }, "with", { type: "string", label: "string" }, "→", { type: "string", label: "variable" }], category: "Strings", color: COLORS.strings },
+    "106": { id: "106", text: ["Sub ", param("string", "variable"), " ", param("number", "start"), " - ", param("number", "end")], category: "Strings", color: COLORS.strings },
+    "107": { id: "107", text: ["Replace ", param("string", "string"), " in ", param("string", "variable"), " by ", param("string", "string")], category: "Strings", color: COLORS.strings },
+    "108": { id: "108", text: ["Get length of ", param("string", "string"), " → ", param("string", "variable")], category: "Strings", color: COLORS.strings },
+    "109": { id: "109", text: ["Split string ", param("string", "string"), " ", param("string", "separator"), " → ", param("string", "table")], category: "Strings", color: COLORS.strings },
+    "110": { id: "110", text: ["Lower ", param("string", "string"), " → ", param("string", "variable")], category: "Strings", color: COLORS.strings },
+    "111": { id: "111", text: ["Upper ", param("string", "string"), " → ", param("string", "variable")], category: "Strings", color: COLORS.strings },
+    "117": { id: "117", text: ["Concatenate ", param("string", "string"), " with ", param("string", "string"), " → ", param("string", "variable")], category: "Strings", color: COLORS.strings },
 
-    // ===== Tables =====
-    "54": { id: "54", text: ["Create table", { type: "string", label: "table" }], category: "Tables", color: COLORS.tables },
-    "55": { id: "55", text: ["Set entry", { type: "string", label: "entry" }, "of", { type: "string", label: "table" }, "to", { type: "any", label: "any" }], category: "Tables", color: COLORS.tables },
-    "56": { id: "56", text: ["Get entry", { type: "string", label: "entry" }, "of", { type: "string", label: "table" }, "→", { type: "string", label: "variable" }], category: "Tables", color: COLORS.tables },
-    "57": { id: "57", text: ["Delete entry", { type: "string", label: "entry" }, "of", { type: "string", label: "table" }], category: "Tables", color: COLORS.tables },
-    "58": { id: "58", text: ["Set entry", { type: "string", label: "entry" }, "of", { type: "string", label: "table" }, "to", { type: "object", label: "object" }], category: "Tables", color: COLORS.tables },
-    "59": { id: "59", text: ["Get length of", { type: "string", label: "table" }, "→", { type: "string", label: "variable" }], category: "Tables", color: COLORS.tables },
-    "85": { id: "85", text: ["Insert", { type: "any", label: "any" }, "at position", { type: "number", label: "number?" }, "of", { type: "string", label: "array" }], category: "Tables", color: COLORS.tables },
-    "86": { id: "86", text: ["Remove entry at position", { type: "number", label: "number?" }, "of", { type: "string", label: "array" }], category: "Tables", color: COLORS.tables },
-    "89": { id: "89", text: ["Insert", { type: "any", label: "any" }, "into", { type: "string", label: "array" }], category: "Tables", color: COLORS.tables },
-    "113": { id: "113", text: ["Iterate through", { type: "string", label: "table" }, "({l!index},{l!value})"], category: "Tables", color: COLORS.tables, shape: "opener" },
-    "118": { id: "118", text: ["Join", { type: "string", label: "array" }, "using", { type: "string", label: "string" }, "→", { type: "string", label: "variable" }], category: "Tables", color: COLORS.tables },
+    "54": { id: "54", text: ["Create table ", param("string", "table")], category: "Tables", color: COLORS.tables },
+    "55": { id: "55", text: ["Set entry ", param("string", "entry"), " of ", param("string", "table"), " to ", param("any", "any")], category: "Tables", color: COLORS.tables },
+    "56": { id: "56", text: ["Get entry ", param("string", "entry"), " of ", param("string", "table"), " → ", param("string", "variable")], category: "Tables", color: COLORS.tables },
+    "57": { id: "57", text: ["Delete entry ", param("string", "entry"), " of ", param("string", "table")], category: "Tables", color: COLORS.tables },
+    "58": { id: "58", text: ["Set entry ", param("string", "entry"), " of ", param("string", "table"), " to ", param("object", "object")], category: "Tables", color: COLORS.tables },
+    "59": { id: "59", text: ["Get length of ", param("string", "table"), " → ", param("string", "variable")], category: "Tables", color: COLORS.tables },
+    "85": { id: "85", text: ["Insert ", param("any", "any"), " at position ", param("number", "number?"), " of ", param("string", "array")], category: "Tables", color: COLORS.tables },
+    "86": { id: "86", text: ["Remove entry at position ", param("number", "number?"), " of ", param("string", "array")], category: "Tables", color: COLORS.tables },
+    "89": { id: "89", text: ["Insert ", param("any", "any"), " into ", param("string", "array")], category: "Tables", color: COLORS.tables },
+    "113": { id: "113", text: ["Iterate through ", param("string", "table"), " ({l!index},{l!value})"], category: "Tables", color: COLORS.tables, shape: "opener" },
+    "118": { id: "118", text: ["Join ", param("string", "array"), " using ", param("string", "string"), " → ", param("string", "variable")], category: "Tables", color: COLORS.tables },
 
-    // ===== Functions =====
-    "87": { id: "87", text: ["Run function", { type: "string", label: "function" }, { type: "tuple", label: "tuple" }, "→", { type: "string", label: "variable?" }], category: "Functions", color: COLORS.functions },
-    "115": { id: "115", text: ["Return", { type: "any", label: "any" }], category: "Functions", color: COLORS.functions },
-    "119": { id: "119", text: ["Run function in background", { type: "string", label: "function" }, { type: "tuple", label: "tuple" }], category: "Functions", color: COLORS.functions },
+    "87": { id: "87", text: ["Run function ", param("string", "function"), " ", param("tuple", "tuple"), " → ", param("string", "variable?")], category: "Functions", color: COLORS.functions },
+    "115": { id: "115", text: ["Return ", param("any", "any")], category: "Functions", color: COLORS.functions },
+    "119": { id: "119", text: ["Run function in background ", param("string", "function"), " ", param("tuple", "tuple")], category: "Functions", color: COLORS.functions },
 };
 
 export const CATEGORIES = [

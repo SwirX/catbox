@@ -8,7 +8,12 @@ const ActionBlock = memo(({ action, onUpdate, onDelete, onDuplicate, onContextMe
 
     const handleValueChange = (segmentIndex, newValue) => {
         const newText = [...action.text];
-        newText[segmentIndex] = { ...newText[segmentIndex], value: newValue };
+        const segment = newText[segmentIndex];
+        newText[segmentIndex] = {
+            value: newValue,
+            t: segment.t,
+            l: segment.l
+        };
         onUpdate({ ...action, text: newText });
     };
 
@@ -30,7 +35,6 @@ const ActionBlock = memo(({ action, onUpdate, onDelete, onDuplicate, onContextMe
             onDragStart={(e) => onDragStart(e, index, action)}
             onContextMenu={handleRightClick}
         >
-            {/* Action text */}
             <div className="flex items-center flex-1 min-w-0 flex-wrap">
                 {action.text.map((segment, i) => {
                     if (typeof segment === "string") {
@@ -39,8 +43,8 @@ const ActionBlock = memo(({ action, onUpdate, onDelete, onDuplicate, onContextMe
                         return (
                             <BlockInput
                                 key={i}
-                                type={segment.t || segment.type}
-                                label={segment.l || segment.label}
+                                type={segment.t}
+                                label={segment.l}
                                 value={segment.value || ""}
                                 onChange={(val) => handleValueChange(i, val)}
                             />
@@ -49,7 +53,6 @@ const ActionBlock = memo(({ action, onUpdate, onDelete, onDuplicate, onContextMe
                 })}
             </div>
 
-            {/* Action buttons - separate space */}
             <div className="flex gap-1 ml-1 flex-shrink-0">
                 <CircleButton
                     icon="duplicate"

@@ -23,7 +23,12 @@ const EventBlock = ({
 
     const handleValueChange = (segmentIndex, newValue) => {
         const newText = [...event.text];
-        newText[segmentIndex] = { ...newText[segmentIndex], value: newValue };
+        const segment = newText[segmentIndex];
+        newText[segmentIndex] = {
+            value: newValue,
+            t: segment.t,
+            l: segment.l
+        };
         onUpdate({ ...event, text: newText });
     };
 
@@ -96,7 +101,6 @@ const EventBlock = ({
             }}
             onContextMenu={handleRightClick}
         >
-            {/* Header */}
             <div
                 className="flex items-center gap-2 px-3 py-2.5 text-white font-semibold text-sm cursor-grab active:cursor-grabbing"
                 style={{
@@ -105,7 +109,6 @@ const EventBlock = ({
                 }}
                 onMouseDown={handleMouseDown}
             >
-                {/* Event text */}
                 <div className="flex items-center flex-1 min-w-0">
                     {event.text.map((seg, i) =>
                         typeof seg === "string" ? (
@@ -113,8 +116,8 @@ const EventBlock = ({
                         ) : (
                             <BlockInput
                                 key={i}
-                                type={seg.t || seg.type}
-                                label={seg.l || seg.label}
+                                type={seg.t}
+                                label={seg.l}
                                 value={seg.value || ""}
                                 onChange={(val) => handleValueChange(i, val)}
                             />
@@ -122,7 +125,6 @@ const EventBlock = ({
                     )}
                 </div>
 
-                {/* Action buttons */}
                 <div className="flex gap-1 ml-2 flex-shrink-0">
                     <CircleButton
                         icon="duplicate"
@@ -138,7 +140,6 @@ const EventBlock = ({
                 </div>
             </div>
 
-            {/* Actions Container */}
             <div
                 className="p-2 flex flex-col min-h-[40px]"
                 style={{

@@ -125,7 +125,7 @@ const BlockPalette = ({ onDragStart, onDeleteDrop }) => {
                                                     key={i}
                                                     className="bg-black/20 px-1 py-0.5 rounded text-[9px] mx-0.5"
                                                 >
-                                                    {seg.label || seg.type}
+                                                    {seg.l}
                                                 </span>
                                             )
                                         )}
