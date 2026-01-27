@@ -36,6 +36,15 @@ export default function JsonCleaner() {
                 return obj;
             };
 
+            const generateId = (length = 3) => {
+                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                let result = "";
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            };
+
             // Process each script
             transformedJson.forEach((script) => {
                 if (script.content && Array.isArray(script.content)) {
@@ -77,6 +86,20 @@ export default function JsonCleaner() {
                                     });
                                 }
                             });
+                        }
+
+                        // NEW: For function definitions (ID 6), add comment actions for each argument
+                        // (Placed AFTER transformation to prevent label from being reset due to empty value)
+                        if (contentItem.id === "6" && contentItem.variable_overrides && Array.isArray(contentItem.variable_overrides)) {
+                            const commentActions = contentItem.variable_overrides.map((override) => ({
+                                id: "124",
+                                text: [{ value: "", t: "string", l: override.value }],
+                                globalid: generateId()
+                            }));
+
+                            // Initialize actions array if it doesn't exist, and prepend comments
+                            if (!contentItem.actions) contentItem.actions = [];
+                            contentItem.actions = [...commentActions, ...contentItem.actions];
                         }
                     });
                 }
