@@ -14,11 +14,12 @@ export default function JsonCleaner() {
             let labelsChanged = 0;
             let typesChanged = 0;
 
-            const transformTextObject = (obj, isNested = false) => {
+            const transformTextObject = (obj) => {
+                if (typeof obj !== "object" || obj === null) return obj;
+
                 // Transform type (t) field
-                if (!isNested && obj.value !== undefined && obj.t !== undefined) {
-                    if (!["tuple", "number"].includes(obj.t) &&
-                        !(obj.t === "string" && ["function", "table", "array", "separator", "format"].includes(obj.l))) {
+                if (obj.value !== undefined && obj.t !== undefined) {
+                    if (!["tuple", "number"].includes(obj.t)) {
                         if (obj.t !== obj.value) {
                             obj.t = obj.value;
                             typesChanged++;
@@ -26,8 +27,8 @@ export default function JsonCleaner() {
                     }
                 }
                 // Transform label (l) field - This preserves variable names for Roblox tag visibility
-                if (!isNested && obj.value !== undefined && obj.l !== undefined) {
-                    if (!["number?", "array", "table", "function", "separator"].includes(obj.l) && obj.l !== obj.value) {
+                if (obj.value !== undefined && (typeof obj.value === "string" || typeof obj.value === "number")) {
+                    if (obj.l !== obj.value) {
                         obj.l = obj.value;
                         labelsChanged++;
                     }
@@ -39,22 +40,24 @@ export default function JsonCleaner() {
             transformedJson.forEach((script) => {
                 if (script.content && Array.isArray(script.content)) {
                     script.content.forEach((contentItem) => {
-                        // Transform event text (NEW: also clean events, not just actions)
+                        // Transform variable_overrides (for function definitions)
+                        if (contentItem.variable_overrides && Array.isArray(contentItem.variable_overrides)) {
+                            contentItem.variable_overrides.forEach((item) => {
+                                transformTextObject(item);
+                            });
+                        }
+
+                        // Transform event text
                         if (contentItem.text && Array.isArray(contentItem.text)) {
-                            contentItem.text = contentItem.text.map((textItem) => {
+                            contentItem.text.forEach((textItem) => {
                                 if (typeof textItem === "object" && textItem !== null) {
                                     if (Array.isArray(textItem.value)) {
-                                        textItem.value = textItem.value.map((nestedItem) => {
-                                            if (typeof nestedItem === "object" && nestedItem !== null) {
-                                                return transformTextObject(nestedItem, true);
-                                            }
-                                            return nestedItem;
+                                        textItem.value.forEach((nestedItem) => {
+                                            transformTextObject(nestedItem);
                                         });
-                                        return textItem;
                                     }
-                                    return transformTextObject(textItem);
+                                    transformTextObject(textItem);
                                 }
-                                return textItem;
                             });
                         }
 
@@ -62,20 +65,15 @@ export default function JsonCleaner() {
                         if (contentItem.actions && Array.isArray(contentItem.actions)) {
                             contentItem.actions.forEach((action) => {
                                 if (action.text && Array.isArray(action.text)) {
-                                    action.text = action.text.map((textItem) => {
+                                    action.text.forEach((textItem) => {
                                         if (typeof textItem === "object" && textItem !== null) {
                                             if (Array.isArray(textItem.value)) {
-                                                textItem.value = textItem.value.map((nestedItem) => {
-                                                    if (typeof nestedItem === "object" && nestedItem !== null) {
-                                                        return transformTextObject(nestedItem, true);
-                                                    }
-                                                    return nestedItem;
+                                                textItem.value.forEach((nestedItem) => {
+                                                    transformTextObject(nestedItem);
                                                 });
-                                                return textItem;
                                             }
-                                            return transformTextObject(textItem);
+                                            transformTextObject(textItem);
                                         }
-                                        return textItem;
                                     });
                                 }
                             });
