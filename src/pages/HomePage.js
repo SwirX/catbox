@@ -1,5 +1,5 @@
 import ToolCard from "../components/ToolCard";
-import { Code, FileJson, ImageIcon, Send, WholeWordIcon, Type, Layers, BookOpen, Figma } from "lucide-react";
+import { Code, FileJson, ImageIcon, Send, WholeWordIcon, Type, Layers, BookOpen, Figma, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function HomePage() {
@@ -114,6 +114,14 @@ export default function HomePage() {
                             title="Figma Exporter"
                             description="Convert Figma designs to CatWeb JSON. Map layers to elements automatically."
                             path="/figma-exporter"
+                        />
+                    </motion.div>
+                    <motion.div variants={item}>
+                        <ToolCard
+                            icon={<Shield size={24} />}
+                            title="Script Obfuscator"
+                            description="Protect your CatWeb scripts with advanced obfuscation techniques."
+                            path="/obfuscator"
                         />
                     </motion.div>
                 </div>

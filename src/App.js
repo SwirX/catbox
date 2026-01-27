@@ -11,6 +11,7 @@ import ScriptEditor from "./pages/ScriptEditor";
 import RichTextEditor from "./pages/RichtextEditor";
 import AIDocsPage from "./pages/AIDocsPage";
 import FigmaExporter from "./pages/FigmaExporter";
+import Obfuscator from "./pages/Obfuscator";
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/rich-text-editor" element={<RichTextEditor />} />
             <Route path="/ai-docs" element={<AIDocsPage />} />
             <Route path="/figma-exporter" element={<FigmaExporter />} />
+            <Route path="/obfuscator" element={<Obfuscator />} />
           </Routes>
         </Layout>
       } />
