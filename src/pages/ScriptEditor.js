@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Layers, Home, X, Copy, Check, Download } from "lucide-react";
+import { Layers, Home, X, Copy, Check, Download, Upload } from "lucide-react";
 import BlockPalette from "../components/ScriptEditor/BlockPalette";
 import Canvas from "../components/ScriptEditor/Canvas";
 import ContextMenu from "../components/ScriptEditor/ContextMenu";
@@ -8,6 +8,10 @@ import { PillButton } from "../components/ScriptEditor/Icon";
 import Icon from "../components/ScriptEditor/Icon";
 import ThemeToggle from "../components/ThemeToggle";
 import { STYLING, EVENT_TYPES, ACTION_TYPES } from "../components/ScriptEditor/Constants";
+import ToolsDropdown from "../components/ScriptEditor/ToolsDropdown";
+import MultiReplacePanel from "../components/ScriptEditor/MultiReplacePanel";
+import MacroReplacePanel from "../components/ScriptEditor/MacroReplacePanel";
+import DeObfuscatorPanel from "../components/ScriptEditor/DeObfuscatorPanel";
 
 const generateId = () => {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
@@ -38,7 +42,19 @@ const convertTextToCatWeb = (textArr) => {
   return textArr.map(item => {
     if (typeof item === "string") return item;
     if (typeof item === "object" && item !== null) {
-      const result = { value: item.value !== undefined ? item.value : "" };
+      let value = item.value !== undefined ? item.value : "";
+
+      // Recursively handle tuples
+      if (item.t === "tuple" && Array.isArray(value)) {
+        value = value.map(tupleItem => {
+          const result = { value: tupleItem.value !== undefined ? tupleItem.value : "" };
+          if (tupleItem.l !== undefined) result.l = tupleItem.l;
+          if (tupleItem.t !== undefined) result.t = tupleItem.t;
+          return result;
+        });
+      }
+
+      const result = { value };
       if (item.l !== undefined) result.l = item.l;
       if (item.t !== undefined) result.t = item.t;
       return result;
@@ -103,7 +119,20 @@ export default function ScriptEditor() {
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const [canvasPastePos, setCanvasPastePos] = useState(null);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [exportCopied, setExportCopied] = useState(false);
+  const [importText, setImportText] = useState("");
+
+  // Tools state
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [activeTool, setActiveTool] = useState(null);
+  const [searchMatches, setSearchMatches] = useState([]);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
+  const [savedMacros, setSavedMacros] = useState([]);
+  const [highlightedMacros, setHighlightedMacros] = useState([]);
+  const [clickableNames, setClickableNames] = useState([]);
+  const [highlightedOccurrence, setHighlightedOccurrence] = useState(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     const checkTheme = () => {
@@ -116,6 +145,245 @@ export default function ScriptEditor() {
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] });
     return () => observer.disconnect();
+  }, []);
+
+  // Keyboard shortcuts for tools
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ctrl+F - Open Find & Replace
+      if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+        e.preventDefault();
+        setToolsOpen(true);
+        setActiveTool("multireplace");
+      }
+      // Ctrl+H - Open Find & Replace (alternative)
+      if ((e.ctrlKey || e.metaKey) && e.key === "h") {
+        e.preventDefault();
+        setToolsOpen(true);
+        setActiveTool("multireplace");
+      }
+      // Escape - Close active tool
+      if (e.key === "Escape" && activeTool) {
+        setActiveTool(null);
+        setToolsOpen(false);
+        setSearchMatches([]);
+        setCurrentMatchIndex(-1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeTool]);
+
+  // Tool selection handler
+  const handleToolSelect = useCallback((toolId) => {
+    if (activeTool === toolId) {
+      setActiveTool(null);
+    } else {
+      setActiveTool(toolId);
+    }
+  }, [activeTool]);
+
+  // Close active tool
+  const handleCloseTool = useCallback(() => {
+    setActiveTool(null);
+    setSearchMatches([]);
+    setCurrentMatchIndex(-1);
+    setHighlightedMacros([]);
+    setClickableNames([]);
+    setHighlightedOccurrence(null);
+  }, []);
+
+  // Replace single match
+  const handleReplaceSingle = useCallback((match, newValue) => {
+    setData((prev) => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const script = next[selectedScriptIndex];
+
+      if (match.type === "event") {
+        const event = script.content.find(e => e.globalid === match.eventId);
+        if (event && event.text[match.segmentIndex]) {
+          const seg = event.text[match.segmentIndex];
+          const before = seg.value.substring(0, match.matchIndex);
+          const after = seg.value.substring(match.matchIndex + match.matchLength);
+          seg.value = before + newValue + after;
+        }
+      } else if (match.type === "action") {
+        const event = script.content.find(e => e.globalid === match.eventId);
+        if (event && event.actions[match.actionIndex]) {
+          const action = event.actions[match.actionIndex];
+          const seg = action.text[match.segmentIndex];
+          if (seg) {
+            const before = seg.value.substring(0, match.matchIndex);
+            const after = seg.value.substring(match.matchIndex + match.matchLength);
+            seg.value = before + newValue + after;
+          }
+        }
+      } else if (match.type === "override") {
+        const event = script.content.find(e => e.globalid === match.eventId);
+        if (event && event.variable_overrides && event.variable_overrides[match.overrideIndex]) {
+          const override = event.variable_overrides[match.overrideIndex];
+          const before = override.value.substring(0, match.matchIndex);
+          const after = override.value.substring(match.matchIndex + match.matchLength);
+          override.value = before + newValue + after;
+        }
+      }
+
+      return next;
+    });
+  }, [selectedScriptIndex]);
+
+  // Replace all matches
+  const handleReplaceAll = useCallback((replacements) => {
+    setData((prev) => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const script = next[selectedScriptIndex];
+
+      // Group replacements by segment to handle multiple matches in same field
+      const groupedBySegment = new Map();
+
+      replacements.forEach(r => {
+        const key = `${r.type}-${r.eventId}-${r.actionIndex ?? ""}-${r.segmentIndex ?? ""}-${r.overrideIndex ?? ""}`;
+        if (!groupedBySegment.has(key)) {
+          groupedBySegment.set(key, []);
+        }
+        groupedBySegment.get(key).push(r);
+      });
+
+      // Process each segment's replacements in reverse order (to preserve indices)
+      groupedBySegment.forEach((matches, key) => {
+        matches.sort((a, b) => b.matchIndex - a.matchIndex);
+
+        matches.forEach(match => {
+          if (match.type === "event") {
+            const event = script.content.find(e => e.globalid === match.eventId);
+            if (event && event.text[match.segmentIndex]) {
+              const seg = event.text[match.segmentIndex];
+              const before = seg.value.substring(0, match.matchIndex);
+              const after = seg.value.substring(match.matchIndex + match.matchLength);
+              seg.value = before + match.replacement + after;
+            }
+          } else if (match.type === "action") {
+            const event = script.content.find(e => e.globalid === match.eventId);
+            if (event && event.actions[match.actionIndex]) {
+              const action = event.actions[match.actionIndex];
+              const seg = action.text[match.segmentIndex];
+              if (seg) {
+                const before = seg.value.substring(0, match.matchIndex);
+                const after = seg.value.substring(match.matchIndex + match.matchLength);
+                seg.value = before + match.replacement + after;
+              }
+            }
+          } else if (match.type === "override") {
+            const event = script.content.find(e => e.globalid === match.eventId);
+            if (event && event.variable_overrides && event.variable_overrides[match.overrideIndex]) {
+              const override = event.variable_overrides[match.overrideIndex];
+              const before = override.value.substring(0, match.matchIndex);
+              const after = override.value.substring(match.matchIndex + match.matchLength);
+              override.value = before + match.replacement + after;
+            }
+          }
+        });
+      });
+
+      return next;
+    });
+  }, [selectedScriptIndex]);
+
+  // Save macro
+  const handleSaveMacro = useCallback((macro) => {
+    setSavedMacros(prev => [...prev.filter(m => m.name !== macro.name), macro]);
+  }, []);
+
+  // Replace macro comment with macro actions
+  const handleReplaceMacro = useCallback((macroComment, newActions) => {
+    setData((prev) => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const script = next[selectedScriptIndex];
+      const event = script.content.find(e => e.globalid === macroComment.eventId);
+
+      if (event && event.actions) {
+        // Remove the macro comment action
+        event.actions.splice(macroComment.actionIndex, 1);
+        // Insert new actions at the same position
+        const actionsWithIds = newActions.map(a => ({
+          ...a,
+          globalid: generateId(),
+        }));
+        event.actions.splice(macroComment.actionIndex, 0, ...actionsWithIds);
+      }
+
+      return next;
+    });
+  }, [selectedScriptIndex]);
+
+  // Rename all occurrences
+  const handleRenameAll = useCallback((oldName, newName) => {
+    // Escape special regex characters
+    const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    setData((prev) => {
+      const next = JSON.parse(JSON.stringify(prev));
+      const script = next[selectedScriptIndex];
+
+      // Helper to replace both exact matches and variable references like {varName}
+      const replaceInValue = (value) => {
+        if (Array.isArray(value)) {
+          return value.map(val => {
+            if (typeof val === "object" && val !== null) {
+              return { ...val, value: replaceInValue(val.value) };
+            }
+            return replaceInValue(val);
+          });
+        }
+
+        if (typeof value !== "string") return value;
+
+        // Replace exact match
+        if (value === oldName) return newName;
+
+        // Replace variable references like {oldName} with {newName}
+        // This handles Catweb's variable reference syntax
+        const regex = new RegExp(`\\{${escapeRegex(oldName)}\\}`, 'g');
+        return value.replace(regex, `{${newName}}`);
+      };
+
+      script.content.forEach(event => {
+        // Check event text
+        event.text?.forEach(seg => {
+          if (typeof seg === "object" && seg.value) {
+            seg.value = replaceInValue(seg.value);
+          }
+        });
+
+        // Check actions
+        event.actions?.forEach(action => {
+          action.text?.forEach(seg => {
+            if (typeof seg === "object" && seg.value) {
+              seg.value = replaceInValue(seg.value);
+            }
+          });
+        });
+
+        // Check variable overrides (function arguments)
+        if (event.variable_overrides) {
+          event.variable_overrides.forEach(override => {
+            if (override.value) {
+              override.value = replaceInValue(override.value);
+            }
+          });
+        }
+      });
+
+      return next;
+    });
+  }, [selectedScriptIndex]);
+
+  // Navigate to event (center canvas on it)
+  const handleNavigateToEvent = useCallback((eventId) => {
+    if (canvasRef.current && canvasRef.current.navigateToEvent) {
+      canvasRef.current.navigateToEvent(eventId);
+    }
   }, []);
 
   const handleMoveEvent = useCallback((eventId, x, y) => {
@@ -324,6 +592,25 @@ export default function ScriptEditor() {
   };
 
   const handleImport = () => {
+    setShowImportModal(true);
+    setImportText("");
+  };
+
+  const handleProcessImport = (text) => {
+    try {
+      const imported = JSON.parse(text || importText);
+      if (Array.isArray(imported) && imported.length > 0) {
+        setData(imported);
+        setShowImportModal(false);
+      } else {
+        alert("Invalid CatWeb script format");
+      }
+    } catch {
+      alert("Invalid JSON");
+    }
+  };
+
+  const handleImportFile = () => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json";
@@ -332,16 +619,7 @@ export default function ScriptEditor() {
       if (file) {
         const reader = new FileReader();
         reader.onload = (ev) => {
-          try {
-            const imported = JSON.parse(ev.target.result);
-            if (Array.isArray(imported) && imported.length > 0) {
-              setData(imported);
-            } else {
-              alert("Invalid CatWeb script format");
-            }
-          } catch {
-            alert("Invalid JSON");
-          }
+          setImportText(ev.target.result);
         };
         reader.readAsText(file);
       }
@@ -479,6 +757,12 @@ export default function ScriptEditor() {
               <PillButton icon="reset" label="Reset" onClick={handleReset} />
               <PillButton icon="import" label="Import" onClick={handleImport} />
               <PillButton icon="export" label="Export" onClick={handleExport} />
+              <ToolsDropdown
+                isOpen={toolsOpen}
+                onToggle={() => setToolsOpen(!toolsOpen)}
+                activeTool={activeTool}
+                onToolSelect={handleToolSelect}
+              />
               <PillButton
                 icon={isFullscreen ? "minimize" : "fullscreen"}
                 label={isFullscreen ? "Exit" : "Fullscreen"}
@@ -488,16 +772,81 @@ export default function ScriptEditor() {
           </div>
 
           <div className="flex flex-1 min-h-0" style={{ gap: GAP }}>
+            {/* Left Sidebar - Either BlockPalette or Tool Panel */}
             <div
-              className="overflow-hidden transition-all duration-500"
+              className="flex flex-col overflow-hidden transition-all duration-500"
               style={{
                 width: `${PALETTE_WIDTH}px`,
                 flexShrink: 0,
                 borderRadius: STYLING.borderRadiusLg,
-                boxShadow: STYLING.shadow
+                boxShadow: STYLING.shadow,
+                backgroundColor: "var(--surface)",
               }}
             >
-              <BlockPalette onDragStart={handlePaletteDragStart} onDeleteDrop={handleDeleteDrop} />
+              {/* When tool is active, show collapsible "Script Blocks" pill + tool panel */}
+              {activeTool ? (
+                <div className="flex flex-col h-full">
+                  {/* Collapsible Script Blocks header */}
+                  <button
+                    onClick={handleCloseTool}
+                    className="flex items-center justify-between gap-2 px-4 py-3 hover:brightness-95 transition-all"
+                    style={{
+                      backgroundColor: "var(--hover)",
+                      borderBottom: "1px solid var(--border)",
+                    }}
+                  >
+                    <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
+                      ← Script Blocks
+                    </span>
+                  </button>
+
+                  {/* Tool Panel Content */}
+                  <div className="flex-1 overflow-y-auto p-3">
+                    {activeTool === "multireplace" && (
+                      <MultiReplacePanel
+                        isOpen={true}
+                        onClose={handleCloseTool}
+                        scriptData={data[selectedScriptIndex].content}
+                        onReplaceAll={handleReplaceAll}
+                        onReplaceSingle={handleReplaceSingle}
+                        searchMatches={searchMatches}
+                        setSearchMatches={setSearchMatches}
+                        currentMatchIndex={currentMatchIndex}
+                        setCurrentMatchIndex={setCurrentMatchIndex}
+                      />
+                    )}
+                    {activeTool === "macro" && (
+                      <MacroReplacePanel
+                        isOpen={true}
+                        onClose={handleCloseTool}
+                        scriptData={data[selectedScriptIndex].content}
+                        savedMacros={savedMacros}
+                        onSaveMacro={handleSaveMacro}
+                        onReplaceMacro={handleReplaceMacro}
+                        highlightedMacros={highlightedMacros}
+                        setHighlightedMacros={setHighlightedMacros}
+                        onNavigateToEvent={handleNavigateToEvent}
+                      />
+                    )}
+                    {activeTool === "deobfuscate" && (
+                      <DeObfuscatorPanel
+                        isOpen={true}
+                        onClose={handleCloseTool}
+                        scriptData={data[selectedScriptIndex].content}
+                        onRenameAll={handleRenameAll}
+                        clickableNames={clickableNames}
+                        setClickableNames={setClickableNames}
+                        onNavigateToEvent={handleNavigateToEvent}
+                        highlightedOccurrence={highlightedOccurrence}
+                        setHighlightedOccurrence={setHighlightedOccurrence}
+                      />
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Normal BlockPalette when no tool is active */
+                <BlockPalette onDragStart={handlePaletteDragStart} onDeleteDrop={handleDeleteDrop} />
+              )}
             </div>
 
             <div
@@ -508,6 +857,7 @@ export default function ScriptEditor() {
               }}
             >
               <Canvas
+                ref={canvasRef}
                 scriptData={data[selectedScriptIndex].content}
                 onUpdateScript={handleUpdateScript}
                 onDropEvent={handleDropEvent}
@@ -517,6 +867,11 @@ export default function ScriptEditor() {
                 onContextMenu={handleContextMenu}
                 onCanvasContextMenu={handleCanvasContextMenu}
                 isDarkTheme={isDarkTheme}
+                searchMatches={searchMatches}
+                currentMatchIndex={currentMatchIndex}
+                highlightedMacros={highlightedMacros}
+                clickableNames={clickableNames}
+                highlightedOccurrence={highlightedOccurrence}
               />
             </div>
           </div>
@@ -533,12 +888,12 @@ export default function ScriptEditor() {
 
         {showExportModal && (
           <div
-            className="fixed inset-0 z-[10000] flex items-center justify-center"
+            className="fixed inset-0 z-[10000] flex items-center justify-center p-4"
             style={{ backgroundColor: "rgba(0,0,0,0.85)" }}
             onClick={() => setShowExportModal(false)}
           >
             <div
-              className="relative w-full max-w-2xl max-h-[80vh] flex flex-col mx-4"
+              className="relative w-full max-w-2xl max-h-[80vh] flex flex-col"
               style={{
                 backgroundColor: "rgb(var(--bg-surface))",
                 borderRadius: STYLING.borderRadiusLg,
@@ -554,7 +909,7 @@ export default function ScriptEditor() {
                 <h2 className="text-lg font-bold" style={{ color: "rgb(var(--text-primary))" }}>Export Script</h2>
                 <button
                   onClick={() => setShowExportModal(false)}
-                  className="p-2 rounded-lg transition-colors"
+                  className="p-2 rounded-lg transition-colors hover:bg-surface-hover"
                   style={{ color: "rgb(var(--text-secondary))" }}
                 >
                   <X size={20} />
@@ -604,6 +959,86 @@ export default function ScriptEditor() {
                   >
                     <Download size={16} />
                     Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showImportModal && (
+          <div
+            className="fixed inset-0 z-[10000] flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0,0,0,0.85)" }}
+            onClick={() => setShowImportModal(false)}
+          >
+            <div
+              className="relative w-full max-w-2xl max-h-[80vh] flex flex-col"
+              style={{
+                backgroundColor: "rgb(var(--bg-surface))",
+                borderRadius: STYLING.borderRadiusLg,
+                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                border: "1px solid rgb(var(--border))"
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                className="flex items-center justify-between px-6 py-4"
+                style={{ borderBottom: "1px solid rgb(var(--border))" }}
+              >
+                <h2 className="text-lg font-bold" style={{ color: "rgb(var(--text-primary))" }}>Import Script</h2>
+                <button
+                  onClick={() => setShowImportModal(false)}
+                  className="p-2 rounded-lg transition-colors hover:bg-surface-hover"
+                  style={{ color: "rgb(var(--text-secondary))" }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-auto p-4">
+                <textarea
+                  className="w-full h-64 p-4 rounded-xl font-mono text-xs resize-none outline-none focus:ring-2 focus:ring-accent/50 transition-all shadow-inner"
+                  placeholder="Paste your script JSON here..."
+                  style={{
+                    backgroundColor: "rgb(var(--bg-primary))",
+                    color: "rgb(var(--text-primary))",
+                    border: "1px solid rgb(var(--border))"
+                  }}
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                />
+              </div>
+
+              <div
+                className="flex items-center justify-between px-6 py-4"
+                style={{ borderTop: "1px solid rgb(var(--border))" }}
+              >
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleImportFile}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all hover:scale-105"
+                    style={{
+                      backgroundColor: "rgb(var(--bg-primary))",
+                      color: "rgb(var(--text-primary))",
+                      border: "1px solid rgb(var(--border))"
+                    }}
+                  >
+                    <Upload size={16} />
+                    Load File
+                  </button>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleProcessImport()}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all hover:scale-105 hover:brightness-110"
+                    style={{
+                      backgroundColor: "rgb(var(--accent))",
+                      color: "#ffffff"
+                    }}
+                  >
+                    <Check size={16} />
+                    Load JSON
                   </button>
                 </div>
               </div>

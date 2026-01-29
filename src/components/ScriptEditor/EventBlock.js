@@ -18,8 +18,16 @@ const EventBlock = ({
     onDelete,
     onDuplicate,
     isDragging,
+    highlightedInputs = [],
+    neonHighlight = null,
 }) => {
     const def = EVENT_TYPES[event.id] || { text: ["Unknown Event"], color: "#333" };
+
+    // Check if this event has any highlighted inputs
+    const eventHighlights = highlightedInputs.filter(h => h.type === "event");
+    const overrideHighlights = highlightedInputs.filter(h => h.type === "override");
+    const hasNeonEventHighlight = neonHighlight && neonHighlight.type === "event";
+    const hasNeonOverrideHighlight = neonHighlight && neonHighlight.type === "override";
 
     const handleValueChange = (segmentIndex, newValue) => {
         const newText = [...event.text];
@@ -30,6 +38,15 @@ const EventBlock = ({
             l: segment.l
         };
         onUpdate({ ...event, text: newText });
+    };
+
+    const handleOverrideChange = (overrideIndex, newValue) => {
+        const newOverrides = [...(event.variable_overrides || [])];
+        newOverrides[overrideIndex] = {
+            ...newOverrides[overrideIndex],
+            value: newValue
+        };
+        onUpdate({ ...event, variable_overrides: newOverrides });
     };
 
     const handleDrop = (e) => {
@@ -65,6 +82,10 @@ const EventBlock = ({
             const shape = typeDef?.shape;
             if (shape === "closer" || shape === "else") indent = Math.max(0, indent - 1);
 
+            // Get highlights for this action
+            const actionHighlights = highlightedInputs.filter(h => h.type === "action" && h.actionIndex === idx);
+            const hasNeonActionHighlight = neonHighlight && neonHighlight.type === "action" && neonHighlight.actionIndex === idx;
+
             const el = (
                 <div key={action.globalid || idx} style={{ marginLeft: `${indent * 12}px` }}>
                     <ActionBlock
@@ -80,6 +101,8 @@ const EventBlock = ({
                             e.dataTransfer.setData("actionIndex", String(i));
                             e.stopPropagation();
                         }}
+                        highlightedInputs={actionHighlights}
+                        neonHighlight={hasNeonActionHighlight ? neonHighlight : null}
                     />
                 </div>
             );
@@ -88,6 +111,9 @@ const EventBlock = ({
         });
     };
 
+    // Check if whole block should have neon glow
+    const hasAnyHighlight = highlightedInputs.length > 0;
+
     return (
         <div
             className="absolute flex flex-col w-max min-w-[220px] select-none transition-transform duration-75"
@@ -95,9 +121,12 @@ const EventBlock = ({
                 left: x,
                 top: y,
                 borderRadius: STYLING.borderRadius,
-                boxShadow: isDragging ? STYLING.shadow : STYLING.shadowSm,
+                boxShadow: hasAnyHighlight
+                    ? "0 0 15px rgba(0, 255, 136, 0.5), " + STYLING.shadow
+                    : isDragging ? STYLING.shadow : STYLING.shadowSm,
                 transform: isDragging ? "scale(1.02)" : "scale(1)",
                 zIndex: isDragging ? 100 : 1,
+                outline: hasAnyHighlight ? "2px solid rgba(0, 255, 136, 0.5)" : "none",
             }}
             onContextMenu={handleRightClick}
         >
@@ -110,8 +139,12 @@ const EventBlock = ({
                 onMouseDown={handleMouseDown}
             >
                 <div className="flex items-center flex-1 min-w-0">
-                    {event.text.map((seg, i) =>
-                        typeof seg === "string" ? (
+                    {event.text.map((seg, i) => {
+                        // Check if this specific segment is highlighted
+                        const isHighlighted = eventHighlights.some(h => h.segmentIndex === i);
+                        const isNeonHighlighted = hasNeonEventHighlight && neonHighlight.segmentIndex === i;
+
+                        return typeof seg === "string" ? (
                             <span key={i} className="mr-1 whitespace-nowrap">{seg}</span>
                         ) : (
                             <BlockInput
@@ -120,8 +153,33 @@ const EventBlock = ({
                                 label={seg.l}
                                 value={seg.value || ""}
                                 onChange={(val) => handleValueChange(i, val)}
+                                isHighlighted={isHighlighted}
+                                isNeonHighlighted={isNeonHighlighted}
                             />
-                        )
+                        );
+                    })}
+
+                    {/* Render Function Arguments (Variable Overrides) */}
+                    {event.id === "6" && event.variable_overrides && event.variable_overrides.length > 0 && (
+                        <div className="flex items-center gap-1 ml-2 pl-2 border-l border-white/20">
+                            <span className="text-[10px] opacity-70 uppercase font-bold">Args:</span>
+                            {event.variable_overrides.map((override, idx) => {
+                                const isHighlighted = overrideHighlights.some(h => h.overrideIndex === idx);
+                                const isNeonHighlighted = hasNeonOverrideHighlight && neonHighlight.overrideIndex === idx;
+
+                                return (
+                                    <BlockInput
+                                        key={idx}
+                                        type="string"
+                                        label="arg"
+                                        value={override.value || ""}
+                                        onChange={(val) => handleOverrideChange(idx, val)}
+                                        isHighlighted={isHighlighted}
+                                        isNeonHighlighted={isNeonHighlighted}
+                                    />
+                                );
+                            })}
+                        </div>
                     )}
                 </div>
 
@@ -161,3 +219,4 @@ const EventBlock = ({
 };
 
 export default EventBlock;
+

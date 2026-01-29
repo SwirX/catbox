@@ -3,8 +3,21 @@ import BlockInput from "./BlockInput";
 import { CircleButton } from "./Icon";
 import { ACTION_TYPES, STYLING } from "./Constants";
 
-const ActionBlock = memo(({ action, onUpdate, onDelete, onDuplicate, onContextMenu, onDragStart, index }) => {
+const ActionBlock = memo(({
+    action,
+    onUpdate,
+    onDelete,
+    onDuplicate,
+    onContextMenu,
+    onDragStart,
+    index,
+    highlightedInputs = [],
+    neonHighlight = null,
+}) => {
     const def = ACTION_TYPES[action.id] || { text: ["Unknown"], color: "#333" };
+
+    // Check if any segment in this action is highlighted
+    const hasAnyHighlight = highlightedInputs.length > 0;
 
     const handleValueChange = (segmentIndex, newValue) => {
         const newText = [...action.text];
@@ -30,6 +43,8 @@ const ActionBlock = memo(({ action, onUpdate, onDelete, onDuplicate, onContextMe
             style={{
                 backgroundColor: def.color,
                 borderRadius: STYLING.borderRadiusSm,
+                boxShadow: neonHighlight ? "0 0 15px #00ff88, 0 0 30px #00ff88" : "none",
+                outline: hasAnyHighlight ? "2px solid rgba(0, 255, 136, 0.6)" : "none",
             }}
             draggable
             onDragStart={(e) => onDragStart(e, index, action)}
@@ -37,6 +52,10 @@ const ActionBlock = memo(({ action, onUpdate, onDelete, onDuplicate, onContextMe
         >
             <div className="flex items-center flex-1 min-w-0 flex-wrap">
                 {action.text.map((segment, i) => {
+                    // Check if this specific segment is highlighted
+                    const isHighlighted = highlightedInputs.some(h => h.segmentIndex === i);
+                    const isNeonHighlighted = neonHighlight && neonHighlight.segmentIndex === i;
+
                     if (typeof segment === "string") {
                         return <span key={i} className="mr-1 whitespace-nowrap">{segment}</span>;
                     } else {
@@ -47,6 +66,8 @@ const ActionBlock = memo(({ action, onUpdate, onDelete, onDuplicate, onContextMe
                                 label={segment.l}
                                 value={segment.value || ""}
                                 onChange={(val) => handleValueChange(i, val)}
+                                isHighlighted={isHighlighted}
+                                isNeonHighlighted={isNeonHighlighted}
                             />
                         );
                     }

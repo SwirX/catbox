@@ -1,6 +1,14 @@
 import React from "react";
 
-const BlockInput = ({ type, value, onChange, label, className = "" }) => {
+const BlockInput = ({
+    type,
+    value,
+    onChange,
+    label,
+    className = "",
+    isHighlighted = false,
+    isNeonHighlighted = false,
+}) => {
     const handleChange = (e) => {
         onChange(e.target.value);
     };
@@ -11,14 +19,30 @@ const BlockInput = ({ type, value, onChange, label, className = "" }) => {
     transition-colors duration-150
   `;
 
+    // Highlight styles
+    const highlightStyle = isNeonHighlighted
+        ? {
+            borderRadius: "8px",
+            boxShadow: "0 0 10px #00ff88, 0 0 20px #00ff88, inset 0 0 10px rgba(0, 255, 136, 0.3)",
+            outline: "2px solid #00ff88",
+            backgroundColor: "rgba(0, 255, 136, 0.3)",
+        }
+        : isHighlighted
+            ? {
+                borderRadius: "8px",
+                boxShadow: "0 0 8px rgba(0, 255, 136, 0.5)",
+                outline: "1px solid rgba(0, 255, 136, 0.6)",
+            }
+            : { borderRadius: "8px" };
+
     if (type === "number") {
         return (
             <input
-                type="number"
+                type="text"
                 value={value || ""}
                 onChange={handleChange}
                 className={`${baseStyle} w-14 text-center ${className}`}
-                style={{ borderRadius: "8px" }}
+                style={highlightStyle}
                 placeholder="0"
             />
         );
@@ -30,11 +54,35 @@ const BlockInput = ({ type, value, onChange, label, className = "" }) => {
                 value={value || "true"}
                 onChange={handleChange}
                 className={`${baseStyle} ${className}`}
-                style={{ borderRadius: "8px" }}
+                style={highlightStyle}
             >
                 <option value="true">true</option>
                 <option value="false">false</option>
             </select>
+        );
+    }
+
+    if (type === "tuple" && Array.isArray(value)) {
+        return (
+            <div className="flex items-center gap-1 mx-1 px-1 bg-black/10 rounded-lg">
+                <span className="text-[10px] opacity-50 px-0.5">(</span>
+                {value.map((item, idx) => (
+                    <React.Fragment key={idx}>
+                        <BlockInput
+                            type={item.t}
+                            label={item.l}
+                            value={item.value}
+                            onChange={(newVal) => {
+                                const newValue = [...value];
+                                newValue[idx] = { ...item, value: newVal };
+                                onChange(newValue);
+                            }}
+                        />
+                        {idx < value.length - 1 && <span className="opacity-30">,</span>}
+                    </React.Fragment>
+                ))}
+                <span className="text-[10px] opacity-50 px-0.5">)</span>
+            </div>
         );
     }
 
@@ -44,7 +92,7 @@ const BlockInput = ({ type, value, onChange, label, className = "" }) => {
             value={value || ""}
             onChange={handleChange}
             className={`${baseStyle} min-w-[50px] max-w-[120px] ${className}`}
-            style={{ borderRadius: "8px" }}
+            style={highlightStyle}
             placeholder={label || ""}
         />
     );

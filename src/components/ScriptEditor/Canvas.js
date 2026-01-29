@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import EventBlock from "./EventBlock";
 import { IconPill } from "./Icon";
 import { CANVAS_SIZE, GRID_SIZE } from "./Constants";
@@ -8,7 +8,23 @@ const MAX_ZOOM = 2;
 const CENTER_X = 5000;
 const CENTER_Y = 5000;
 
-const Canvas = ({ scriptData, onUpdateScript, onDropEvent, onMoveEvent, onDeleteEvent, onDuplicateEvent, onContextMenu, onCanvasContextMenu, isDarkTheme }) => {
+const Canvas = forwardRef(({
+    scriptData,
+    onUpdateScript,
+    onDropEvent,
+    onMoveEvent,
+    onDeleteEvent,
+    onDuplicateEvent,
+    onContextMenu,
+    onCanvasContextMenu,
+    isDarkTheme,
+    searchMatches = [],
+    currentMatchIndex = -1,
+    highlightedMacros = [],
+    clickableNames = [],
+    highlightedOccurrence = null,
+    onNameClick,
+}, ref) => {
     const containerRef = useRef(null);
     const canvasRef = useRef(null);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -128,6 +144,25 @@ const Canvas = ({ scriptData, onUpdateScript, onDropEvent, onMoveEvent, onDelete
         }
     };
 
+    // Navigate to a specific event by centering on it
+    const navigateToEvent = useCallback((eventId) => {
+        const event = scriptData.find(e => e.globalid === eventId);
+        if (event && containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            const eventX = Number(event.x);
+            const eventY = Number(event.y);
+            setOffset({
+                x: -eventX * zoom + rect.width / 2,
+                y: -eventY * zoom + rect.height / 2,
+            });
+        }
+    }, [scriptData, zoom]);
+
+    // Expose navigateToEvent via ref
+    useImperativeHandle(ref, () => ({
+        navigateToEvent,
+    }), [navigateToEvent]);
+
     const handleCanvasRightClick = (e) => {
         const isBackground = e.target === containerRef.current || e.target === canvasRef.current;
         if (isBackground) {
@@ -178,24 +213,32 @@ const Canvas = ({ scriptData, onUpdateScript, onDropEvent, onMoveEvent, onDelete
                     }}
                 />
 
-                {scriptData.map((eventBlock, i) => (
-                    <EventBlock
-                        key={eventBlock.globalid || i}
-                        event={eventBlock}
-                        x={Number(eventBlock.x)}
-                        y={Number(eventBlock.y)}
-                        onUpdate={(updated) => onUpdateScript("updateEvent", updated)}
-                        onActionDrop={(eventId, actionData) => onUpdateScript("addAction", { eventId, actionData })}
-                        onActionUpdate={(eventId, actionIndex, updated) => onUpdateScript("updateAction", { eventId, actionIndex, updated })}
-                        onActionDelete={(eventId, actionIndex) => onUpdateScript("deleteAction", { eventId, actionIndex })}
-                        onActionDuplicate={(eventId, actionIndex) => onUpdateScript("duplicateAction", { eventId, actionIndex })}
-                        onDelete={onDeleteEvent}
-                        onDuplicate={onDuplicateEvent}
-                        onContextMenu={onContextMenu}
-                        onDragStart={(eventId, x, y, mouseX, mouseY) => handleEventDragStart(eventId, x, y, mouseX, mouseY)}
-                        isDragging={draggingEvent === eventBlock.globalid}
-                    />
-                ))}
+                {scriptData.map((eventBlock, i) => {
+                    // Check if this event has any highlighted occurrences
+                    const eventClickables = clickableNames.filter(c => c.eventId === eventBlock.globalid);
+                    const hasNeonHighlight = highlightedOccurrence && highlightedOccurrence.eventId === eventBlock.globalid;
+
+                    return (
+                        <EventBlock
+                            key={eventBlock.globalid || i}
+                            event={eventBlock}
+                            x={Number(eventBlock.x)}
+                            y={Number(eventBlock.y)}
+                            onUpdate={(updated) => onUpdateScript("updateEvent", updated)}
+                            onActionDrop={(eventId, actionData) => onUpdateScript("addAction", { eventId, actionData })}
+                            onActionUpdate={(eventId, actionIndex, updated) => onUpdateScript("updateAction", { eventId, actionIndex, updated })}
+                            onActionDelete={(eventId, actionIndex) => onUpdateScript("deleteAction", { eventId, actionIndex })}
+                            onActionDuplicate={(eventId, actionIndex) => onUpdateScript("duplicateAction", { eventId, actionIndex })}
+                            onDelete={onDeleteEvent}
+                            onDuplicate={onDuplicateEvent}
+                            onContextMenu={onContextMenu}
+                            onDragStart={(eventId, x, y, mouseX, mouseY) => handleEventDragStart(eventId, x, y, mouseX, mouseY)}
+                            isDragging={draggingEvent === eventBlock.globalid}
+                            highlightedInputs={eventClickables}
+                            neonHighlight={hasNeonHighlight ? highlightedOccurrence : null}
+                        />
+                    );
+                })}
             </div>
 
             {/* Canvas Controls */}
@@ -218,6 +261,6 @@ const Canvas = ({ scriptData, onUpdateScript, onDropEvent, onMoveEvent, onDelete
             </div>
         </div>
     );
-};
+});
 
 export default Canvas;
