@@ -1,6 +1,4 @@
 import React, { useState, useMemo, useCallback } from "react";
-import Icon from "./Icon";
-import { STYLING, ACTION_TYPES } from "./Constants";
 
 // Macro comment identifier
 const MACRO_PREFIX = "#!";
@@ -125,7 +123,6 @@ const MacroReplacePanel = ({
         if (!selectedFunctionEvent || !newMacroName.trim()) return;
 
         // Extract parameter names from the function definition
-        const funcNameSeg = selectedFunctionEvent.text?.find(seg => typeof seg === "object");
         const paramNames = [];
 
         // Check for variable_overrides which contain parameters

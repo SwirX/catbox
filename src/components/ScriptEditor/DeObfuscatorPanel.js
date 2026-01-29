@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
 import Icon from "./Icon";
-import { STYLING, EVENT_TYPES } from "./Constants";
 
 const DeObfuscatorPanel = ({
     isOpen,

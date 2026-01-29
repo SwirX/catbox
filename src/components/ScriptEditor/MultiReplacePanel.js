@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Icon from "./Icon";
-import { STYLING } from "./Constants";
 
 // Modifier buttons for search options
 const ModifierButton = ({ label, shortLabel, isActive, onClick, title }) => (
