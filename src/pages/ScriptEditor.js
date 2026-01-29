@@ -813,6 +813,7 @@ export default function ScriptEditor() {
                         setSearchMatches={setSearchMatches}
                         currentMatchIndex={currentMatchIndex}
                         setCurrentMatchIndex={setCurrentMatchIndex}
+                        onNavigateToEvent={handleNavigateToEvent}
                       />
                     )}
                     {activeTool === "macro" && (

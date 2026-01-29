@@ -34,6 +34,7 @@ const MultiReplacePanel = ({
     setSearchMatches,
     currentMatchIndex,
     setCurrentMatchIndex,
+    onNavigateToEvent,
 }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [replaceTerm, setReplaceTerm] = useState("");
