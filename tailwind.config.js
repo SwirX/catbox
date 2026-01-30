@@ -22,7 +22,6 @@ module.exports = {
         accent: "rgb(var(--accent) / <alpha-value>)",
         border: "rgb(var(--border) / <alpha-value>)",
 
-        // Apple-inspired distinct dark grays (Legacy/Fallbacks)
         apple: {
           base: "#000000",
           card: "#1C1C1E",

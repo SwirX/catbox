@@ -11,7 +11,6 @@ const TOOLS = [
 export const ToolsDropdown = ({ isOpen, onToggle, activeTool, onToolSelect }) => {
     return (
         <div className="flex items-center gap-1.5">
-            {/* Dropdown Toggle Button */}
             <button
                 onClick={onToggle}
                 className={`
@@ -37,7 +36,6 @@ export const ToolsDropdown = ({ isOpen, onToggle, activeTool, onToolSelect }) =>
                 />
             </button>
 
-            {/* Tool buttons shown inline when open */}
             {isOpen && TOOLS.map((tool) => (
                 <ToolPill
                     key={tool.id}

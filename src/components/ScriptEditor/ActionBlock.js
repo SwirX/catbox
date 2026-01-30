@@ -16,7 +16,6 @@ const ActionBlock = memo(({
 }) => {
     const def = ACTION_TYPES[action.id] || { text: ["Unknown"], color: "#333" };
 
-    // Check if any segment in this action is highlighted
     const hasAnyHighlight = highlightedInputs.length > 0;
 
     const handleValueChange = (segmentIndex, newValue) => {
@@ -52,7 +51,6 @@ const ActionBlock = memo(({
         >
             <div className="flex items-center flex-1 min-w-0 flex-wrap">
                 {action.text.map((segment, i) => {
-                    // Check if this specific segment is highlighted
                     const isHighlighted = highlightedInputs.some(h => h.segmentIndex === i);
                     const isNeonHighlighted = neonHighlight && neonHighlight.segmentIndex === i;
 

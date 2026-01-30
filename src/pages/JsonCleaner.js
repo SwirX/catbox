@@ -17,7 +17,6 @@ export default function JsonCleaner() {
             const transformTextObject = (obj) => {
                 if (typeof obj !== "object" || obj === null) return obj;
 
-                // Transform type (t) field
                 if (obj.value !== undefined && obj.t !== undefined) {
                     if (!["tuple", "number"].includes(obj.t)) {
                         if (obj.t !== obj.value) {
@@ -26,7 +25,6 @@ export default function JsonCleaner() {
                         }
                     }
                 }
-                // Transform label (l) field - This preserves variable names for Roblox tag visibility
                 if (obj.value !== undefined && (typeof obj.value === "string" || typeof obj.value === "number")) {
                     if (obj.l !== obj.value) {
                         obj.l = obj.value;
@@ -45,18 +43,15 @@ export default function JsonCleaner() {
                 return result;
             };
 
-            // Process each script
             transformedJson.forEach((script) => {
                 if (script.content && Array.isArray(script.content)) {
                     script.content.forEach((contentItem) => {
-                        // Transform variable_overrides (for function definitions)
                         if (contentItem.variable_overrides && Array.isArray(contentItem.variable_overrides)) {
                             contentItem.variable_overrides.forEach((item) => {
                                 transformTextObject(item);
                             });
                         }
 
-                        // Transform event text
                         if (contentItem.text && Array.isArray(contentItem.text)) {
                             contentItem.text.forEach((textItem) => {
                                 if (typeof textItem === "object" && textItem !== null) {
@@ -70,7 +65,6 @@ export default function JsonCleaner() {
                             });
                         }
 
-                        // Transform actions
                         if (contentItem.actions && Array.isArray(contentItem.actions)) {
                             contentItem.actions.forEach((action) => {
                                 if (action.text && Array.isArray(action.text)) {
@@ -88,8 +82,6 @@ export default function JsonCleaner() {
                             });
                         }
 
-                        // NEW: For function definitions (ID 6), add comment actions for each argument
-                        // (Placed AFTER transformation to prevent label from being reset due to empty value)
                         if (contentItem.id === "6" && contentItem.variable_overrides && Array.isArray(contentItem.variable_overrides)) {
                             const commentActions = contentItem.variable_overrides.map((override) => ({
                                 id: "124",
@@ -97,7 +89,6 @@ export default function JsonCleaner() {
                                 globalid: generateId()
                             }));
 
-                            // Initialize actions array if it doesn't exist, and prepend comments
                             if (!contentItem.actions) contentItem.actions = [];
                             contentItem.actions = [...commentActions, ...contentItem.actions];
                         }
@@ -146,7 +137,6 @@ export default function JsonCleaner() {
                     Preserve variable names in labels so you can see what was there after Roblox tags them.
                 </p>
 
-                {/* Info Box */}
                 <div className="max-w-2xl mx-auto mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl text-left">
                     <div className="flex gap-3">
                         <Info size={20} className="text-blue-400 flex-shrink-0 mt-0.5" />

@@ -45,7 +45,6 @@ const BlockPalette = ({ onDragStart, onDeleteDrop }) => {
             onDragOver={handleDragOver}
             onDrop={handleDrop}
         >
-            {/* Icon Navigation */}
             <div
                 className="w-12 flex flex-col items-center py-3 gap-2 border-r overflow-y-auto"
                 style={{
@@ -66,7 +65,6 @@ const BlockPalette = ({ onDragStart, onDeleteDrop }) => {
                 ))}
             </div>
 
-            {/* Scrollable Block List */}
             <div
                 ref={scrollContainerRef}
                 className="flex-1 overflow-y-auto p-3 space-y-4"
@@ -80,7 +78,6 @@ const BlockPalette = ({ onDragStart, onDeleteDrop }) => {
                             ref={(el) => (sectionRefs.current[cat.id] = el)}
                             className="scroll-mt-3"
                         >
-                            {/* Section Header */}
                             <div
                                 className="flex items-center gap-2 mb-2 px-1 sticky top-0 py-1.5 z-10"
                                 style={{ backgroundColor: "var(--surface, #1C1C1E)" }}
@@ -99,7 +96,6 @@ const BlockPalette = ({ onDragStart, onDeleteDrop }) => {
                                 </span>
                             </div>
 
-                            {/* Blocks */}
                             <div className="space-y-1">
                                 {items.map((item) => (
                                     <div

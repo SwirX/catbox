@@ -18,8 +18,6 @@ export default function ImageRichTextExporterHEXRLEV2() {
     const [warning, setWarning] = useState("");
     const [numTextboxes, setNumTextboxes] = useState(1);
 
-
-
     function ensureHex(s) {
         if (!s) return null;
         let x = s.trim();
@@ -51,7 +49,6 @@ export default function ImageRichTextExporterHEXRLEV2() {
     function onPickClick() {
         fileInputRef.current?.click();
     }
-
 
     function generate() {
         setWarning("");
@@ -173,7 +170,6 @@ export default function ImageRichTextExporterHEXRLEV2() {
             </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Left Column: Controls & Input */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
                     className="lg:col-span-5 space-y-6"
@@ -307,7 +303,6 @@ export default function ImageRichTextExporterHEXRLEV2() {
                     </div>
                 </motion.div>
 
-                {/* Right Column: Output */}
                 <motion.div
                     initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
                     className="lg:col-span-7 flex flex-col gap-6"

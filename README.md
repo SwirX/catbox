@@ -18,15 +18,15 @@ Catbox streamlines your Catweb workflow by combining multiple essential tools in
 
 ## Tools
 
-- **List Importer** – Import any JSON into Catweb format. Supports nested structures, mixed content, and re-imports Catweb JSON for quick edits.  
+- **List Importer V3** – Advanced JSON/Dictionary importer. Supports nested structs, recursive editing, and re-importing Catweb JSON with high precision.
+- **Script Obfuscator** – Protect your CatWeb scripts with variable renaming, function chaining, and dummy code insertion.
 - **Lyra API Builder** – Interactive API request builder for [Lyra](https://www.roblox.com/games/start?placeId=16855862021&launchData=lyra.rbx) playlists. Fill arguments, view return types, and generate requests for your Catweb projects.  
-- **Image Exporter** – Convert images into Roblox rich text for use in text labels without uploading to Roblox.  
-- **Image Exporter V3** – Latest iteration with RLE and hex code compression. Validates row/column lengths. Some large images may exceed Catweb textbox limits.  
-- **Json Cleaner** – Cleans Catweb JSON by embedding variables into scripts to bypass Roblox filtering.  
-- **AI Documentation** – Hosted CatWeb specification files for AI assistants. Download or copy `CatUI`, `CatDocs`, and `CatScript` specs.
-- **Figma Exporter** – Convert Figma designs directly to CatWeb JSON. Handles relative UDim2 normalization and aspect ratio preservation.
-- **Script Editor** – (WIP) Web-based script editor resembling Catweb's in-game editor. Taller 700px viewport for better workflow.
-- **Rich Text Editor** – (WIP) WYSIWYG rich text editor that outputs Roblox-compatible rich text.
+- **Image Exporter V3** – High-performance image-to-richtext converter with RLE and HEX compression. Supports splitting output across multiple textboxes to bypass Roblox limits.
+- **Json Cleaner** – Optimized Catweb JSON transformer that embeds variable names into labels to bypass Roblox text filtering.
+- **CatWeb Documentation** – Hosted specification files for CatWeb development. Download or copy `CatUI`, `CatDocs`, and `CatScript` specs.
+- **Figma Exporter** – Convert Figma designs directly to CatWeb JSON. Supports both relative Scale and absolute Roblox (1920x1080) coordinate modes.
+- **Script Editor** – (WIP) Full-featured web-based script editor with a block-based interface.
+- **Rich Text Editor** – (WIP) WYSIWYG rich text editor that outputs Roblox-compatible XML rich text.
 
 > **Note:** Image Exporter V2 exists but is deprecated and hidden from the homepage.
 

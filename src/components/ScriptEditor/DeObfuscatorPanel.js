@@ -14,25 +14,21 @@ const DeObfuscatorPanel = ({
 }) => {
     const [selectedName, setSelectedName] = useState(null);
     const [newName, setNewName] = useState("");
-    const [filter, setFilter] = useState("all"); // all, variables, functions
+    const [filter, setFilter] = useState("all");
 
-    // Helper: Find what function an event belongs to (or return "Global")
     const getParentFunctionName = useCallback((eventId) => {
         if (!scriptData) return "Global";
 
-        // Find the event
         const eventIndex = scriptData.findIndex(e => e.globalid === eventId);
         if (eventIndex === -1) return "Global";
 
         const event = scriptData[eventIndex];
 
-        // If it's a function definition itself, return its name
         if (event.id === "6") {
             const funcSeg = event.text?.find(s => typeof s === "object" && s.l === "function");
             return funcSeg?.value || "Function";
         }
 
-        // Look backwards to find the containing function
         for (let i = eventIndex - 1; i >= 0; i--) {
             const prevEvent = scriptData[i];
             if (prevEvent.id === "6") {
@@ -44,13 +40,11 @@ const DeObfuscatorPanel = ({
         return "Global";
     }, [scriptData]);
 
-    // Extract all variable and function names from script
     const allNames = useMemo(() => {
         if (!scriptData) return [];
 
         const namesMap = new Map();
 
-        // Helper to add or update entry in namesMap
         const addOccurrence = (name, type, occ) => {
             if (!name) return;
             if (!namesMap.has(name)) {
@@ -60,7 +54,6 @@ const DeObfuscatorPanel = ({
                     occurrences: [],
                 });
             }
-            // Avoid duplicate occurrences for same position
             const exists = namesMap.get(name).occurrences.some(o =>
                 o.type === occ.type &&
                 o.eventId === occ.eventId &&
@@ -73,15 +66,12 @@ const DeObfuscatorPanel = ({
             }
         };
 
-        // Types that indicate variables or functions
         const variableTypes = ["variable", "string"];
         const functionTypes = ["function"];
 
         scriptData.forEach((event, eventBlockIndex) => {
-            // Check event text (for function definitions and variables)
             event.text?.forEach((seg, segIdx) => {
                 if (typeof seg === "object" && seg.value) {
-                    // Exact matches for functions/variables
                     if (event.id === "6" && seg.l === "function") {
                         addOccurrence(seg.value, "function", {
                             type: "event",
@@ -98,7 +88,6 @@ const DeObfuscatorPanel = ({
                         });
                     }
 
-                    // Scan for {references}
                     const refRegex = /\{([^}]+)\}/g;
                     let match;
                     while ((match = refRegex.exec(seg.value)) !== null) {
@@ -115,7 +104,6 @@ const DeObfuscatorPanel = ({
                 }
             });
 
-            // Check variable overrides (function arguments)
             if (event.id === "6" && event.variable_overrides) {
                 event.variable_overrides.forEach((override, overrideIdx) => {
                     if (override.value) {
@@ -129,7 +117,6 @@ const DeObfuscatorPanel = ({
                 });
             }
 
-            // Check all actions
             event.actions?.forEach((action, actionIdx) => {
                 action.text?.forEach((seg, segIdx) => {
                     if (typeof seg === "object" && seg.value) {
@@ -146,7 +133,6 @@ const DeObfuscatorPanel = ({
                             });
                         }
 
-                        // Scan for {references}
                         const refRegex = /\{([^}]+)\}/g;
                         let match;
                         while ((match = refRegex.exec(seg.value)) !== null) {
@@ -171,16 +157,13 @@ const DeObfuscatorPanel = ({
         );
     }, [scriptData]);
 
-    // Filtered names based on filter selection
     const filteredNames = useMemo(() => {
         if (filter === "all") return allNames;
         return allNames.filter(n => n.type === (filter === "variables" ? "variable" : "function"));
     }, [allNames, filter]);
 
-    // Update clickable names when panel opens/closes or selection changes
     React.useEffect(() => {
         if (isOpen && selectedName) {
-            // When a name is selected, highlight all its occurrences
             const clickables = selectedName.occurrences.map(occ => ({
                 ...occ,
                 name: selectedName.name,
@@ -188,7 +171,6 @@ const DeObfuscatorPanel = ({
             }));
             setClickableNames(clickables);
         } else if (isOpen) {
-            // Panel is open but no name selected - show all as clickable
             const clickables = [];
             allNames.forEach(nameData => {
                 nameData.occurrences.forEach(occ => {
@@ -207,24 +189,20 @@ const DeObfuscatorPanel = ({
         }
     }, [isOpen, allNames, selectedName, setClickableNames, setHighlightedOccurrence]);
 
-    // Handle name selection
     const handleSelectName = useCallback((nameData) => {
         setSelectedName(nameData);
         setNewName(nameData.name);
         setHighlightedOccurrence?.(null);
     }, [setHighlightedOccurrence]);
 
-    // Handle rename
     const handleRename = useCallback(() => {
         if (!selectedName || !newName.trim() || newName === selectedName.name) return;
 
         onRenameAll(selectedName.name, newName.trim());
 
-        // Update selected name after rename
         setSelectedName(prev => prev ? { ...prev, name: newName.trim() } : null);
     }, [selectedName, newName, onRenameAll]);
 
-    // Navigate to occurrence and highlight it
     const handleNavigateToOccurrence = useCallback((occurrence, idx) => {
         onNavigateToEvent?.(occurrence.eventId);
         setHighlightedOccurrence?.({
@@ -237,14 +215,12 @@ const DeObfuscatorPanel = ({
 
     return (
         <div className="flex flex-col gap-3">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold" style={{ color: "var(--text)" }}>
                     De-obfuscator
                 </h3>
             </div>
 
-            {/* Filter buttons */}
             <div className="flex items-center gap-1">
                 {["all", "variables", "functions"].map((f) => (
                     <button
@@ -263,7 +239,6 @@ const DeObfuscatorPanel = ({
                 ))}
             </div>
 
-            {/* Names list */}
             <div className="flex flex-col gap-2">
                 <span className="text-xs font-medium" style={{ color: "var(--secondary)" }}>
                     Identifiers ({filteredNames.length})
@@ -314,7 +289,6 @@ const DeObfuscatorPanel = ({
                 )}
             </div>
 
-            {/* Selected name details */}
             {selectedName && (
                 <div className="flex flex-col gap-2 p-3 rounded-xl" style={{ backgroundColor: "var(--hover)" }}>
                     <div className="flex items-center gap-2">
@@ -342,7 +316,6 @@ const DeObfuscatorPanel = ({
                         </button>
                     </div>
 
-                    {/* Occurrences */}
                     <span className="text-xs font-medium" style={{ color: "var(--secondary)" }}>
                         Occurrences ({selectedName.occurrences.length})
                     </span>

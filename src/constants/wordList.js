@@ -1,5 +1,3 @@
-// Word list for obfuscator - extracted from pycatools assets
-// Words are filtered to only include alphabetic words with length > 3
 export const wordList = [
     "about", "above", "abstract", "academy", "accept", "access", "accident", "account",
     "accounting", "accuracy", "accurate", "achieve", "acid", "acoustic", "acquire", "acres",

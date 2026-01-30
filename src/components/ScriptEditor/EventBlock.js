@@ -23,7 +23,6 @@ const EventBlock = ({
 }) => {
     const def = EVENT_TYPES[event.id] || { text: ["Unknown Event"], color: "#333" };
 
-    // Check if this event has any highlighted inputs
     const eventHighlights = highlightedInputs.filter(h => h.type === "event");
     const overrideHighlights = highlightedInputs.filter(h => h.type === "override");
     const hasNeonEventHighlight = neonHighlight && neonHighlight.type === "event";
@@ -82,7 +81,6 @@ const EventBlock = ({
             const shape = typeDef?.shape;
             if (shape === "closer" || shape === "else") indent = Math.max(0, indent - 1);
 
-            // Get highlights for this action
             const actionHighlights = highlightedInputs.filter(h => h.type === "action" && h.actionIndex === idx);
             const hasNeonActionHighlight = neonHighlight && neonHighlight.type === "action" && neonHighlight.actionIndex === idx;
 
@@ -111,7 +109,6 @@ const EventBlock = ({
         });
     };
 
-    // Check if whole block should have neon glow
     const hasAnyHighlight = highlightedInputs.length > 0;
 
     return (
@@ -140,7 +137,6 @@ const EventBlock = ({
             >
                 <div className="flex items-center flex-1 min-w-0">
                     {event.text.map((seg, i) => {
-                        // Check if this specific segment is highlighted
                         const isHighlighted = eventHighlights.some(h => h.segmentIndex === i);
                         const isNeonHighlighted = hasNeonEventHighlight && neonHighlight.segmentIndex === i;
 
@@ -159,7 +155,6 @@ const EventBlock = ({
                         );
                     })}
 
-                    {/* Render Function Arguments (Variable Overrides) */}
                     {event.id === "6" && event.variable_overrides && event.variable_overrides.length > 0 && (
                         <div className="flex items-center gap-1 ml-2 pl-2 border-l border-white/20">
                             <span className="text-[10px] opacity-70 uppercase font-bold">Args:</span>
@@ -219,4 +214,3 @@ const EventBlock = ({
 };
 
 export default EventBlock;
-

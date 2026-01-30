@@ -3,7 +3,6 @@ import { Download, Copy, Edit, Trash2, ArrowUp, ArrowDown, Upload, Plus, Chevron
 import { motion, AnimatePresence } from "framer-motion";
 import JsonImportModal from "../components/ListJsonImport";
 
-/* ---------------------- Helpers ---------------------- */
 const numberToLetters = (n) => {
   let s = "";
   n = n + 1;
@@ -17,7 +16,6 @@ const numberToLetters = (n) => {
 
 const makeId = () => Math.random().toString(36).slice(2, 9);
 
-/* ---------------------- Modal: Key/Value ---------------------- */
 function KeyValueModal({ isOpen, onClose, onSave, initial = { key: "", value: "" }, title = "Add Field" }) {
   const [keyName, setKeyName] = useState(initial.key || "");
   const [value, setValue] = useState(initial.value || "");
@@ -73,8 +71,6 @@ function KeyValueModal({ isOpen, onClose, onSave, initial = { key: "", value: ""
   );
 }
 
-/* ---------------------- Recursive Struct Node ---------------------- */
-/* ---------------------- Recursive Struct Node ---------------------- */
 function StructNode({ node, onChange, defaultName, level = 0 }) {
   const [open, setOpen] = useState(true);
   const [kvOpen, setKvOpen] = useState(false);
@@ -224,7 +220,6 @@ function StructNode({ node, onChange, defaultName, level = 0 }) {
   );
 }
 
-/* ---------------------- Main Component ---------------------- */
 export default function ListImporter() {
   const [tableName, setTableName] = useState("my_table");
   const [fileName, setFileName] = useState("my_file.json");
@@ -238,16 +233,14 @@ export default function ListImporter() {
 
   const [entries, setEntries] = useState([]);
   const [newEntry, setNewEntry] = useState("");
-  const [newKey, setNewKey] = useState("");          // <-- dictionary key
+  const [newKey, setNewKey] = useState("");
   const [generated, setGenerated] = useState(null);
 
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [importType, setImportType] = useState("plain");
 
-  /* ------------ mode toggle ------------ */
   const [isDict, setIsDict] = useState(false);
 
-  /* ------------ CRUD helpers ------------ */
   const addString = () => {
     if (!newEntry.trim()) return;
     setEntries(prev => [...prev, { id: makeId(), type: "string", value: newEntry.trim(), key: newKey.trim() || `key_${prev.length}` }]);
@@ -275,7 +268,6 @@ export default function ListImporter() {
     if (idx === entries.length - 1) return; const copy = [...entries];[copy[idx + 1], copy[idx]] = [copy[idx], copy[idx + 1]]; setEntries(copy);
   };
 
-  /* ------------ Import: Plain JSON (list or dict) ------------ */
   const importPlainList = (raw) => {
     try {
       const parsed = JSON.parse(raw);
@@ -300,7 +292,6 @@ export default function ListImporter() {
         });
         setEntries(rebuilt);
       } else {
-        /* old list behaviour */
         let structCount = 0;
         const mapped = parsed.map((v) => {
           if (v && typeof v === "object") {
@@ -323,7 +314,6 @@ export default function ListImporter() {
     } catch (e) { alert("Invalid JSON"); }
   };
 
-  /* ------------ Import: Catweb JSON (reverse) ------------ */
   const importCatweb = (raw) => {
     try {
       const scripts = JSON.parse(raw);
@@ -347,7 +337,6 @@ export default function ListImporter() {
         });
       });
 
-      /* decide mode */
       const hasInsert = scripts.some(sc => (sc.content || []).some(b => (b.actions || []).some(a => (a.text || [])[0] === "Insert")));
       setIsDict(!hasInsert);
 
@@ -360,13 +349,13 @@ export default function ListImporter() {
         return node;
       };
 
-      if (hasInsert) { /* list mode */
+      if (hasInsert) {
         const rebuilt = inserts.map(val => {
           if (created.has(val)) return toStructNode(val, tables[val] || {});
           return { id: makeId(), type: "string", value: String(val) };
         });
         setEntries(rebuilt);
-      } else { /* dictionary mode */
+      } else {
         const rebuilt = Object.entries(tables[mainTable] || {}).map(([k, v]) => {
           if (created.has(v)) return { id: makeId(), key: k, ...toStructNode(v, tables[v] || {}) };
           return { id: makeId(), type: "string", key: k, value: String(v) };
@@ -377,7 +366,6 @@ export default function ListImporter() {
     } catch (e) { alert("Invalid Catweb JSON"); console.error(e); }
   };
 
-  /* ------------ Generator ------------ */
   const generateJson = () => {
     const usedIds = new Set();
     const randomId = () => { while (true) { const rid = Math.random().toString(36).slice(2, 8); if (!usedIds.has(rid)) { usedIds.add(rid); return rid; } } };
@@ -421,7 +409,6 @@ export default function ListImporter() {
       }
     });
 
-    /* same tiling logic as before */
     const contents2 = [];
     let actionsChunk = [{ ...actionsAll[0] }];
     let weightSum = 0; let blockCount = 0; let x = 0; let y = 0;
@@ -449,7 +436,6 @@ export default function ListImporter() {
     setGenerated(JSON.stringify(scripts, null, 2));
   };
 
-  /* ------------ Export helpers ------------ */
   const copyJson = () => { if (generated) navigator.clipboard.writeText(generated); };
   const downloadJson = () => {
     if (!generated) return;
@@ -458,7 +444,6 @@ export default function ListImporter() {
     const a = document.createElement("a"); a.href = url; a.download = fileName; a.click();
   };
 
-  /* ------------ Render ------------ */
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -476,7 +461,6 @@ export default function ListImporter() {
         </div>
       </div>
 
-      {/* Config Card */}
       <div className="bg-surface rounded-3xl p-6 shadow-xl shadow-gray-200/50 dark:shadow-none border border-border">
         <div className="grid gap-6 md:grid-cols-2 mb-6">
           <div className="space-y-1">
@@ -494,7 +478,6 @@ export default function ListImporter() {
           <button onClick={() => setIsDict(true)} className={`flex-1 sm:flex-none px-6 py-2 rounded-xl text-sm font-medium transition-all ${isDict ? "bg-white dark:bg-[#1C1C1E] text-gray-900 dark:text-white shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}>Dictionary Mode</button>
         </div>
 
-        {/* Advanced Toggle */}
         <div className="border-t border-border pt-4">
           <button onClick={() => setShowAdvanced(v => !v)} className="flex items-center gap-2 text-sm text-text-secondary hover:text-accent transition-colors font-medium">
             <Settings size={16} /> {showAdvanced ? "Hide" : "Show"} Advanced Settings
@@ -515,7 +498,6 @@ export default function ListImporter() {
         </div>
       </div>
 
-      {/* Add Entry Bar */}
       <div className="bg-surface rounded-3xl p-4 shadow-lg border border-border flex flex-col sm:flex-row gap-3 items-stretch">
         {isDict && <input className="sm:w-40 px-4 py-3 rounded-2xl bg-primary border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none" value={newKey} onChange={e => setNewKey(e.target.value)} placeholder="Key" />}
         <input className="flex-1 px-4 py-3 rounded-2xl bg-primary border-transparent focus:border-accent focus:bg-surface text-text-primary transition-all outline-none" value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder={isDict ? "Value (string)" : "New entry (string)"} />
@@ -523,7 +505,6 @@ export default function ListImporter() {
         <button onClick={addStruct} className="px-6 py-3 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-500/20 transition-colors flex items-center justify-center gap-2 whitespace-nowrap"><Plus size={18} /> Struct</button>
       </div>
 
-      {/* Entries List */}
       <div className="space-y-4">
         {entries.map((entry, idx) => (
           <motion.div layout key={entry.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-surface p-4 rounded-3xl border border-border shadow-sm hover:shadow-md transition-shadow">
@@ -561,7 +542,6 @@ export default function ListImporter() {
         )}
       </div>
 
-      {/* Generate Button Fixed or Sticky? Let's keep it at bottom for now but styled */}
       <div className="sticky bottom-6 z-20 flex justify-center pointer-events-none">
         <button onClick={generateJson} className="pointer-events-auto px-8 py-4 rounded-full bg-accent hover:bg-accent/90 text-white font-bold shadow-2xl shadow-accent/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 backdrop-blur-md">
           <Download size={20} /> Generate Catweb JSON

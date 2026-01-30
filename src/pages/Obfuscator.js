@@ -553,7 +553,6 @@ export default function Obfuscator() {
 
     return (
         <div className="space-y-12 max-w-7xl mx-auto py-12 px-4">
-            {/* Hero Section */}
             <motion.section
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -578,7 +577,6 @@ export default function Obfuscator() {
                 </p>
             </motion.section>
 
-            {/* Info Card */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -602,9 +600,7 @@ export default function Obfuscator() {
                 </div>
             </motion.div>
 
-            {/* Editor Section */}
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Input Panel */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -648,7 +644,6 @@ export default function Obfuscator() {
                     />
                 </motion.div>
 
-                {/* Output Panel */}
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -723,7 +718,6 @@ export default function Obfuscator() {
                 </motion.div>
             </section>
 
-            {/* Stats Cards */}
             <AnimatePresence>
                 {stats && (
                     <motion.section
@@ -748,7 +742,6 @@ export default function Obfuscator() {
                 )}
             </AnimatePresence>
 
-            {/* Action Button */}
             <section className="flex justify-center pt-4">
                 <motion.button
                     whileHover={{ scale: 1.02 }}

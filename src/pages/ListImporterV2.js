@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { Download, Copy, Edit, Trash2, ArrowUp, ArrowDown, Upload, Plus, ChevronDown, ChevronRight, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import JsonImportModal from "../components/ListJsonImport";
-// import KeyValueModal from "../components/KeyValueModal"
 
-/* ---------------------- Helpers ---------------------- */
 const numberToLetters = (n) => {
   let s = "";
   n = n + 1;
@@ -18,7 +16,6 @@ const numberToLetters = (n) => {
 
 const makeId = () => Math.random().toString(36).slice(2, 9);
 
-/* ---------------------- Modal: Key/Value ---------------------- */
 function KeyValueModal({ isOpen, onClose, onSave, initial = { key: "", value: "" }, title = "Add Field" }) {
   const [keyName, setKeyName] = useState(initial.key || "");
   const [value, setValue] = useState(initial.value || "");
@@ -67,7 +64,6 @@ function KeyValueModal({ isOpen, onClose, onSave, initial = { key: "", value: ""
   );
 }
 
-/* ---------------------- Recursive Struct Node ---------------------- */
 function StructNode({ node, onChange, defaultName, level = 0 }) {
   const [open, setOpen] = useState(true);
   const [kvOpen, setKvOpen] = useState(false);
@@ -180,7 +176,6 @@ function StructNode({ node, onChange, defaultName, level = 0 }) {
   );
 }
 
-/* ---------------------- Main Component ---------------------- */
 export default function ListImporter() {
   const [tableName, setTableName] = useState("my_table");
   const [fileName, setFileName] = useState("my_file.json");
@@ -198,7 +193,6 @@ export default function ListImporter() {
 
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [importType, setImportType] = useState("plain");
-
 
   const addString = () => {
     if (!newEntry.trim()) return;
@@ -234,7 +228,6 @@ export default function ListImporter() {
     setEntries(copy);
   };
 
-  /* ---------------------- Import: Plain JSON ---------------------- */
   const importPlainList = (raw) => {
     try {
       const arr = JSON.parse(raw);
@@ -264,7 +257,6 @@ export default function ListImporter() {
     }
   };
 
-  /* ---------------------- Import: Catweb JSON (reverse) ---------------------- */
   const importCatweb = (raw) => {
     try {
       const scripts = JSON.parse(raw);
@@ -336,8 +328,6 @@ export default function ListImporter() {
     }
   };
 
-
-  /* ---------------------- Generate Catweb JSON ---------------------- */
   const generateJson = () => {
     const usedIds = new Set();
     const randomId = () => {
@@ -401,7 +391,6 @@ export default function ListImporter() {
       } else if (e.type === "struct") {
         let name = e.name && e.name.trim() ? e.name.trim() : `item_${numberToLetters(autoStructCounter++)}`;
         const build = () => {
-          // const beforeLen = actionsAll.length;
           const actualName = createStructTable({ ...e, name }, name);
           return [
             {
@@ -436,7 +425,7 @@ export default function ListImporter() {
     let blockCount = 0, x = 0, y = 0;
     actionsChunk.push(actionsAll[0]);
     for (let i = 0; i < weightedInserts.length; i++) {
-      const { weight, /*build*/ } = weightedInserts[i];
+      const { weight,  } = weightedInserts[i];
       if (weightSum + weight > insertsPerBlock) {
         pushChunk(x, y);
         blockCount++;
@@ -444,7 +433,6 @@ export default function ListImporter() {
         if (x > xMax) { x = 0; y += blockHeight; }
       }
 
-      // const built = build();
     }
 
     const contents2 = [];
@@ -543,7 +531,6 @@ export default function ListImporter() {
     setGenerated(JSON.stringify(scripts, null, 2));
   };
 
-  /* ---------------------- Export helpers ---------------------- */
   const copyJson = () => { if (generated) navigator.clipboard.writeText(generated); };
   const downloadJson = () => {
     if (!generated) return;
@@ -555,12 +542,10 @@ export default function ListImporter() {
     a.click();
   };
 
-  /* ---------------------- Render ---------------------- */
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 text-gray-100 p-6">
       <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">List Importer</h1>
 
-      {/* Config */}
       <div className="grid gap-4 md:grid-cols-2 mb-2">
         <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
           value={tableName} onChange={e => setTableName(e.target.value)} placeholder="Main Table Name" />
@@ -568,7 +553,6 @@ export default function ListImporter() {
           value={fileName} onChange={e => setFileName(e.target.value)} placeholder="File Name (e.g., my_file.json)" />
       </div>
 
-      {/* Advanced */}
       <div className="mb-6">
         <button onClick={() => setShowAdvanced(v => !v)} className="flex items-center gap-2 dark:text-sm px-3 py-2 rounded bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-gray-100">
           <Settings size={16} /> {showAdvanced ? "Hide" : "Show"} Advanced Settings
@@ -608,7 +592,6 @@ export default function ListImporter() {
         </AnimatePresence>
       </div>
 
-      {/* Add Entry */}
       <div className="flex gap-2 mb-4">
         <input className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-gray-100"
           value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder="New entry (string)" />
@@ -616,7 +599,6 @@ export default function ListImporter() {
         <button onClick={addStruct} className="px-4 py-2 rounded bg-purple-600 text-white flex items-center gap-1"><Plus size={16} /> Add Struct</button>
       </div>
 
-      {/* Entries */}
       <div className="flex flex-col gap-3 mb-6">
         {entries.map((entry, idx) => (
           <div key={entry.id} className="p-3 rounded bg-gray-100 dark:bg-slate-800">
@@ -659,7 +641,6 @@ export default function ListImporter() {
         ))}
       </div>
 
-      {/* Import */}
       <div className="flex gap-2 mb-6 text-gray-900 dark:text-gray-100">
         <button
           onClick={() => { setImportType("plain"); setImportModalOpen(true); }}
@@ -677,7 +658,6 @@ export default function ListImporter() {
 
       </div>
 
-      {/* Generate */}
       <button onClick={generateJson} className="px-6 py-2 rounded bg-green-600 text-white mb-4">Generate Catweb JSON</button>
 
       {generated && (

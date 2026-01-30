@@ -2,14 +2,11 @@ import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Figma, Download, Copy, Check, RefreshCw, Eye, ChevronRight, ChevronDown, AlertCircle, Info } from "lucide-react";
 
-// Standard Roblox viewport size
 const ROBLOX_WIDTH = 1920;
 const ROBLOX_HEIGHT = 1080;
 
-// Helper to generate unique globalids
 const generateId = () => Math.random().toString(36).substr(2, 6);
 
-// Convert Figma color to hex
 const figmaColorToHex = (color) => {
     if (!color) return "#ffffff";
     const r = Math.round((color.r || 0) * 255);
@@ -18,7 +15,6 @@ const figmaColorToHex = (color) => {
     return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 };
 
-// Convert Figma node to CatWeb element
 const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, parentAbsolutePos = { x: 0, y: 0 }, rootSize = { width: 1920, height: 1080 }, useRobloxMode = false) => {
     if (!node) return null;
 
@@ -28,8 +24,6 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
         children: [],
     };
 
-    // Calculate position and size as UDim2
-    // Use absoluteBoundingBox for standard geometry, fallback to absoluteRenderBounds
     const bounds = node.absoluteBoundingBox || node.absoluteRenderBounds || { x: parentAbsolutePos.x, y: parentAbsolutePos.y, width: 100, height: 100 };
 
     const absX = bounds.x;
@@ -37,17 +31,13 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
     const width = bounds.width;
     const height = bounds.height;
 
-    // Relative to parent
     const relX = absX - parentAbsolutePos.x;
     const relY = absY - parentAbsolutePos.y;
 
     if (useRobloxMode) {
-        // Roblox Mode: Normalize to 1920x1080 using offsets
-        // Scale factor from design to Roblox viewport
         const scaleFactorX = ROBLOX_WIDTH / rootSize.width;
         const scaleFactorY = ROBLOX_HEIGHT / rootSize.height;
 
-        // Use the smaller scale factor to maintain aspect ratio
         const scaleFactor = Math.min(scaleFactorX, scaleFactorY);
 
         const offsetX = Math.round(relX * scaleFactor);
@@ -58,7 +48,6 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
         baseElement.position = `{0,${offsetX}},{0,${offsetY}}`;
         baseElement.size = `{0,${offsetWidth}},{0,${offsetHeight}}`;
     } else {
-        // Scale Mode: Pure percentages for responsive layouts
         const scaleX = (relX / parentSize.width).toFixed(4);
         const scaleY = (relY / parentSize.height).toFixed(4);
         const sizeScaleX = (width / parentSize.width).toFixed(4);
@@ -68,7 +57,6 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
         baseElement.size = `{${sizeScaleX},0},{${sizeScaleY},0}`;
     }
 
-    // Add Aspect Ratio Constraint to preserve design proportions
     if (width > 0 && height > 0) {
         baseElement.children.push({
             class: "UIAspectRatioConstraint",
@@ -77,13 +65,11 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
         });
     }
 
-    // Get background color
     if (node.fills && node.fills.length > 0 && node.fills[0].type === "SOLID") {
         baseElement.background_color = figmaColorToHex(node.fills[0].color);
         baseElement.background_transparency = String(1 - (node.fills[0].opacity || 1));
     }
 
-    // Get corner radius
     if (node.cornerRadius && node.cornerRadius > 0) {
         baseElement.children.push({
             class: "UICorner",
@@ -92,7 +78,6 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
         });
     }
 
-    // Get stroke/border
     if (node.strokes && node.strokes.length > 0 && node.strokes[0].type === "SOLID") {
         baseElement.children.push({
             class: "UIStroke",
@@ -103,7 +88,6 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
         });
     }
 
-    // Determine element class based on node type
     switch (node.type) {
         case "FRAME":
         case "GROUP":
@@ -135,7 +119,7 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
 
         case "IMAGE":
             baseElement.class = "ImageLabel";
-            baseElement.image = "rbxassetid://0"; // Placeholder - user needs to replace
+            baseElement.image = "rbxassetid://0";
             baseElement.scale_type = "Fit";
             break;
 
@@ -143,7 +127,6 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
             baseElement.class = "Frame";
     }
 
-    // Process children recursively
     if (node.children && node.children.length > 0) {
         const nodeSize = {
             width: width,
@@ -165,7 +148,6 @@ const convertNodeToCatWeb = (node, parentSize = { width: 1920, height: 1080 }, p
     return baseElement;
 };
 
-// TreeNode component for displaying Figma structure
 const TreeNode = ({ node, depth = 0 }) => {
     const [isExpanded, setIsExpanded] = useState(depth < 2);
     const hasChildren = node.children && node.children.length > 0;
@@ -223,13 +205,11 @@ export default function FigmaExporter() {
     const [copied, setCopied] = useState(false);
     const [useRobloxMode, setUseRobloxMode] = useState(false);
 
-    // Extract file key from Figma URL
     const extractFileKey = (url) => {
         const match = url.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/);
         return match ? match[1] : null;
     };
 
-    // Fetch Figma file data
     const fetchFigmaData = useCallback(async () => {
         const fileKey = extractFileKey(figmaUrl);
         if (!fileKey) {
@@ -262,16 +242,12 @@ export default function FigmaExporter() {
             const data = await response.json();
             setFigmaData(data);
 
-            // Convert to CatWeb format
-            // Find the first Page, then the first Frame/Component/Instance on that page
             const firstPage = data.document?.children?.[0];
             const rootNode = firstPage?.children?.find(c => ["FRAME", "COMPONENT", "INSTANCE", "GROUP"].includes(c.type)) || firstPage;
 
             if (rootNode) {
-                // Use rootNode's position as the absolute origin for the coordinate system
                 const origin = rootNode.absoluteBoundingBox || rootNode.absoluteRenderBounds || { x: 0, y: 0, width: 1920, height: 1080 };
 
-                // Normalizing to the rootNode's own size
                 const baseSize = {
                     width: origin.width || 1920,
                     height: origin.height || 1080
@@ -279,7 +255,6 @@ export default function FigmaExporter() {
 
                 const converted = convertNodeToCatWeb(rootNode, baseSize, origin, baseSize, useRobloxMode);
                 if (converted) {
-                    // Wrap in proper CatWeb structure
                     const catwebOutput = [
                         {
                             class: "Frame",
@@ -327,7 +302,6 @@ export default function FigmaExporter() {
 
     return (
         <div className="space-y-8 py-12">
-            {/* Header */}
             <motion.section
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -351,7 +325,6 @@ export default function FigmaExporter() {
                 </p>
             </motion.section>
 
-            {/* Main Content */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -359,7 +332,6 @@ export default function FigmaExporter() {
                 className="max-w-6xl mx-auto"
             >
                 <div className="bg-surface rounded-3xl border border-border overflow-hidden">
-                    {/* Input Section */}
                     <div className="p-6 border-b border-border space-y-4">
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
@@ -416,7 +388,6 @@ export default function FigmaExporter() {
                             </div>
                         )}
 
-                        {/* Roblox Mode Toggle */}
                         <div className="flex items-center justify-between p-4 bg-primary rounded-xl border border-border">
                             <div className="flex items-center gap-3">
                                 <label className="relative inline-flex items-center cursor-pointer">
@@ -443,10 +414,8 @@ export default function FigmaExporter() {
                         </div>
                     </div>
 
-                    {/* Results Section */}
                     {figmaData && (
                         <div className="grid md:grid-cols-2 divide-x divide-border">
-                            {/* Figma Tree View */}
                             <div className="p-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-bold text-text-primary">
@@ -463,7 +432,6 @@ export default function FigmaExporter() {
                                 </div>
                             </div>
 
-                            {/* CatWeb JSON Output */}
                             <div className="p-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-bold text-text-primary">
@@ -499,7 +467,6 @@ export default function FigmaExporter() {
                         </div>
                     )}
 
-                    {/* Empty State */}
                     {!figmaData && !loading && (
                         <div className="p-12 text-center">
                             <Figma size={48} className="mx-auto text-text-secondary/30 mb-4" />
@@ -510,7 +477,6 @@ export default function FigmaExporter() {
                     )}
                 </div>
 
-                {/* Info Cards */}
                 <div className="grid md:grid-cols-3 gap-4 mt-8">
                     <div className="bg-surface rounded-2xl border border-border p-5">
                         <h4 className="font-bold text-text-primary mb-2">📐 Size Conversion</h4>

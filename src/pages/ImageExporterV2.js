@@ -17,8 +17,6 @@ export default function ImageRichTextExporterHEXRLE() {
     const [warning, setWarning] = useState("");
     const [numTextboxes, setNumTextboxes] = useState(1);
 
-
-
     function ensureHex(s) {
         if (!s) return null;
         let x = s.trim();
@@ -50,7 +48,6 @@ export default function ImageRichTextExporterHEXRLE() {
     function onPickClick() {
         fileInputRef.current?.click();
     }
-
 
     function generate() {
         setWarning("");
@@ -128,7 +125,6 @@ export default function ImageRichTextExporterHEXRLE() {
 
         img.src = imageSrc;
     }
-
 
     function copyToClipboard() {
         if (!generated) return;
@@ -215,7 +211,6 @@ export default function ImageRichTextExporterHEXRLE() {
                                     onChange={(e) => setNumTextboxes(Math.max(1, Number(e.target.value)))}
                                     className="px-2 py-1 rounded bg-gray-100 dark:bg-slate-900"
                                 />
-
 
                                 <label className="text-xs">Output filename</label>
                                 <input value={fileName} onChange={(e) => setFileName(e.target.value)} className="px-2 py-1 rounded bg-gray-100 dark:bg-slate-900" />

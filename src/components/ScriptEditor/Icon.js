@@ -1,7 +1,6 @@
 import React from "react";
 import { ICONS, STYLING } from "./Constants";
 
-// Reusable Icon component
 export const Icon = ({ name, size = 18, className = "", style = {} }) => {
     const path = ICONS[name];
     if (!path) return null;
@@ -24,8 +23,6 @@ export const Icon = ({ name, size = 18, className = "", style = {} }) => {
     );
 };
 
-// Pill button with icon that expands to show text on hover
-// All variants now use consistent surface style
 export const PillButton = ({ icon, label, onClick, variant = "default", className = "" }) => {
     return (
         <button
@@ -51,7 +48,6 @@ export const PillButton = ({ icon, label, onClick, variant = "default", classNam
     );
 };
 
-// Simple icon-only pill for canvas controls
 export const IconPill = ({ icon, onClick, title, className = "" }) => (
     <button
         onClick={onClick}
@@ -71,7 +67,6 @@ export const IconPill = ({ icon, onClick, title, className = "" }) => (
     </button>
 );
 
-// Circular action button for blocks (delete/duplicate)
 export const CircleButton = ({ icon, onClick, title, danger = false, className = "" }) => (
     <button
         onClick={onClick}

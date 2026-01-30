@@ -8,7 +8,6 @@ export default function ThemeToggle() {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
 
-    // Close on click outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -62,7 +61,6 @@ export default function ThemeToggle() {
                                             : "hover:bg-surface-hover border-transparent"
                                         }`}
                                 >
-                                    {/* Palette Preview */}
                                     <div className="flex -space-x-1 shrink-0">
                                         <div className="w-6 h-6 rounded-full border border-border shadow-sm" style={{ backgroundColor: themeData.colors.background }} title="Background" />
                                         <div className="w-6 h-6 rounded-full border border-border shadow-sm" style={{ backgroundColor: themeData.colors.surface }} title="Surface" />

@@ -51,19 +51,6 @@ export const themes = {
             hover: "#e0ded9"
         }
     },
-    // monochrome_beach: {
-    //     name: "Monochrome Beach",
-    //     type: "dark",
-    //     colors: {
-    //         background: "#353535",
-    //         surface: "#284b63",
-    //         text: "#ffffff",
-    //         secondary: "#d9d9d9",
-    //         accent: "#3c6e71",
-    //         border: "#4a4a4a",
-    //         hover: "#3a6d89"
-    //     }
-    // },
     soft_lavender: {
         name: "Soft Lavender",
         type: "dark",
@@ -129,19 +116,6 @@ export const themes = {
             hover: "#f0e6c8"
         }
     },
-    // forest_hues: {
-    //     name: "Forest Hues",
-    //     type: "dark",
-    //     colors: {
-    //         background: "#283d3b",
-    //         surface: "#197278",
-    //         text: "#edddd4",
-    //         secondary: "#c44536",
-    //         accent: "#772e25",
-    //         border: "#3d5956",
-    //         hover: "#2a8288"
-    //     }
-    // },
     monochrome_harmony: {
         name: "Monochrome Harmony",
         type: "light",
@@ -181,19 +155,6 @@ export const themes = {
             hover: "#5f7191"
         }
     },
-    // playful_pastel: {
-    //     name: "Playful Pastel",
-    //     type: "light",
-    //     colors: {
-    //         background: "#f3de8a",
-    //         surface: "#fff9e6",
-    //         text: "#7e7f9a",
-    //         secondary: "#97a7b3",
-    //         accent: "#eb9486",
-    //         border: "#e0cd7a",
-    //         hover: "#f0e6b4"
-    //     }
-    // },
     vintage_coffee: {
         name: "Vintage Coffee",
         type: "light",
