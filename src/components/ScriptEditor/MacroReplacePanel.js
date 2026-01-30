@@ -1,9 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 
-// Macro comment identifier
 const MACRO_PREFIX = "#!";
 
-// Prebuilt macros (empty for now, can be extended)
 export const PREBUILT_MACROS = [];
 
 const MacroReplacePanel = ({
@@ -22,7 +20,6 @@ const MacroReplacePanel = ({
     const [newMacroName, setNewMacroName] = useState("");
     const [selectedFunctionEvent, setSelectedFunctionEvent] = useState(null);
 
-    // Find all macro comments in the script
     const macroComments = useMemo(() => {
         if (!scriptData) return [];
 
@@ -30,7 +27,6 @@ const MacroReplacePanel = ({
 
         scriptData.forEach((event) => {
             event.actions?.forEach((action, actionIdx) => {
-                // Comment action id is "124"
                 if (action.id === "124") {
                     const commentText = action.text?.[0];
                     if (typeof commentText === "object" && commentText.value?.startsWith(MACRO_PREFIX)) {
@@ -40,7 +36,6 @@ const MacroReplacePanel = ({
                         if (parts) {
                             const macroName = parts[1] || "";
                             const argsString = parts[2] || "";
-                            // Parse arguments like {arg1} {arg2}
                             const args = [...argsString.matchAll(/\{([^}]+)\}/g)].map(m => m[1]);
 
                             macros.push({
@@ -59,13 +54,11 @@ const MacroReplacePanel = ({
         return macros;
     }, [scriptData]);
 
-    // Find all "Define Function" events (id="6")
     const functionEvents = useMemo(() => {
         if (!scriptData) return [];
         return scriptData.filter((event) => event.id === "6");
     }, [scriptData]);
 
-    // Update highlighted macros when panel opens/closes
     React.useEffect(() => {
         if (isOpen) {
             setHighlightedMacros(macroComments.map(m => ({
@@ -77,23 +70,18 @@ const MacroReplacePanel = ({
         }
     }, [isOpen, macroComments, setHighlightedMacros]);
 
-    // Get all available macros (saved + prebuilt)
     const allMacros = useMemo(() => {
         return [...PREBUILT_MACROS, ...savedMacros];
     }, [savedMacros]);
 
-    // Handle macro replacement
     const handleReplaceMacro = useCallback((macroComment, selectedMacroDef) => {
         if (!selectedMacroDef) return;
 
-        // Find the source function event
         const sourceEvent = scriptData.find(e => e.globalid === selectedMacroDef.sourceEventId);
         if (!sourceEvent) return;
 
-        // Clone the actions from the function definition
         let newActions = JSON.parse(JSON.stringify(sourceEvent.actions || []));
 
-        // Replace argument placeholders with actual values
         if (selectedMacroDef.paramNames && macroComment.args) {
             newActions = newActions.map(action => {
                 const newAction = { ...action };
@@ -122,10 +110,8 @@ const MacroReplacePanel = ({
     const handleSaveMacro = () => {
         if (!selectedFunctionEvent || !newMacroName.trim()) return;
 
-        // Extract parameter names from the function definition
         const paramNames = [];
 
-        // Check for variable_overrides which contain parameters
         if (selectedFunctionEvent.variable_overrides) {
             selectedFunctionEvent.variable_overrides.forEach(override => {
                 if (override.name) paramNames.push(override.name);
@@ -148,20 +134,17 @@ const MacroReplacePanel = ({
 
     return (
         <div className="flex flex-col gap-3">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold" style={{ color: "var(--text)" }}>
                     Macro Replace
                 </h3>
             </div>
 
-            {/* Info */}
             <p className="text-xs" style={{ color: "var(--secondary)" }}>
                 Macro comments use <code className="px-1 py-0.5 rounded bg-black/10">{MACRO_PREFIX}</code> prefix.
                 Example: <code className="px-1 py-0.5 rounded bg-black/10">{MACRO_PREFIX} myMacro {"{"}"arg1{"}"} {"{"}"arg2{"}"}</code>
             </p>
 
-            {/* Detected Macros */}
             <div className="flex flex-col gap-2">
                 <span className="text-xs font-medium" style={{ color: "var(--secondary)" }}>
                     Detected Macro Comments ({macroComments.length})
@@ -215,7 +198,6 @@ const MacroReplacePanel = ({
                 )}
             </div>
 
-            {/* Saved Macros */}
             <div className="flex flex-col gap-2">
                 <span className="text-xs font-medium" style={{ color: "var(--secondary)" }}>
                     Available Macros ({allMacros.length})
@@ -243,7 +225,6 @@ const MacroReplacePanel = ({
                 )}
             </div>
 
-            {/* Quick Save from Function Events */}
             {functionEvents.length > 0 && (
                 <div className="flex flex-col gap-2">
                     <span className="text-xs font-medium" style={{ color: "var(--secondary)" }}>
@@ -282,7 +263,6 @@ const MacroReplacePanel = ({
                 </div>
             )}
 
-            {/* Save Macro Modal */}
             {showSaveModal && (
                 <div className="flex items-center gap-2 p-3 rounded-xl" style={{ backgroundColor: "var(--hover)" }}>
                     <input

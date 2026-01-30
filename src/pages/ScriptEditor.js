@@ -44,7 +44,6 @@ const convertTextToCatWeb = (textArr) => {
     if (typeof item === "object" && item !== null) {
       let value = item.value !== undefined ? item.value : "";
 
-      // Recursively handle tuples
       if (item.t === "tuple" && Array.isArray(value)) {
         value = value.map(tupleItem => {
           const result = { value: tupleItem.value !== undefined ? tupleItem.value : "" };
@@ -123,7 +122,6 @@ export default function ScriptEditor() {
   const [exportCopied, setExportCopied] = useState(false);
   const [importText, setImportText] = useState("");
 
-  // Tools state
   const [toolsOpen, setToolsOpen] = useState(false);
   const [activeTool, setActiveTool] = useState(null);
   const [searchMatches, setSearchMatches] = useState([]);
@@ -147,22 +145,18 @@ export default function ScriptEditor() {
     return () => observer.disconnect();
   }, []);
 
-  // Keyboard shortcuts for tools
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Ctrl+F - Open Find & Replace
       if ((e.ctrlKey || e.metaKey) && e.key === "f") {
         e.preventDefault();
         setToolsOpen(true);
         setActiveTool("multireplace");
       }
-      // Ctrl+H - Open Find & Replace (alternative)
       if ((e.ctrlKey || e.metaKey) && e.key === "h") {
         e.preventDefault();
         setToolsOpen(true);
         setActiveTool("multireplace");
       }
-      // Escape - Close active tool
       if (e.key === "Escape" && activeTool) {
         setActiveTool(null);
         setToolsOpen(false);
@@ -175,7 +169,6 @@ export default function ScriptEditor() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeTool]);
 
-  // Tool selection handler
   const handleToolSelect = useCallback((toolId) => {
     if (activeTool === toolId) {
       setActiveTool(null);
@@ -184,7 +177,6 @@ export default function ScriptEditor() {
     }
   }, [activeTool]);
 
-  // Close active tool
   const handleCloseTool = useCallback(() => {
     setActiveTool(null);
     setSearchMatches([]);
@@ -194,7 +186,6 @@ export default function ScriptEditor() {
     setHighlightedOccurrence(null);
   }, []);
 
-  // Replace single match
   const handleReplaceSingle = useCallback((match, newValue) => {
     setData((prev) => {
       const next = JSON.parse(JSON.stringify(prev));
@@ -233,13 +224,11 @@ export default function ScriptEditor() {
     });
   }, [selectedScriptIndex]);
 
-  // Replace all matches
   const handleReplaceAll = useCallback((replacements) => {
     setData((prev) => {
       const next = JSON.parse(JSON.stringify(prev));
       const script = next[selectedScriptIndex];
 
-      // Group replacements by segment to handle multiple matches in same field
       const groupedBySegment = new Map();
 
       replacements.forEach(r => {
@@ -250,7 +239,6 @@ export default function ScriptEditor() {
         groupedBySegment.get(key).push(r);
       });
 
-      // Process each segment's replacements in reverse order (to preserve indices)
       groupedBySegment.forEach((matches, key) => {
         matches.sort((a, b) => b.matchIndex - a.matchIndex);
 
@@ -290,12 +278,10 @@ export default function ScriptEditor() {
     });
   }, [selectedScriptIndex]);
 
-  // Save macro
   const handleSaveMacro = useCallback((macro) => {
     setSavedMacros(prev => [...prev.filter(m => m.name !== macro.name), macro]);
   }, []);
 
-  // Replace macro comment with macro actions
   const handleReplaceMacro = useCallback((macroComment, newActions) => {
     setData((prev) => {
       const next = JSON.parse(JSON.stringify(prev));
@@ -303,9 +289,7 @@ export default function ScriptEditor() {
       const event = script.content.find(e => e.globalid === macroComment.eventId);
 
       if (event && event.actions) {
-        // Remove the macro comment action
         event.actions.splice(macroComment.actionIndex, 1);
-        // Insert new actions at the same position
         const actionsWithIds = newActions.map(a => ({
           ...a,
           globalid: generateId(),
@@ -317,16 +301,13 @@ export default function ScriptEditor() {
     });
   }, [selectedScriptIndex]);
 
-  // Rename all occurrences
   const handleRenameAll = useCallback((oldName, newName) => {
-    // Escape special regex characters
     const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     setData((prev) => {
       const next = JSON.parse(JSON.stringify(prev));
       const script = next[selectedScriptIndex];
 
-      // Helper to replace both exact matches and variable references like {varName}
       const replaceInValue = (value) => {
         if (Array.isArray(value)) {
           return value.map(val => {
@@ -339,24 +320,19 @@ export default function ScriptEditor() {
 
         if (typeof value !== "string") return value;
 
-        // Replace exact match
         if (value === oldName) return newName;
 
-        // Replace variable references like {oldName} with {newName}
-        // This handles Catweb's variable reference syntax
         const regex = new RegExp(`\\{${escapeRegex(oldName)}\\}`, 'g');
         return value.replace(regex, `{${newName}}`);
       };
 
       script.content.forEach(event => {
-        // Check event text
         event.text?.forEach(seg => {
           if (typeof seg === "object" && seg.value) {
             seg.value = replaceInValue(seg.value);
           }
         });
 
-        // Check actions
         event.actions?.forEach(action => {
           action.text?.forEach(seg => {
             if (typeof seg === "object" && seg.value) {
@@ -365,7 +341,6 @@ export default function ScriptEditor() {
           });
         });
 
-        // Check variable overrides (function arguments)
         if (event.variable_overrides) {
           event.variable_overrides.forEach(override => {
             if (override.value) {
@@ -379,7 +354,6 @@ export default function ScriptEditor() {
     });
   }, [selectedScriptIndex]);
 
-  // Navigate to event (center canvas on it)
   const handleNavigateToEvent = useCallback((eventId) => {
     if (canvasRef.current && canvasRef.current.navigateToEvent) {
       canvasRef.current.navigateToEvent(eventId);
@@ -772,7 +746,6 @@ export default function ScriptEditor() {
           </div>
 
           <div className="flex flex-1 min-h-0" style={{ gap: GAP }}>
-            {/* Left Sidebar - Either BlockPalette or Tool Panel */}
             <div
               className="flex flex-col overflow-hidden transition-all duration-500"
               style={{
@@ -783,10 +756,8 @@ export default function ScriptEditor() {
                 backgroundColor: "var(--surface)",
               }}
             >
-              {/* When tool is active, show collapsible "Script Blocks" pill + tool panel */}
               {activeTool ? (
                 <div className="flex flex-col h-full">
-                  {/* Collapsible Script Blocks header */}
                   <button
                     onClick={handleCloseTool}
                     className="flex items-center justify-between gap-2 px-4 py-3 hover:brightness-95 transition-all"
@@ -800,7 +771,6 @@ export default function ScriptEditor() {
                     </span>
                   </button>
 
-                  {/* Tool Panel Content */}
                   <div className="flex-1 overflow-y-auto p-3">
                     {activeTool === "multireplace" && (
                       <MultiReplacePanel
@@ -845,7 +815,6 @@ export default function ScriptEditor() {
                   </div>
                 </div>
               ) : (
-                /* Normal BlockPalette when no tool is active */
                 <BlockPalette onDragStart={handlePaletteDragStart} onDeleteDrop={handleDeleteDrop} />
               )}
             </div>

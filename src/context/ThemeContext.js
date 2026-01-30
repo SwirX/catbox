@@ -4,7 +4,6 @@ import { themes } from '../constants/themes';
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-    // Initialize from localStorage or default to 'apple_light'
     const [currentThemeId, setCurrentThemeId] = useState(() => {
         return localStorage.getItem('catbox_theme') || 'apple_light';
     });
@@ -24,7 +23,6 @@ export const ThemeProvider = ({ children }) => {
         const root = document.documentElement;
         const colors = theme.colors;
 
-        // Apply CSS variables as RGB channels
         root.style.setProperty('--bg-primary', hexToRgb(colors.background));
         root.style.setProperty('--bg-surface', hexToRgb(colors.surface));
         root.style.setProperty('--text-primary', hexToRgb(colors.text));
@@ -33,14 +31,12 @@ export const ThemeProvider = ({ children }) => {
         root.style.setProperty('--border', hexToRgb(colors.border));
         root.style.setProperty('--bg-hover', hexToRgb(colors.hover));
 
-        // Handle "dark mode" class for Tailwind's convenience
         if (theme.type === 'dark') {
             root.classList.add('dark');
         } else {
             root.classList.remove('dark');
         }
 
-        // Persist
         localStorage.setItem('catbox_theme', currentThemeId);
 
     }, [currentThemeId, theme]);

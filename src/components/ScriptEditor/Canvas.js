@@ -35,10 +35,8 @@ const Canvas = forwardRef(({
     const offsetStartRef = useRef({ x: 0, y: 0 });
     const eventStartPosRef = useRef({ x: 0, y: 0 });
 
-    // Grid color based on theme
     const gridColor = isDarkTheme ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.08)";
 
-    // Center view on mount
     useEffect(() => {
         if (containerRef.current) {
             const rect = containerRef.current.getBoundingClientRect();
@@ -144,7 +142,6 @@ const Canvas = forwardRef(({
         }
     };
 
-    // Navigate to a specific event by centering on it
     const navigateToEvent = useCallback((eventId) => {
         const event = scriptData.find(e => e.globalid === eventId);
         if (event && containerRef.current) {
@@ -158,7 +155,6 @@ const Canvas = forwardRef(({
         }
     }, [scriptData, zoom]);
 
-    // Expose navigateToEvent via ref
     useImperativeHandle(ref, () => ({
         navigateToEvent,
     }), [navigateToEvent]);
@@ -202,7 +198,6 @@ const Canvas = forwardRef(({
                     backgroundColor: "var(--surface)",
                 }}
             >
-                {/* Center marker */}
                 <div
                     className="absolute w-3 h-3 rounded-full"
                     style={{
@@ -214,7 +209,6 @@ const Canvas = forwardRef(({
                 />
 
                 {scriptData.map((eventBlock, i) => {
-                    // Check if this event has any highlighted occurrences
                     const eventClickables = clickableNames.filter(c => c.eventId === eventBlock.globalid);
                     const hasNeonHighlight = highlightedOccurrence && highlightedOccurrence.eventId === eventBlock.globalid;
 
@@ -241,14 +235,12 @@ const Canvas = forwardRef(({
                 })}
             </div>
 
-            {/* Canvas Controls */}
             <div className="absolute bottom-3 right-3 flex gap-1.5">
                 <IconPill icon="zoomOut" onClick={handleZoomOut} title="Zoom Out" />
                 <IconPill icon="zoomIn" onClick={handleZoomIn} title="Zoom In" />
                 <IconPill icon="center" onClick={handleCenter} title="Center View" />
             </div>
 
-            {/* Zoom indicator */}
             <div
                 className="absolute bottom-3 left-3 px-2.5 py-1 text-[10px] font-medium rounded-full"
                 style={{

@@ -1,5 +1,17 @@
 # Catbox Changelog
 
+## 1.8.0
+- **Script Obfuscator**: New tool to protect CatWeb scripts with variable renaming, function splitting, and decoy comments.
+- **List Importer V3**:
+    - Full support for Dictionaries (Key-Value pairs).
+    - Recursive Struct editor for nested data.
+    - Improved CatWeb JSON re-importing.
+- **Figma Exporter**:
+    - Added **Roblox Mode** for 1920x1080 pixel-perfect normalization.
+    - Improved layer type detection (Group, Component, Instance).
+- **Under the Hood Documentation**: Detailed technical guides for all tools.
+- Removed all comments and AI-generated boilerplate from the codebase for a cleaner production state.
+
 ## 1.7.2
 - **Website UI Overhaul**: Complete redesign with modern aesthetics, glassmorphism, and improved navigation.
 - **AI Documentation Branding**: New dedicated page for AI-ready documentation (Credits to @sytesn).

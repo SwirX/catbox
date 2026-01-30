@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Icon from "./Icon";
 
-// Modifier buttons for search options
 const ModifierButton = ({ label, shortLabel, isActive, onClick, title }) => (
     <button
         onClick={onClick}
@@ -42,14 +41,12 @@ const MultiReplacePanel = ({
     const [useRegex, setUseRegex] = useState(false);
     const searchInputRef = useRef(null);
 
-    // Focus search input when panel opens
     useEffect(() => {
         if (isOpen && searchInputRef.current) {
             searchInputRef.current.focus();
         }
     }, [isOpen]);
 
-    // Build search pattern
     const buildSearchPattern = useCallback(() => {
         if (!searchTerm) return null;
 
@@ -57,7 +54,6 @@ const MultiReplacePanel = ({
             let pattern = searchTerm;
 
             if (!useRegex) {
-                // Escape regex special characters for literal search
                 pattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
             }
 
@@ -72,7 +68,6 @@ const MultiReplacePanel = ({
         }
     }, [searchTerm, caseSensitive, wholeWord, useRegex]);
 
-    // Find all matches in script data
     const findMatches = useCallback(() => {
         if (!searchTerm || !scriptData) {
             setSearchMatches([]);
@@ -88,7 +83,6 @@ const MultiReplacePanel = ({
 
         const matches = [];
 
-        // Helper to find matches in values (recursively for tuples)
         const scanValue = (value, type, eventId, actionIndex, segmentIndex, overrideIndex = null, path = []) => {
             if (typeof value === "string") {
                 const segMatches = [...value.matchAll(regex)];
@@ -104,7 +98,7 @@ const MultiReplacePanel = ({
                         matchText: match[0],
                         groups: match.slice(1),
                         value: value,
-                        path // To handle nested updates if needed
+                        path
                     });
                 });
             } else if (Array.isArray(value)) {
@@ -116,16 +110,13 @@ const MultiReplacePanel = ({
             }
         };
 
-        // Iterate through all events and their actions
         scriptData.forEach((event) => {
-            // Check event text inputs
             event.text?.forEach((seg, segIdx) => {
                 if (typeof seg === "object" && seg.value) {
                     scanValue(seg.value, "event", event.globalid, null, segIdx);
                 }
             });
 
-            // Check variable overrides (function arguments)
             if (event.id === "6" && event.variable_overrides) {
                 event.variable_overrides.forEach((override, idx) => {
                     if (override.value) {
@@ -134,7 +125,6 @@ const MultiReplacePanel = ({
                 });
             }
 
-            // Check action text inputs
             event.actions?.forEach((action, actionIdx) => {
                 action.text?.forEach((seg, segIdx) => {
                     if (typeof seg === "object" && seg.value) {
@@ -154,16 +144,13 @@ const MultiReplacePanel = ({
         }
     }, [scriptData, searchTerm, buildSearchPattern, setSearchMatches, currentMatchIndex, setCurrentMatchIndex]);
 
-    // Search when term or options change
     useEffect(() => {
         findMatches();
     }, [searchTerm, caseSensitive, wholeWord, useRegex, scriptData, findMatches]);
 
-    // Handle replace with regex capture group support
     const processReplaceTerm = (match) => {
         let result = replaceTerm;
 
-        // Replace @{n} or @n with capture groups
         result = result.replace(/@(\d+)/g, (_, num) => {
             const idx = parseInt(num, 10) - 1;
             return match.groups[idx] || "";
@@ -178,7 +165,6 @@ const MultiReplacePanel = ({
         const newValue = processReplaceTerm(match);
         onReplaceSingle(match, newValue);
 
-        // Move to next match or stay at current position
         if (searchMatches.length > 1) {
             setCurrentMatchIndex((prev) =>
                 prev >= searchMatches.length - 1 ? 0 : prev
@@ -197,7 +183,6 @@ const MultiReplacePanel = ({
         setCurrentMatchIndex(-1);
     };
 
-    // Sync current match with canvas navigation and highlight
     useEffect(() => {
         if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
             const match = searchMatches[currentMatchIndex];
@@ -221,14 +206,12 @@ const MultiReplacePanel = ({
 
     return (
         <div className="flex flex-col gap-3">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold" style={{ color: "var(--text)" }}>
                     Find & Replace
                 </h3>
             </div>
 
-            {/* Search Row */}
             <div className="flex items-center gap-2">
                 <div className="flex-1 relative">
                     <input
@@ -250,7 +233,6 @@ const MultiReplacePanel = ({
                             }
                         }}
                     />
-                    {/* Match count */}
                     <span
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
                         style={{ color: "var(--secondary)" }}
@@ -261,7 +243,6 @@ const MultiReplacePanel = ({
                     </span>
                 </div>
 
-                {/* Navigation */}
                 <button
                     onClick={goToPrevMatch}
                     disabled={searchMatches.length === 0}
@@ -282,7 +263,6 @@ const MultiReplacePanel = ({
                 </button>
             </div>
 
-            {/* Modifiers */}
             <div className="flex items-center gap-1.5">
                 <ModifierButton
                     label="Case Sensitive"
@@ -307,7 +287,6 @@ const MultiReplacePanel = ({
                 />
             </div>
 
-            {/* Replace Row */}
             <div className="flex items-center gap-2">
                 <input
                     type="text"
@@ -347,7 +326,6 @@ const MultiReplacePanel = ({
                 </button>
             </div>
 
-            {/* Regex help */}
             {useRegex && (
                 <p className="text-xs" style={{ color: "var(--secondary)" }}>
                     💡 Use <code className="px-1 py-0.5 rounded bg-black/10">@1</code>, <code className="px-1 py-0.5 rounded bg-black/10">@2</code> in replacement to reference capture groups.

@@ -19,7 +19,6 @@ const BlockInput = ({
     transition-colors duration-150
   `;
 
-    // Highlight styles
     const highlightStyle = isNeonHighlighted
         ? {
             borderRadius: "8px",

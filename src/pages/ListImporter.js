@@ -3,7 +3,7 @@ import { Download, Copy, Edit, Trash2, ArrowUp, ArrowDown, Upload } from "lucide
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 
 export default function ListImporter() {
- 
+
   const [tableName, setTableName] = useState("my_table");
   const [fileName, setFileName] = useState("my_file.json");
   const [insertsPerBlock, setInsertsPerBlock] = useState(300);
@@ -12,13 +12,11 @@ export default function ListImporter() {
   const [blockWidth, setBlockWidth] = useState(450);
   const [blockHeight, setBlockHeight] = useState(600);
 
- 
   const [entries, setEntries] = useState([]);
   const [newEntry, setNewEntry] = useState("");
   const [sortBy, setSortBy] = useState("last");
   const [sortDir, setSortDir] = useState("asc");
 
- 
   const [generated, setGenerated] = useState(null);
 
   const addEntry = () => {
@@ -143,7 +141,6 @@ export default function ListImporter() {
     a.click();
   };
 
- 
   const displayedEntries = [...entries].sort((a, b) => {
     if (sortBy === "name") {
       return sortDir === "asc" ? a.value.localeCompare(b.value) : b.value.localeCompare(a.value);
@@ -155,7 +152,6 @@ export default function ListImporter() {
     <div className="min-h-screen bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 p-6">
       <h1 className="text-2xl font-bold mb-4">List Importer</h1>
 
-      {/* Config Section */}
       <div className="grid gap-4 md:grid-cols-2 mb-6">
         <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" value={tableName} onChange={e => setTableName(e.target.value)} placeholder="Table Name" />
         <input className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" value={fileName} onChange={e => setFileName(e.target.value)} placeholder="File Name" />
@@ -166,13 +162,11 @@ export default function ListImporter() {
         <input type="number" className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" value={blockHeight} onChange={e => setBlockHeight(+e.target.value)} placeholder="Block Height" />
       </div>
 
-      {/* Add Entry */}
       <div className="flex gap-2 mb-4">
         <input className="flex-1 px-3 py-2 rounded bg-gray-100 dark:bg-slate-800" value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder="New entry" />
         <button onClick={addEntry} className="px-4 py-2 rounded bg-indigo-600 text-white">Add</button>
       </div>
 
-      {/* Sorting Controls */}
       <div className="flex gap-2 mb-4">
         <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="px-3 py-2 rounded bg-gray-100 dark:bg-slate-800">
           <option value="last">Last Added</option>
@@ -184,7 +178,6 @@ export default function ListImporter() {
         </select>
       </div>
 
-      {/* Entries */}
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="entries">
           {(provided) => (
@@ -213,7 +206,6 @@ export default function ListImporter() {
         </Droppable>
       </DragDropContext>
 
-      {/* Import Options */}
       <div className="flex gap-2 mb-6">
         <button onClick={() => {
           const raw = prompt("Paste plain list JSON");
@@ -225,7 +217,6 @@ export default function ListImporter() {
         }} className="px-4 py-2 rounded bg-gray-200 dark:bg-slate-700 flex items-center gap-1"><Upload size={16} /> Import Catweb</button>
       </div>
 
-      {/* Generate JSON */}
       <button onClick={generateJson} className="px-6 py-2 rounded bg-green-600 text-white mb-4">Generate JSON</button>
 
       {generated && (

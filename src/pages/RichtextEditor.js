@@ -16,8 +16,6 @@ import {
     Droplet
 } from 'lucide-react';
 
-// --- Constants ---
-
 const ROBLOX_FONTS = [
     'Arial', 'SourceSans', 'Roboto', 'Merriweather', 'NotoSans', 'ComicNeue',
     'Gotham', 'Arcade', 'Bangers', 'Creepster', 'DenkOne', 'Fondamento',
@@ -41,8 +39,6 @@ const PRESET_COLORS = [
     '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff',
     '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc',
 ];
-
-// --- Helper Components ---
 
 const ToolbarButton = ({ isActive, onClick, icon, label, showChevron, className = '', title }) => (
     <button
@@ -85,12 +81,10 @@ const RichTextEditor = () => {
     const editorRef = useRef(null);
     const containerRef = useRef(null);
 
-    // State
     const [activePopup, setActivePopup] = useState(null);
     const [editorFormats, setEditorFormats] = useState({});
     const [copied, setCopied] = useState(false);
 
-    // Close popups on outside click
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (activePopup && containerRef.current && !containerRef.current.contains(e.target)) {
@@ -101,12 +95,9 @@ const RichTextEditor = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [activePopup]);
 
-    // --- Core Editor Logic ---
-
     const updateActiveFormats = useCallback(() => {
         if (!document.queryCommandSupported('bold')) return;
 
-        // Native commands
         const formats = {
             bold: document.queryCommandState('bold'),
             italic: document.queryCommandState('italic'),
@@ -119,7 +110,6 @@ const RichTextEditor = () => {
             fontSize: document.queryCommandValue('fontSize'),
         };
 
-        // Custom styles via computed style of selection anchor
         const sel = window.getSelection();
         if (sel && sel.anchorNode) {
             const el = sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode;
@@ -160,29 +150,25 @@ const RichTextEditor = () => {
         updateActiveFormats();
     };
 
-    // --- HTML to Roblox XML Serializer ---
-
     const rgbToHex = (rgb) => {
         if (!rgb || rgb === 'rgba(0, 0, 0, 0)' || rgb === 'transparent' || rgb === 'none') return null;
         if (rgb.startsWith('#')) return rgb;
         const res = rgb.match(/\d+/g);
         if (!res || res.length < 3) return null;
-        // eslint-disable-next-line
         return '#' + res.slice(0, 3).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
     };
 
     const collectRuns = (node, parentStyle = {}) => {
         let runs = [];
-        if (node.nodeType === 3) { // Text Node
+        if (node.nodeType === 3) {
             if (node.textContent) runs.push({ text: node.textContent, style: { ...parentStyle } });
             return runs;
         }
-        if (node.nodeType !== 1) return runs; // Skip comments etc
+        if (node.nodeType !== 1) return runs;
 
         const style = { ...parentStyle };
         const comp = window.getComputedStyle(node);
 
-        // Extract styles
         if (comp.fontWeight >= 600 || comp.fontWeight === 'bold') style.bold = true;
         if (comp.fontStyle === 'italic') style.italic = true;
         if (comp.textDecorationLine.includes('underline') || node.tagName === 'U') style.underline = true;
@@ -208,7 +194,6 @@ const RichTextEditor = () => {
             if (match) style.stroke = rgbToHex(match[0]);
         }
 
-        // Children
         const isBlock = ['DIV', 'P', 'BR', 'LI'].includes(node.tagName);
         if (node.tagName === 'BR') runs.push({ text: '\n', style });
 
@@ -223,7 +208,6 @@ const RichTextEditor = () => {
         if (!editorRef.current) return '';
         const runs = collectRuns(editorRef.current);
 
-        // Merge runs
         const merged = [];
         if (runs.length) {
             let curr = runs[0];
@@ -238,7 +222,6 @@ const RichTextEditor = () => {
             merged.push(curr);
         }
 
-        // Generate XML
         let out = '';
         merged.forEach(r => {
             let txt = r.text
@@ -247,7 +230,7 @@ const RichTextEditor = () => {
                 .replace(/>/g, '&gt;')
                 .replace(/'/g, '&apos;')
                 .replace(/"/g, '&quot;')
-                .replace(/\u200B/g, ''); // Remove zero-width space
+                .replace(/\u200B/g, '');
 
             if (!txt) return;
 
@@ -281,12 +264,8 @@ const RichTextEditor = () => {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    // --- Render ---
-
-    // --- Render ---
     return (
         <div className="max-w-6xl mx-auto min-h-screen py-10 px-6 flex flex-col gap-6" ref={containerRef}>
-            {/* Title & Copy Action */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="space-y-1">
                     <h1 className="text-4xl font-extrabold tracking-tight text-text-primary flex items-center gap-3">
@@ -313,18 +292,14 @@ const RichTextEditor = () => {
                 </button>
             </div>
 
-            {/* Main Editor Card */}
             <div className="bg-surface rounded-[2rem] shadow-2xl border border-border overflow-visible flex flex-col z-20 h-[700px] transition-all">
 
-                {/* Visual Toolbar */}
                 <div className="px-3 py-3 border-b border-border bg-primary/80 backdrop-blur-xl rounded-t-[2rem] flex flex-wrap gap-1.5 items-center relative select-none z-30">
 
-                    {/* Clear */}
                     <div className="flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <ToolbarButton icon={<Eraser size={18} />} onClick={() => exec('removeFormat')} title="Clear Formatting" />
                     </div>
 
-                    {/* Font Dropdown */}
                     <div className="relative flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <div className="relative">
                             <ToolbarButton
@@ -351,7 +326,6 @@ const RichTextEditor = () => {
                             )}
                         </div>
 
-                        {/* Size Dropdown */}
                         <div className="w-px h-6 bg-border mx-1" />
 
                         <div className="relative">
@@ -379,7 +353,6 @@ const RichTextEditor = () => {
                         </div>
                     </div>
 
-                    {/* Base Styles */}
                     <div className="flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <ToolbarButton icon={<Bold size={18} />} isActive={editorFormats.bold} onClick={() => exec('bold')} title="Bold" />
                         <ToolbarButton icon={<Italic size={18} />} isActive={editorFormats.italic} onClick={() => exec('italic')} title="Italic" />
@@ -387,7 +360,6 @@ const RichTextEditor = () => {
                         <ToolbarButton icon={<Strikethrough size={18} />} isActive={editorFormats.strikethrough} onClick={() => exec('strikethrough')} title="Strikethrough" />
                     </div>
 
-                    {/* Colors & Highlights */}
                     <div className="flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <div className="relative">
                             <ToolbarButton
@@ -450,7 +422,6 @@ const RichTextEditor = () => {
                         </div>
                     </div>
 
-                    {/* Effects */}
                     <div className="flex items-center gap-1 bg-surface p-1 rounded-2xl border border-border">
                         <div className="relative">
                             <ToolbarButton
@@ -500,7 +471,6 @@ const RichTextEditor = () => {
                         </div>
                     </div>
 
-                    {/* Align */}
                     <div className="flex bg-surface border border-border rounded-2xl p-1">
                         <button className={`p-2 rounded-xl transition-all ${editorFormats.justifyLeft ? 'bg-surface-hover text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`} onClick={() => exec('justifyLeft')}><AlignLeft size={18} /></button>
                         <button className={`p-2 rounded-xl transition-all ${editorFormats.justifyCenter ? 'bg-surface-hover text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`} onClick={() => exec('justifyCenter')}><AlignCenter size={18} /></button>
@@ -509,7 +479,6 @@ const RichTextEditor = () => {
 
                 </div>
 
-                {/* Editor Surface */}
                 <div className="relative flex-1 overflow-hidden rounded-b-[2rem]">
                     <div
                         ref={editorRef}

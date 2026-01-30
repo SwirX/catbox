@@ -15,8 +15,6 @@ export default function ImageRichTextExporter() {
     const [origSize, setOrigSize] = useState({ w: 0, h: 0 });
     const [generated, setGenerated] = useState("");
     const [warning, setWarning] = useState("");
-    
-
 
     function ensureHex(s) {
         if (!s) return null;
@@ -50,7 +48,6 @@ export default function ImageRichTextExporter() {
         fileInputRef.current?.click();
     }
 
-
     function generate() {
         setWarning("");
         if (!imageSrc) return alert("No image loaded");
@@ -63,20 +60,16 @@ export default function ImageRichTextExporter() {
             const newH = Math.max(1, Math.round(img.height * scale));
             const renderedH = Math.max(1, Math.round(newH * Number(aspect)));
 
-
             const canvas = canvasRef.current || document.createElement("canvas");
             canvas.width = newW;
             canvas.height = newH;
             const ctx = canvas.getContext("2d");
-
 
             const bg = ensureHex(bgColor) || "#ffffff";
             ctx.fillStyle = bg;
             ctx.fillRect(0, 0, newW, newH);
 
             ctx.drawImage(img, 0, 0, newW, newH);
-
-
 
             const lines = [];
             for (let y = 0; y < renderedH; y++) {
@@ -94,10 +87,7 @@ export default function ImageRichTextExporter() {
             const finalText = lines.join("\n") + "\n";
             setGenerated(finalText);
 
-
             if (finalText.length > 16382) setWarning("Output exceeds 16k chars — may not fit a single Roblox TextLabel.");
-
-
 
             canvasRef.current = canvas;
         };

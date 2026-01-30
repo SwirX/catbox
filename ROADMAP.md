@@ -2,8 +2,8 @@
 
 ## Current Focus
 - **Tool Stability**: Finalizing the Script and Rich Text editors for production release.
-- **Figma Integration**: Improving layer mapping accuracy and support for complex shapes.
 - **UX Refinement**: Ensuring all tools follow the new design system consistently.
+- **Under the Hood Docs**: Technical documentation for developers.
 
 ## Future Goals
 
@@ -14,7 +14,6 @@
 
 ### 🎨 Design & Layout
 - **Figma Exporter V2**: Support for Gradients, UIStroke modes, and automatic Image ID mapping.
-- **Advanced Normalization**: Option to choose between absolute offset and relative scale-only positioning.
 - **Theme Builder**: Allow users to create and preview their own Catbox themes.
 
 ### 🤖 AI Documentation

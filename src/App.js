@@ -16,10 +16,8 @@ import Obfuscator from "./pages/Obfuscator";
 export default function App() {
   return (
     <Routes>
-      {/* Script Editor with its own layout handling for fullscreen */}
       <Route path="/script-editor" element={<ScriptEditor />} />
 
-      {/* All other routes with Layout */}
       <Route path="*" element={
         <Layout>
           <Routes>

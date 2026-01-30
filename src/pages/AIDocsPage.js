@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Download, Copy, Check, ExternalLink, Github } from "lucide-react";
 
-// CatWeb documentation content - credits to @sytesn (Discord) / https://github.com/quitism
 const DOCS = [
     {
         id: "catui",
@@ -15,7 +14,7 @@ const DOCS = [
 
 CatWeb is a Roblox game where players create 2D websites using JSON-based UI definitions. This document covers the UI/visual structure specification. For scripting logic, see the CatDocs reference.
 
-**Current Version:** v2.15.0.3  
+**Current Version:** v2.15.0.3
 **TLD:** \`.rbx\` (CatWeb-specific, not real internet TLD)
 
 ---
@@ -32,7 +31,6 @@ CatWeb is a Roblox game where players create 2D websites using JSON-based UI def
     "size": "{1,0},{1,0}",
     "background_color": "#1a1a1a",
     "children": [
-      // All your UI elements go here
     ]
   }
 ]
@@ -163,7 +161,7 @@ For the complete specification, download this file.
 
 **CatWeb** is a Roblox game where players create 2D websites using JSON-based UI and a visual block-based scripting system.
 
-**Current Version:** v2.15.0.3  
+**Current Version:** v2.15.0.3
 **TLD:** \`.rbx\` (CatWeb-specific, not real internet)
 
 ---
@@ -347,13 +345,10 @@ Scripts use a **mandatory array wrapper**:
 ## Variable Scoping
 
 \`\`\`json
-// Global (any script)
 {"value": "{globalVar}", "t": "any", "l": "any"}
 
-// Object (same script)  
 {"value": "{o!objectVar}", "t": "any", "l": "any"}
 
-// Local (same event)
 {"value": "{l!localVar}", "t": "any", "l": "any"}
 \`\`\`
 
@@ -414,7 +409,6 @@ export default function AIDocsPage() {
 
     return (
         <div className="space-y-12 py-12">
-            {/* Header */}
             <motion.section
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -428,17 +422,16 @@ export default function AIDocsPage() {
                 </div>
 
                 <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-text-primary">
-                    AI <span className="text-accent">Documentation</span>
+                    CatWeb <span className="text-accent">Documentation</span>
                 </h1>
 
                 <p className="text-xl md:text-2xl text-text-secondary font-medium max-w-2xl mx-auto leading-relaxed">
-                    CatWeb specification files for AI assistants and developers.
+                    CatWeb specification files for developers and creators.
                     <br className="hidden md:block" />
-                    Download or copy to use with your favorite AI tools.
+                    Download or copy to use with your favorite development tools.
                 </p>
             </motion.section>
 
-            {/* Attribution Banner */}
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -471,13 +464,11 @@ export default function AIDocsPage() {
                 </div>
             </motion.div>
 
-            {/* Doc Cards */}
             <motion.section variants={container} initial="hidden" animate="show">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {DOCS.map((doc) => (
                         <motion.div key={doc.id} variants={item}>
                             <div className="group h-full bg-surface rounded-3xl border border-border hover:border-accent/50 transition-all duration-300 hover:shadow-2xl hover:shadow-accent/10 overflow-hidden">
-                                {/* Card Header */}
                                 <div className="p-6 border-b border-border">
                                     <div className="flex items-start justify-between mb-4">
                                         <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-primary text-accent">
@@ -512,7 +503,6 @@ export default function AIDocsPage() {
                                     </p>
                                 </div>
 
-                                {/* Code Preview */}
                                 <div className="p-4 bg-primary/50 max-h-[300px] overflow-auto">
                                     <pre className="text-xs text-text-secondary font-mono whitespace-pre-wrap leading-relaxed">
                                         {doc.content.slice(0, 800)}
@@ -527,7 +517,6 @@ export default function AIDocsPage() {
                 </div>
             </motion.section>
 
-            {/* Usage Tips */}
             <motion.section
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -545,11 +534,11 @@ export default function AIDocsPage() {
                         </li>
                         <li className="flex items-start gap-3">
                             <span className="w-6 h-6 rounded-full bg-accent/20 text-accent flex items-center justify-center flex-shrink-0 text-sm font-bold">2</span>
-                            <span>Paste them into your AI assistant's context or attach as files</span>
+                            <span>Paste them into your developer's context or attach as files</span>
                         </li>
                         <li className="flex items-start gap-3">
                             <span className="w-6 h-6 rounded-full bg-accent/20 text-accent flex items-center justify-center flex-shrink-0 text-sm font-bold">3</span>
-                            <span>Ask the AI to generate CatWeb-compatible JSON based on these specs</span>
+                            <span>Generate CatWeb-compatible JSON based on these specs</span>
                         </li>
                     </ul>
                 </div>

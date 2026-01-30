@@ -48,7 +48,6 @@ export default function HomePage() {
             >
                 <div className="flex items-center justify-between mb-8 px-2">
                     <h2 className="text-3xl font-bold tracking-tight text-text-primary">All Tools</h2>
-                    {/* Optional: Add filter or view options here */}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -103,8 +102,8 @@ export default function HomePage() {
                     <motion.div variants={item}>
                         <ToolCard
                             icon={<BookOpen size={24} />}
-                            title="AI Documentation"
-                            description="CatWeb spec files for AI assistants. Download or copy for your prompts."
+                            title="CatWeb Documentation"
+                            description="CatWeb spec files for developers. Download or copy for your prompts."
                             path="/ai-docs"
                         />
                     </motion.div>

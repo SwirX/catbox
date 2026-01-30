@@ -7,7 +7,6 @@ const ContextMenu = ({ x, y, options, onClose }) => {
     const [menuPos, setMenuPos] = useState({ x, y });
 
     useEffect(() => {
-        // Adjust position to stay within viewport
         if (menuRef.current) {
             const rect = menuRef.current.getBoundingClientRect();
             let newX = x;
