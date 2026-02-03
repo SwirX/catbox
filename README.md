@@ -1,4 +1,5 @@
 # Catbox
+
 ![Vercel](https://img.shields.io/badge/Deployed%20On%20Vercel-000?style=flat-square&logo=vercel)
 ![License: MPL 2.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-blue.svg)
 
@@ -8,12 +9,14 @@
 
 ---
 
-![Catbox Hero Screenshot](./assets/catbox-hero.png)
+![Catbox Hero Screenshot](./assets/catbox-hero-split.png)
 
 ## Overview
+
 Catbox is an open-source web toolbox for Catweb users, hosted on Vercel. It provides multiple tools for managing JSON, images, scripts, and rich text for Roblox, as well as custom API interactions with Lyra. Users can use the site directly or self-host Catbox locally.
 
 ## Why Catbox
+
 Catbox streamlines your Catweb workflow by combining multiple essential tools in one open-source, browser-accessible platform.
 
 ## Tools
@@ -33,10 +36,13 @@ Catbox streamlines your Catweb workflow by combining multiple essential tools in
 ## Quick Start
 
 ### Use Online
+
 Visit [Catbox Live](https://sxcatbox.vercel.app/) and use any of the available tools directly. No installation required.
 
 ### Self-Host
+
 1. Clone the repository:  
+
     ```bash
    git clone https://github.com/SwirX/catbox.git
    cd catbox
@@ -47,22 +53,40 @@ Visit [Catbox Live](https://sxcatbox.vercel.app/) and use any of the available t
    ```bash
    npm i
    ```
+
 3. Run the development server:
 
    ```bash
    npm start
    ```
+
 4. Open your browser at `http://localhost:3000` to view Catbox locally.
 
 > **Note:** Copy `.env.example` to `.env` to configure optional tool credentials (e.g., Figma API). The site runs with reduced functionality without them.
 
 ## Tech Stack
 
-* **Frontend:** React + Tailwind CSS
-* **Node:** v24.7.0
-* **npm:** 11.6.0
+- **Frontend:** React + Tailwind CSS
+- **Node:** v24.7.0
+- **npm:** 11.6.0
 
 > Some testing scripts were made in Python but are **not included** in the repo.
+
+## Themes
+
+<details>
+<summary>Click to view some available themes</summary>
+<br>
+
+| Coastal Vibes | Midnight Gold | Fiery Ocean |
+| :---: | :---: | :---: |
+| ![Coastal Vibes](./assets/images/coastal-vibes.png) | ![Midnight Gold](./assets/images/midnight-gold.png) | ![Fiery Ocean](./assets/images/fiery-ocean.png) |
+
+| Rustic Charm | Monochrome Harmony | Summer Breeze |
+| :---: | :---: | :---: |
+| ![Rustic Charm](./assets/images/rustic-charm.png) | ![Monochrome Harmony](./assets/images/monochrome-harmony.png) | ![Summer Breeze](./assets/images/summer-breeze.png) |
+
+</details>
 
 ## Contribution
 
@@ -70,8 +94,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for gu
 
 ## Changelog & Features
 
-* See [CHANGELOG.md](./CHANGELOG.md) for updates and history.
-* See [FEATURE\_IDEAS.md](./FEATURE_IDEAS.md) for roadmap suggestions.
+- See [CHANGELOG.md](./CHANGELOG.md) for updates and history.
+- See [FEATURE\_IDEAS.md](./FEATURE_IDEAS.md) for roadmap suggestions.
 
 ## Roadmap
 
@@ -82,10 +106,12 @@ See [ROADMAP.md](./ROADMAP.md) for upcoming features, WIP tools, and long-term v
 Catbox is open-source under the [Creative Commons Attribution-NonCommercial 4.0 International](./LICENSE). You can contribute and use the code freely but **cannot monetize it directly**.
 
 ## Credits
+
 - Image Exporter (original [Python version](https://github.com/quitism/catweb/blob/main/ascii.py)) by [quitism](https://github.com/quitism)
 - AI Documentation files by [sytesn](https://github.com/quitism) (quitism)
 - Inspiration and ideas from Catweb community
 
 ## Contact
-* GitHub: [SwirX](https://github.com/SwirX)
-* Discord: `.swirx`
+
+- GitHub: [SwirX](https://github.com/SwirX)
+- Discord: `.swirx`
